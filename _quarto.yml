@@ -1,0 +1,16 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  navbar:
+    right:
+      - about.qmd
+      - icon: github
+        href: https://github.com//saunteringcat
+      - icon: twitter
+        href: https://twitter.com/saunteringcat
+format:
+  html:
+    theme: flatly
+    css: styles.css
