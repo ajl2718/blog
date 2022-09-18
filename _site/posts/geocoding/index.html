@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Alex Lee">
+<meta name="dcterms.date" content="2021-03-14">
+
+<title>Meanderings in data - A simple geocoder using Postgres and Python</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Meanderings in data</span>
+  </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">About</a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//saunteringcat"><i class="bi bi-github" role="img">
+</i> 
+ </a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/saunteringcat"><i class="bi bi-twitter" role="img">
+</i> 
+ </a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">A simple geocoder using Postgres and Python</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">python</div>
+    <div class="quarto-category">postgres</div>
+    <div class="quarto-category">geospatial</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Alex Lee </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 14, 2021</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<p>For a work project last year we needed to create at short notice a geocoder for Victorian addresses. While there are a number of open source options such as <a href="https://github.com/openvenues/libpostal">libpostal</a>, we decided to take a different approach, following the ideas in the paper <a href="https://arxiv.org/abs/1708.01402">Exploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes</a>. This allowed us to create a proof-of-concept within a few days and was relatively simple to code from scratch, using Python and Postgres.</p>
+<h1>
+An observation about street addresses
+</h1>
+<p>The paper is partly based on some observations about the statistics of street addresses which imply significant amount of redundancy in the way they are described. For example:</p>
+<blockquote class="blockquote">
+<p>Based on the <a href="https://data.gov.au/dataset/ds-dga-19432f89-dc3a-4ef3-b943-5326ef1dbecc/details">January 2021 release of the GNAF</a> there are 3,839,496 addresses in Victoria. 516,926 of which (i.e., over 13%) are uniquely defined by three numbers: flat number, street number and postcode.</p>
+</blockquote>
+<p>As a result, <strong>these addresses can be identified irrespective of typographical errors in the street name, suburb or other text</strong>. Furthermore, even where the text is necessary to identify an address, often only a subset of the text is needed, and this is generally the parts of the text that occur relatively infrequently.</p>
+<h1>
+The algorithm: general idea
+</h1>
+<p>The authors of the paper use this idea as the starting point for a geocoding algorithm (actually an address linking algorithm in their paper) that has some nice properties:</p>
+<ul>
+<li>It can be coded up in SQL in a few queries;</li>
+<li>There is no need to <em>standardize</em> the addresses, i.e., to identify each of the address components and then re-write in a way that can be linked to the GNAF;</li>
+<li>It can be scaled up to allow for fast linking of large datasets (as the title suggests).</li>
+</ul>
+<p>Despite its simplicity it works surprisingly well and at least for me was a good project for getting more hands-on experience using Postgres.</p>
+<p>Based on these ideas, the authors developed a simple geocoding algorithm that represents each address in terms of <em>rare phrases</em>, i.e., pairs of consecutive tokens that occur below a certain frequency, along with other infrequently occuring elements.</p>
+<h1>
+The algorithm: details and implementation
+</h1>
+<p>Here are the basic steps of the algorithm for geocoding street addresses:</p>
+<ol type="1">
+<li>Create a database to store the GNAF data;</li>
+<li>For both the input addresses and GNAF create corresponding <strong>phrase tables</strong> which generate the phrases for each address, i.e., the pairs of consecutive tokens;</li>
+<li>An <strong>inverted index</strong> is generated on the phrases which maps each phrase to a set of addresses that contain these phrases;</li>
+<li>The inverted index tables for the input addresses and GNAF addresses are then linked, only considering those that appear below a certain frequency. This has the advantage of only requiring searches over a small subset of addresses. The result is a set of <strong>candidate matches</strong> for each of the input addresses;</li>
+<li>For each input address a <strong>similarity score is calculated</strong> with its set of candidate addresses. We used the <em>similarity</em> function from <em>pg_tgrm</em> module;</li>
+<li>As a final step, an additional constraint on the numeric tokens is imposed: <strong>the set of numeric tokens in the input address has to be a subset of those in the matched address</strong>. This ensures, for example, that the unit numbers are correct.</li>
+</ol>
+<p>The paper has SQL code for most of these steps, with the exception of the GNAF setup and the numerical constraint.</p>
+<p>I have written a Python module for geocoding that implements this algorithm in Postgres thanks to the nice <a href="https://pypi.org/project/results/">results library</a>. It is available in the repo <a href="https://github.com/saunteringcat/PhraseGeocoder">PhraseGeocoder</a>.</p>
+<h1>
+Summary and extensions to the algorithm
+</h1>
+<p>I found this an instructive project for learning more about Postgres, in particular things like Common Table Expressions, string similarity and operations that I wasn’t at all familiar with.</p>
+<p>There are a few obvious ways that this algorithm can be extended:</p>
+<ul>
+<li>Intead of using pairs of <em>consecutive</em> tokens as phrases, use pairs of <em>next-to-nearest neighbour</em> phrases.</li>
+<li>To better handle certain spelling errors, particularly those that occur in the text that is needed for the matching, construct phrases based on trigrams.</li>
+<li>Chain together a sequence of geocoding algorithms, so that with higher data quality addresses can be geocoded by the faster phrase-based geocoder and the lower quality ones then get filtered out and geocoded by the slower but more accurate trigram based geocoder (or another variant).</li>
+</ul>
+<p>Some of these variations I have coded up and will upload them at a later date.</p>
+<h1>
+References
+</h1>
+<ul>
+<li><a href="https://arxiv.org/abs/1708.01402">Exploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes</a></li>
+<li><a href="https://github.com/saunteringcat/PhraseGeocoder">Github repo for PhraseGeocoder</a></li>
+</ul>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

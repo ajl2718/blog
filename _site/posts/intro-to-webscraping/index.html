@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Alex Lee">
+<meta name="dcterms.date" content="2021-01-01">
+
+<title>Meanderings in data - Intro to webscraping</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Meanderings in data</span>
+  </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">About</a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//saunteringcat"><i class="bi bi-github" role="img">
+</i> 
+ </a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/saunteringcat"><i class="bi bi-twitter" role="img">
+</i> 
+ </a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Intro to webscraping</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">python</div>
+    <div class="quarto-category">webscraping</div>
+    <div class="quarto-category">requests</div>
+    <div class="quarto-category">open data</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Alex Lee </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 1, 2021</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<p>Webscraping involves writing small programs to automatically extract data from websites. It’s an extremely useful technique for creating large aggregated datasets using publicly available data as it’s inexpensive and fast. With the large amount of data available in the public domain it can also be the best way to obtain up-to-date and complete data for a given task.</p>
+<p>There are plenty of applications of webscraping, across domains ranging from <strong>economic statistics</strong> to <strong>data journalism</strong> to <strong>compliance monitoring</strong>. Here are some specific ones:</p>
+<ul>
+<li><a href="https://www.abs.gov.au/articles/web-scraping-australian-cpi">Estimating the Consumer Price Index</a></li>
+<li><a href="https://commoncrawl.org/">Creating aggregated datasets</a> for research and machine learning training</li>
+<li>Monitoring business openings and closures</li>
+<li><a href="https://www.realestate.com.au">Tracking house prices</a></li>
+<li>Identifying <a href="https://www.abc.net.au/news/2020-12-14/jobs-ads-targeting-migrant-workers-offering-below-minimum-wage/12976454">under-payment of wages</a> through <a href="https://www.gumtree.com.au">job listings</a></li>
+<li><a href="https://www.ons.gov.uk/file?uri=/aboutus/transparencyandgovernance/datastrategy/datapolicies/webscrapingpolicy/webscrapingcoronavirusupdate.pdf">COVID-19 response</a></li>
+</ul>
+<p>Learning the basics is straightforward and requires only a few lines of Python. The main challenge is identifying the relevant snippets of HTML, JSON or Javascript containing the data you are looking for; this is usually the most time-consuming part as well.</p>
+<p>In this tutorial I will give an introduction to webscraping using two simple examples. All the code is in a <a href="https://github.com/saunteringcat/python_learning/blob/master/Intro_to_webscraping_010121.ipynb">Jupyter Notebook</a>.</p>
+<section id="ethics-and-best-practices" class="level2">
+<h2 class="anchored" data-anchor-id="ethics-and-best-practices">Ethics and best practices</h2>
+<p>Before we begin, there are some general tips to ensure you’re doing the right thing:</p>
+<ul>
+<li>Read the <strong>robots.txt</strong> file: this is found at <em>(domain name of website)/robots.txt</em>. It will tell you which parts of the website can and can’t be scraped;</li>
+<li><strong>Only make a single request to the website at a given time</strong>. This helps to avoid placing too much load on the server;</li>
+<li>Read the website <strong>Terms and Conditions</strong>, particularly if you are planning to use the data for commercial purposes.</li>
+</ul>
+<p>The UK Office of National Statistics has a handy <a href="https://www.ons.gov.uk/aboutus/transparencyandgovernance/datastrategy/datapolicies/webscrapingpolicy">Webscraping Policy</a> too. Unfortunately, no Australian jurisdiction appears to have created anything similar.</p>
+<p>Now, let’s begin. ## Install the relevant libraries We’ll need <a href="https://pandas.pydata.org/">Pandas</a> and <a href="https://lxml.de/">LXML</a> for data wrangling and <a href="https://requests.readthedocs.io/en/master/">Requests</a> to make HTTP requests.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pip install requests</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>pip install pandas</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pip install lxml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="make-your-first-http-request" class="level2">
+<h2 class="anchored" data-anchor-id="make-your-first-http-request">Make your first HTTP request</h2>
+<p>Open up a Python terminal and type the following code</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>import requests</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>url = 'https://www.abc.net.au'</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>page = requests.get(url)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>print(f'Status: {page.status_code}')</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If everything is working you should get:</p>
+<blockquote class="blockquote">
+<p>Status: 200</p>
+</blockquote>
+<p>There are a few different HTTP Verbs: <em>GET</em>, <em>POST</em>, <em>DELETE</em>, <em>PUT</em> and others. I have only ever used <em>GET</em> and <em>POST</em> (when you have to send some data). If you get a response code other than <strong>200</strong> then generally something has gone wrong. Here’s a <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status">full list of HTTP response codes</a>.</p>
+</section>
+<section id="first-example-create-a-dataset-of-lonely-dogs" class="level2">
+<h2 class="anchored" data-anchor-id="first-example-create-a-dataset-of-lonely-dogs">First example: Create a dataset of lonely dogs</h2>
+<p>In this first example let’s scrape <a href="https://www.petrescue.com.au">Pet Rescue</a>, a site containing profiles of dogs and cats (and other animals) available for adoption. Perhaps we want a dataset of images of cats and dogs to <strong>train an object detection algorithm</strong>, or a dataset of <strong>common pet names</strong>, or maybe just want to know how the available pets are <strong>distributed throughout Australia.</strong></p>
+<section id="inspecting-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="inspecting-the-data">Inspecting the data</h3>
+<p>Once you’re at the website, open up the Inspector (<strong>Tools → Web Developer → Inspector</strong> in Firefox) or Developer Tools (<strong>View → Developer → Developer Tools</strong> in Chrome).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="inspector_firefox2.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">The Inspector is located under Tools and Web Developer</figcaption><p></p>
+</figure>
+</div>
+<p>Then click on the ‘dogs’ link to get to the first page of ‘dog profiles’. You will see the window at the bottom under the <strong>Network</strong> tab fill up with links corresponding to different elements of the website. Note that the actual content will look slightly different as the pet listings change over time. Doing this we find the HTML snippet that relates to one of the dogs.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="dog_listing.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Some cute dogs looking for a new home</figcaption><p></p>
+</figure>
+</div>
+<p>Click on the ‘dogs’ row under the Network tab (it should be the first row) and then <strong>Response</strong> and <strong>Response payload</strong> in the window on the right. This will show the HTML for the web page. We can do a quick search to get the name, location and characteristics of one of the dog profiles.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="html_snippet_chase.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">The HTML snippet corresponding to the entry for ‘Chase’</figcaption><p></p>
+</figure>
+</div>
+<p>The entries for each of the dogs has the same structure and from this we can extract all the names, sizes and locations.</p>
+</section>
+<section id="using-lxml-to-extract-the-relevant-data" class="level3">
+<h3 class="anchored" data-anchor-id="using-lxml-to-extract-the-relevant-data">Using LXML to extract the relevant data</h3>
+<p>Now we know where the relevant data is located, we can define some <a href="https://lxml.de">LXML</a> paths to extract it. An alternative is <a href="https://www.crummy.com/software/BeautifulSoup/">Beautiful Soup</a>. Here are LXML paths for the name and location data:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>name_path = '//article[@class="cards-listings-preview"]/a/header/h3/text()'</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>location_path = '//strong[@class="cards-listings-preview__content__section__location"]/text()'</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The LXML syntax can appear a bit clunky but the <em>name_path</em> variable is saying to look for every instance of the <em>article</em> tag with class value “cards-listing-preview” then look at the <em>a</em> tag below this, followed by the <em>header</em> tag, the <em>h3</em> tag and then the text within this.</p>
+<p>The code for extracting the names and locations is then:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>from lxml import html</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>import requests</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>url = 'https://www.petrescue.com.au/listings/search/dogs'</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>page = requests.get(url)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>tree = html.fromstring(page.text)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>names = tree.xpath(name_path)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>locations = tree.xpath(location_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Because of the <code>&lt;i&gt;</code> tags we get additional strings returned in the location_path so we take every second one. The full Python code to get all the data from a single page is then:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>from lxml import html</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>import requests</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>url = 'https://www.petrescue.com.au/listings/search/dogs'</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>page = requests.get(url)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>tree = html.fromstring(page.text)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>name_path = '//article[@class="cards-listings-preview"]/a/header/h3/text()'</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>location_path = '//strong[@class="cards-listings-preview__content__section__location"]/text()'</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>names = tree.xpath(name_path)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>locations = tree.xpath(location_path)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>locations = locations[1::2]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Skipping to the next page, the url is <code>https://www.petrescue.com.au/listings/search/dogs?page=2</code> so we can scrape all the pages by looping over a range of integers and, for each request, appending an integer to the base url <code>https://www.petrescue.com.au/listings/search/dogs?page=</code>. Let’s add in this bit of code:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>from lxml import html</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>import requests</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>import pandas as pd</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>url_base = 'https://www.petrescue.com.au/listings/search/dogs?page='</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>name_path = '//article[@class="cards-listings-preview"]/a/header/h3/text()'</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>location_path = '//strong[@class="cards-listings-preview__content__section__location"]/text()'</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>all_names = []</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>all_locations = []</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>for n in range(1, 50):</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    print(f'Scraping page: {n}')</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    url = f'{url_base}{n}'</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    page = requests.get(url)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    tree = html.fromstring(page.text)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    names = tree.xpath(name_path)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    locations = tree.xpath(location_path)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    locations = locations[1::2]</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    all_names += names</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    all_locations += locations</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>I like to print out which page is being scraped for debugging purposes and also as a sort of progress indicator. Finally, once we’ve scraped all this data, we can add put it all into a nice tidy Pandas Dataframe (with a tiny bit of text processing to remove unwanted spaces and new lines characters):</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df = pd.DataFrame(data={'name': all_names, 'location': all_locations})</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df['name'] = df['name'].str.strip()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>df['location'] = df['location'].str.strip()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>And we have a nice tidy dataset of dog names and locations. Here are the first five rows:</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>name</th>
+<th>location</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Teddy Yoric</td>
+<td>Brunswick, VIC</td>
+</tr>
+<tr class="even">
+<td>Tilly Goldsworthy</td>
+<td>Richmond, VIC</td>
+</tr>
+<tr class="odd">
+<td>Marnie &amp; Panda Wazowski</td>
+<td>Hampton, VIC</td>
+</tr>
+<tr class="even">
+<td>Bear Hartwell</td>
+<td>Altona Meadows, VIC</td>
+</tr>
+<tr class="odd">
+<td>Shayla Caballero</td>
+<td>Clifton Hill, VIC</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="second-example-atm-locations-in-australia" class="level2">
+<h2 class="anchored" data-anchor-id="second-example-atm-locations-in-australia">Second example: ATM locations in Australia</h2>
+<p>For this example we’ll extract JSON data, which is usually a bit easier to work with than HTML as it’s naturally represented as Python dictionaries. We’ll do this by scraping all National Australia Bank ATMs.</p>
+<p>Firstly, with the developer tools / inspector open, navigate to <a href="https://www.nab.com.au/locations">https://www.nab.com.au/locations</a>. In the inspector select the <strong>XHR</strong> tab in the right-hand pane. The reasoning is that, since there is a store locator in the page, there is an API behind the scenes that is delivering this data.</p>
+<p>Scrolling through the different files we inspect the response provided by each. We find that file ‘4000?v=1’ produces a nice nested data structure of what appears to be locations and names of ATMs and branches. Clicking through to the headers tab we find the URL is:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>https://api.nab.com.au/info/nab/location/locationType/atm+brc/queryType/geo/-37.7787919055083/144.92910033652242/-37.74062261073386/144.99833566347752/1/4000?v=1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>There is also some header information that we may need, so we include this too.</p>
+<p>Notice that four of the numbers in the URL look like latitude and longitude values and so these likely describe a bounding box for the search area. Since we are interested in all the ATMs and branches in the country we expand it to a box that encompasses all of Australia. The maximum and minimum latitude and longitude values of this bounding box are:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>lat_min, lng_min = -43.834124, 114.078644</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>lat_max, lng_max = -10.400824, 154.508331</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The code to scrape the locations of all NAB ATMS (which can in this case be done in only a single request) is:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>import requests</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>import pandas as pd</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>lat_min, lng_min = -43.834124, 114.078644</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>lat_max, lng_max = -10.400824, 154.508331</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>url = f'https://api.nab.com.au/info/nab/location/locationType/atm+brc/queryType/geo/{lat_min}/{lng_min}/{lat_max}/{lng_max}/1/4000?v=1'</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>headers = {'Host': 'api.nab.com.au', </span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>'Origin': 'https://www.nab.com.au', </span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>'Referer': 'https://www.nab.com.au/',</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>'x-nab-key': 'a8469c09-22f8-45c1-a0aa-4178438481ef'}</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>page = requests.get(url=url, headers=headers)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>data = page.json()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Notice that since the output of the HTTP request is in JSON format it can immediately be converted to a Python dict. It is now a matter of finding where the location information is.</p>
+<p>The final Python code is:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>import requests</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>import pandas as pd</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>lat_min, lng_min = -43.834124, 114.078644</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>lat_max, lng_max = -10.400824, 154.508331</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>url = f'https://api.nab.com.au/info/nab/location/locationType/atm+brc/queryType/geo/{lat_min}/{lng_min}/{lat_max}/{lng_max}/1/4000?v=1'</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>headers = {'Host': 'api.nab.com.au', </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>'Origin': 'https://www.nab.com.au', </span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>'Referer': 'https://www.nab.com.au/',</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>'x-nab-key': 'a8469c09-22f8-45c1-a0aa-4178438481ef'}</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>page = requests.get(url=url, headers=headers)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>data = page.json()</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>df = pd.json_normalize(data['locationSearchResponse']['locations'])</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>df = df[['atm.address1', 'atm.suburb', 'atm.state', 'atm.postcode', 'atm.latitude', 'atm.longitude']].dropna()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The <code>json_normalize</code> method in Pandas is a handy way to flatten the nested JSON data into a flat data structure. Now we have a nice tidy data frame with the address, latitude and longitude of each ATM:</p>
+<table class="table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 14%">
+<col style="width: 13%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 19%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>atm.address1</th>
+<th>atm.suburb</th>
+<th>atm.state</th>
+<th>atm.postcode</th>
+<th>atm.latitude</th>
+<th>atm.longitude</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Brunswick City Centre, 94 Sydney Road</td>
+<td>Brunswick</td>
+<td>VIC</td>
+<td>3056</td>
+<td>-37.775660</td>
+<td>144.961047</td>
+</tr>
+<tr class="even">
+<td>406 Sydney Road</td>
+<td>Coburg</td>
+<td>VIC</td>
+<td>3058</td>
+<td>-37.743756</td>
+<td>144.966389</td>
+</tr>
+<tr class="odd">
+<td>406 Sydney Road</td>
+<td>Coburg</td>
+<td>VIC</td>
+<td>3058</td>
+<td>-37.743756</td>
+<td>144.966389</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="summary-and-general-tips" class="level2">
+<h2 class="anchored" data-anchor-id="summary-and-general-tips">Summary and General tips</h2>
+<p>That’s enough of an intro to get started. Using a couple of examples, we’ve covered the basics of scraping HTML and JSON, and parsing the data into tidy form using LXML and Pandas. To summarise:</p>
+<ul>
+<li>Remember to check the Terms and Conditions, robots.txt file and consider the application that you are using the data for;</li>
+<li>The developer tools in the browser are a good way to identify the relevant elements in the web site;</li>
+<li>There is fair amount of hack-work required to find where the relevant data is, and it changes from website to website. The two examples here illustrate how scraping works for a fair number of different websites;</li>
+<li>Those with store locators or unofficial APIs are generally much easier to scrape as the data is already in a relatively structured form.</li>
+</ul>
+<p>To make things easy, all the code in this post is available in a (hopefully) easy-to-follow <a href="https://github.com/saunteringcat/python_learning/blob/master/Intro_to_webscraping_010121.ipynb">Jupyter Notebook</a>.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
