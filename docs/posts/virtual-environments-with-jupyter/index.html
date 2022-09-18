@@ -193,12 +193,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<p>Virtual environments are a way of collecting all the packages you need for a given software project into one place, in such a way that it can be isolated from other software projects. For example, recently I have been experimenting with several different libraries for natural language processing and machine learning: <a href="https://docs.fast.ai">Fast AI</a>, <a href="https://pytorch.org">PyTorch</a>, <a href="https://spacy.io">spaCy</a>. Installing all of them turns out to cause conflicts: one project may require one set of versions for the libraries and another requires a different set of versions.</p>
+<p>Virtual environments are a way of collecting all the packages you need for a given software project into one place, in such a way that they can be isolated from other software projects. For example, recently I have been experimenting with several different libraries for natural language processing and machine learning: <a href="https://docs.fast.ai">Fast AI</a>, <a href="https://pytorch.org">PyTorch</a>, <a href="https://spacy.io">spaCy</a>. Installing all of them turns out to cause conflicts: one project may require one set of versions for the libraries and another requires a different set of versions.</p>
 <p>Furthermore, I mostly rely on Jupyter Notebooks, as they allow you to quickly experiment, which is a requirement for data science work. Since I keep forgetting how to set up a virtual environment that is accessible from Jupyter Notebook, I thought it would be a good idea to record this here to quickly remind myself.</p>
 <section id="create-the-environment-and-install-the-required-packages" class="level2">
 <h2 class="anchored" data-anchor-id="create-the-environment-and-install-the-required-packages">Create the environment and install the required packages</h2>
 <ol type="1">
-<li>Firstly make sure that conda is installed. The instructions are available here: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html</li>
+<li>Firstly make sure that conda is installed. The instructions are available here: <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html">conda installation</a></li>
 <li>Next, create a virtual environment form conda. Here we will just call is ds_project1 and use Python 3.8:</li>
 </ol>
 <div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>conda create -n ds_project1 python=3.8</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
