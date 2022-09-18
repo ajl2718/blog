@@ -193,7 +193,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<p>Working with sensitivity data, such as in healthcare, requires additional security in the environments that data science work is done in. Often I am forced to do my data science work using virtual machines which are isolated from the public internet. This introduces many limitations to data science workflows, one in particular being the ability to perform geospatial analysis and visualisation. Packages like <a href="https://python-visualization.github.io/folium/">Folium</a> require access to a web mapping service to download the map tiles for an area of interest. I therefore had to find a way around this.</p>
+<p>Working with sensitive data, such as in healthcare, requires additional security in the environments that data science work is done in. Often I am forced to do my data science work using virtual machines which are isolated from the public internet. This introduces many limitations to data science workflows, one in particular being the ability to perform geospatial analysis and visualisation. Packages like <a href="https://python-visualization.github.io/folium/">Folium</a> require access to a web mapping service to download the map tiles for an area of interest. I therefore had to find a way around this.</p>
 <p>After some experimentation, I found a combination of <a href="https://contextily.readthedocs.io/en/latest/">contextily</a> and <a href="https://geopandas.org/">geopandas</a> were suitable as they allow you to download the map tiles and then plot them along with any data. There are two steps here:</p>
 <ul>
 <li>Use contextily to download the map tiles that are required for your application</li>
