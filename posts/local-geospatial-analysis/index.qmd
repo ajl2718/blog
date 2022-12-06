@@ -3,7 +3,7 @@ title: "Geospatial analysis in a secure environment"
 author: "Alex Lee"
 date: "2022-05-14"
 categories: [python, geospatial]
-image: greater_melbourne_example.png
+image: melbourne_new.png
 ---
 
 Working with sensitivity data, such as in healthcare, requires additional security in the environments that data science work is done in. Often I am forced to do my data science work using virtual machines which are isolated from the public internet. This introduces many limitations to data science workflows, one in particular being the ability to perform geospatial analysis and visualisation. Packages like [Folium](https://python-visualization.github.io/folium/) require access to a web mapping service to download the map tiles for an area of interest. I therefore had to find a way around this.
