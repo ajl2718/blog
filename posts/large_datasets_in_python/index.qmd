@@ -1,0 +1,9 @@
+---
+title: "Out-of-core data science workflows in Python"
+author: "Alex Lee"
+date: "2023-06-03"
+categories: [python, polars, duckdb, large data]
+---
+
+For a work project last year we needed to create at short notice a geocoder for Victorian addresses. While there are a number of open source options such as [libpostal](https://github.com/openvenues/libpostal), we decided to take a different approach, following the ideas in the paper [Exploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes](https://arxiv.org/abs/1708.01402). This allowed us to create a proof-of-concept within a few days and was relatively simple to code from scratch, using Python and Postgres.
+

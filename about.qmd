@@ -8,25 +8,25 @@ about:
       href: https://twitter.com/saunteringcat
     - icon: github
       text: Github
-      href: https://github.com/saunteringcat
+      href: https://github.com/ajl2718
 
 ---
 
-I am currently a Research Fellow in Cancer Services and Data Science at the University of Melbourne. My research focuses on applications of machine learning and statistical methods to linked health services data in order to improve cancer outcomes.
+I am a Research Fellow in Cancer Services and Data Science at the University of Melbourne and VCCC. In My research focuses on applications of machine learning and statistical methods to linked health services data in order to improve cancer outcomes.
 
-This blog is less related to my academic research and more to general tech, programming and data topics. It is really just a place to record some interesting things I have learnt about. I find it helpful to write up what I learn in order to test and clarify my own understanding; hopefully some of these articles will be useful for others too. 
+This blog relates more to general tech, programming and data topics, rather than academia - just a place to record some interesting things I have learned. Hopefully some of these articles will be useful for others too. 
 
-My background is in maths and physics and I completed my PhD back in 2015. Since then I have worked in a range of data science roles, working in the areas of signal processing, geospatial analysis and over the past few years, clinical data science. My main interests are in clinical data science, machine learning and statistics, both in the science sense and also in building useful, tools to make data science work easier. I also enjoy occasionally tinkering with open data.
+My background is in maths and physics and I completed my PhD back in 2015. Since then I have worked in a range of data science roles, working in the areas of signal processing, geospatial analysis and over the past few years, clinical data science. My main interests are in clinical data science, machine learning and statistics.
 
 *** 
 
-A couple of open source projects I have worked on, mostly still in an early form:
+A github project I'm currently developing
 
-- [Loupe](https://github.com/saunteringcat/loupe): a Python package for detecting and redacting Personally Identifiable Information (PII) from text to faciliate data sharing;
-- [PhraseGeocoder](https://github.com/saunteringcat/phrasegeocoder): a geocoding package built using Python and PostgreSQL for Australian street addresses, based on recent research on record linkage algorithms. 
+- [Whereabouts](https://github.com/ajl2718/whereabouts): a fast open-source geocoding package built using Python and DuckDB that can be run in your own environment.
+
 
 Some other things I like: mountains; cycling; middle-eastern cooking experiments and anything involving eggplant; reading; and music.
 
 ***
 
-![Some mountains in Georgia](georgia1.jpg)
+![Meandering in Chile](chile_lago_grey.jpg)
