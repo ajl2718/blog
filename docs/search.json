@@ -198,8 +198,8 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Data meanderings",
+    "title": "Articles",
     "section": "",
-    "text": "Larger than memory datasets in Python using Polars\n\n\n\n\n\n\nAlex Lee\n\n\nMar 31, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nVirtual environments with Jupyter Notebooks\n\n\n\n\n\n\nAlex Lee\n\n\nJul 9, 2022\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nGeospatial analysis in a secure environment\n\n\n\n\n\n\nAlex Lee\n\n\nMay 14, 2022\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSetting up a scratch space using Poetry, Docker and Jupyter\n\n\n\n\n\n\nAlex Lee\n\n\nApr 2, 2021\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nA simple geocoder using Postgres and Python\n\n\n\n\n\n\nAlex Lee\n\n\nMar 14, 2021\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nIntro to webscraping\n\n\n\n\n\n\nAlex Lee\n\n\nJan 1, 2021\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nRegular lattice shapefiles with geopandas\n\n\n\n\n\n\nAlex Lee\n\n\nDec 31, 2020\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "Larger than memory datasets in Python using Polars\n\n\n\n\n\n\n\n\n\n\n\nMar 31, 2024\n\n\nAlex Lee\n\n\n\n\n\n\n\n\n\n\n\n\nVirtual environments with Jupyter Notebooks\n\n\n\n\n\n\n\n\n\n\n\nJul 9, 2022\n\n\nAlex Lee\n\n\n\n\n\n\n\n\n\n\n\n\nGeospatial analysis in a secure environment\n\n\n\n\n\n\n\n\n\n\n\nMay 14, 2022\n\n\nAlex Lee\n\n\n\n\n\n\n\n\n\n\n\n\nSetting up a scratch space using Poetry, Docker and Jupyter\n\n\n\n\n\n\n\n\n\n\n\nApr 2, 2021\n\n\nAlex Lee\n\n\n\n\n\n\n\n\n\n\n\n\nA simple geocoder using Postgres and Python\n\n\n\n\n\n\n\n\n\n\n\nMar 14, 2021\n\n\nAlex Lee\n\n\n\n\n\n\n\n\n\n\n\n\nIntro to webscraping\n\n\n\n\n\n\n\n\n\n\n\nJan 1, 2021\n\n\nAlex Lee\n\n\n\n\n\n\n\n\n\n\n\n\nRegular lattice shapefiles with geopandas\n\n\n\n\n\n\n\n\n\n\n\nDec 31, 2020\n\n\nAlex Lee\n\n\n\n\n\n\nNo matching items"
   }
 ]
