@@ -1,5 +1,5 @@
 ---
-title: "Meandering in data"
+title: "Data meanderings"
 listing:
   contents: posts
   sort: "date desc"
