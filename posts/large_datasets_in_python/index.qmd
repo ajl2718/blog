@@ -9,7 +9,7 @@ format:
     code-links:
       - text: Polars vs Pandas
         icon: file-code
-        href: https://github.com/saunteringcat/python_learning/blob/master/polars_vs_pandas_020424.ipynb
+        href: https://github.com/ajl2718/python_learning/blob/master/polars_vs_pandas.ipynb
 ---
 
 While Pandas is still the go-to Python package for data analysis, there are now a new generation of data analysis tools which are much faster and better suited to working with data that is larger than the available memory. It isn't unusual to encounter a dataset around 10Gb in size which is usually just large enough to be awkward to work with on a single machine.
