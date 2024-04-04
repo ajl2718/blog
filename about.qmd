@@ -1,7 +1,7 @@
 ---
 title: "About"
 about:
-  template: solana
+  template: trestles
   links:
     - icon: twitter
       text: Twitter
@@ -9,24 +9,21 @@ about:
     - icon: github
       text: Github
       href: https://github.com/ajl2718
+  image: chile_lago_grey.jpg
 
 ---
 
-I am a Research Fellow in Cancer Services and Data Science at the University of Melbourne and VCCC. In My research focuses on applications of machine learning and statistical methods to linked health services data in order to improve cancer outcomes.
+In my day job I am a data scientist who works with linked healthcare data for cancer research, applying machine learning and statistical methods to improve cancer outcomes.
 
-This blog relates more to general tech, programming and data topics, rather than academia - just a place to record some interesting things I have learned. Hopefully some of these articles will be useful for others too. 
+This blog relates more to general tech, programming and data topics, rather than academia; the purpose is to record some interesting things I learn, which are hopefully useful to others too.
 
-My background is in maths and physics and I completed my PhD back in 2015. Since then I have worked in a range of data science roles, working in the areas of signal processing, geospatial analysis and over the past few years, clinical data science. My main interests are in clinical data science, machine learning and statistics.
+My background is in maths and physics and since around 2015 I have been in the data world, working on projects involving signal processing, geospatial analysis and over the past few years, clinical data science. My main interests are in data science, particularly the methodological aspects of statistics and machine learning, and also tools that can help to faciliate the grunt work that is common in data science (especially in the healthcare area).
 
 *** 
 
-A github project I'm currently developing
+Here is a github project I've been working on for open-source geocoding, since I couldn't find any good open-source geocoding libraries and prefer not to pay:
 
-- [Whereabouts](https://github.com/ajl2718/whereabouts): a fast open-source geocoding package built using Python and DuckDB that can be run in your own environment.
+- [whereabouts](https://github.com/ajl2718/whereabouts): a fast open-source geocoding package built using Python and DuckDB that can be run in your own environment.
 
 
-Some other things I like: mountains; cycling; middle-eastern cooking experiments and anything involving eggplant; reading; and music.
-
-***
-
-![Meandering in Chile](chile_lago_grey.jpg)
+Some other things I like: mountains; cycling; middle-eastern cooking experiments; reading; and music.

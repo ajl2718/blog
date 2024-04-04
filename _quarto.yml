@@ -1,16 +1,22 @@
 project:
   type: website
   output-dir: docs
-
 website:
+  open-graph: true
   navbar:
+    title: "Meanderings in data"
+  #  background: secondary
+    search: true
+    collapse: true
     right:
       - about.qmd
       - icon: github
-        href: https://github.com//saunteringcat
+        href: https://github.com/ajl2718
       - icon: twitter
         href: https://twitter.com/saunteringcat
 format:
   html:
-    theme: flatly
+    theme: simplex
+    anchor-sections: true
     css: styles.css
+    highlight-style: dracula

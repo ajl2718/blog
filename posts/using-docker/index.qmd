@@ -3,6 +3,7 @@ title: "Setting up a scratch space using Poetry, Docker and Jupyter"
 author: "Alex Lee"
 date: "2021-04-02"
 categories: [python, docker, jupyter]
+image: whiteboard.jpg
 ---
 
 Often I want to experiment with a new Python package but don't want to have to set up a virtual environment, or affect the packages that I already have installed on my system. Jupyter Notebooks provide a great interface for quickly testing out new features of a library but using them inside a virtual environment can also be a pain. 

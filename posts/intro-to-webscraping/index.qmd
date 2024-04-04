@@ -4,6 +4,12 @@ author: "Alex Lee"
 date: "2021-01-01"
 categories: [python, webscraping, requests, open data]
 image: html_snippet_chase.png
+format:
+  html:
+    code-links:
+      - text: Webscraping notebook
+        icon: file-code
+        href: https://github.com/saunteringcat/python_learning/blob/master/Intro_to_webscraping_010121.ipynb
 ---
 
 Webscraping involves writing small programs to automatically extract data from websites. It's an extremely useful technique for creating large aggregated datasets using publicly available data as it's inexpensive and fast. With the large amount of data available in the public domain it can also be the best way to obtain up-to-date and complete data for a given task.
@@ -31,6 +37,7 @@ Before we begin, there are some general tips to ensure you're doing the right th
 The UK Office of National Statistics has a handy [Webscraping Policy](https://www.ons.gov.uk/aboutus/transparencyandgovernance/datastrategy/datapolicies/webscrapingpolicy) too. Unfortunately, no Australian jurisdiction appears to have created anything similar.
 
 Now, let's begin.
+
 ## Install the relevant libraries
 We'll need [Pandas](https://pandas.pydata.org/) and [LXML](https://lxml.de/) for data wrangling and [Requests](https://requests.readthedocs.io/en/master/) to make HTTP requests.
 
