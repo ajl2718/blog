@@ -1,9 +1,10 @@
 ---
-title: "Data meanderings"
+title: "Articles"
 listing:
   contents: posts
   sort: "date desc"
-  type: grid
+  type: table
+  fields: [date, title, categories]
   categories: false
   sort-ui: false
   filter-ui: false

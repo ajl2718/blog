@@ -4,8 +4,8 @@ project:
 website:
   open-graph: true
   navbar:
-    title: "Meanderings in data"
-  #  background: secondary
+    background: "#DDDDDD"
+    title: "Data meanderings"
     search: true
     collapse: true
     right:
@@ -19,4 +19,4 @@ format:
     theme: simplex
     anchor-sections: true
     css: styles.css
-    highlight-style: dracula
+ #   highlight-style: dracula
