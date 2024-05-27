@@ -6,6 +6,8 @@ categories: [python, polars, large data]
 image: GettyImages-1296252531.jpg
 format:
   html:
+    toc: true
+    toc-location: left
     code-links:
       - text: Polars vs Pandas
         icon: file-code
@@ -57,7 +59,7 @@ A nicer way of writing this code is to chain these statements into a single quer
 ```default
 gnaf.query('POSTCODE == 3000').groupby('STREET_NAME').size().sort_values(ascending=False)
 ```
-Notice that this uses the **query** method to filter the addresses and then a sequence of methods to carry the remaining operations. In a slightly more readable form
+Notice that this uses the `query` method to filter the addresses and then a sequence of methods to carry the remaining operations. In a slightly more readable form
 
 ```default
 (
@@ -68,7 +70,7 @@ Notice that this uses the **query** method to filter the addresses and then a se
     .sort_values(ascending=False)
 )
 ```
-This sequence of transformation now reads as a single 'recipe' with each transformation appearing in a single line, making it all much easier to interpret. It more closely resembles **dplyr** code in R and as we see, Polars code. It also avoids creating unneccessary variables and memory in the intermediate steps. So far, so good.
+This sequence of transformation now reads as a single 'recipe' with each transformation appearing in a single line, making it all much easier to interpret. It more closely resembles **dplyr** code in R and as we will see later, Polars code. It also avoids creating unneccessary variables and memory in the intermediate steps. So far, so good.
 
 Let's answer another question: What is the distribution of starting letters for streets in New South Wales?
 
@@ -96,7 +98,7 @@ gnaf = pl.read_csv('GNAF_CORE.psv', separator='|', infer_schema_length=10000)
 gnaf.shape
 ```
 
-The first thing you should notice is the speed in loading the csv. We'll to a comparison with Pandas later.
+The first thing you should notice is the speed in loading the csv. We'll do a comparison with Pandas later.
 
 ```default
 (
@@ -139,7 +141,7 @@ t2 = time()
 print(t2-t1)
 ```
 
-On my Macbook M3, Polars takes around 1.7seconds and Pandas around 39.1 seconds, so Polars is over 20 times faster at loading this csv file!
+On my Macbook M3, Polars takes around 1.7s and Pandas around 39.1s, so Polars is over 20 times faster at loading this csv file!
 
 ```default
 t1 = time()
@@ -198,9 +200,9 @@ print(t2-t1)
 
 ## Another speed up: parquet files
 
-Rather than using csv files we can convert them to parquet. This is a binary file format that represents tabular datasets as columns rather than rows; both of these properties result in smaller file sizes that are quicker to load. A better explanation of why this is the case can be found in [this article](https://wesmckinney.com/blog/python-parquet-multithreading/) by Wes McKinney, the creator of Pandas.
+Rather than using csv files we can convert them to parquet. This is a binary file format that represents tabular datasets as columns rather than rows; both of these properties result in smaller file sizes that are quicker to load and faster to analyse. A more in-depth  explanation for why this is the case can be found in [this article](https://wesmckinney.com/blog/python-parquet-multithreading/) by Wes McKinney, the creator of Pandas.
 
-The original file is 3.2Gb in csv format but when converted to parquet it's 970Mb. This is a pretty decent saving on space. From experience Parquet files can be up to 10% the size of csv file.
+The original file is 3.2Gb in csv format but when converted to parquet it's 970Mb. This is a decent saving on space. From experience Parquet files can be up to 10% the size of csv file.
 
 ```default
 # load in pandas
@@ -237,7 +239,7 @@ t2 = time()
 print(t2 - t1)
 ```
 
-The only difference is that a ```collect()``` method is appended to the end of the query so that it actually runs. The result: only 0.08 seconds! I was surprised about how much faster this is. Let's see how fast the earlier query runs:
+The only difference is that a `collect()` method is appended to the end of the query so that it actually runs. The result: only 0.08 seconds! I was surprised about how much faster this is. Let's see how fast the earlier query runs:
 
 ```default
 t1 = time()
@@ -284,7 +286,9 @@ nyc_taxis.select(pl.median('fare_amount')).collect()
 )
 ```
 
-There are around 1.4 billion trips,  with a median fare of $9. These queries are all run out of the memory so can take 10s or so. Finally let's consider a more interesting question: how do credit card vs cash payments vary over time?
+There are around 1.4 billion trips, with a median fare of $9. These queries are all run out of the memory so can take 10s or so. 
+
+Finally let's consider a more interesting question: how do credit card vs cash payments vary over time?
 
 ```default
 payment_types_year = (

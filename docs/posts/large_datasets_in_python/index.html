@@ -110,7 +110,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta property="og:image" content="GettyImages-1296252531.jpg">
 </head>
 
-<body class="nav-fixed">
+<body class="floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -118,7 +118,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">Meanderings in data</span>
+    <span class="navbar-title">Data meanderings</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -151,10 +151,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#querying-data-in-pandas-the-messy-way-and-the-pretty-way" id="toc-querying-data-in-pandas-the-messy-way-and-the-pretty-way" class="nav-link active" data-scroll-target="#querying-data-in-pandas-the-messy-way-and-the-pretty-way">Querying data in Pandas: the messy way and the pretty way</a></li>
+  <li><a href="#why-polars" id="toc-why-polars" class="nav-link" data-scroll-target="#why-polars">Why Polars?</a></li>
+  <li><a href="#comparing-the-speeds" id="toc-comparing-the-speeds" class="nav-link" data-scroll-target="#comparing-the-speeds">Comparing the speeds</a></li>
+  <li><a href="#another-speed-up-parquet-files" id="toc-another-speed-up-parquet-files" class="nav-link" data-scroll-target="#another-speed-up-parquet-files">Another speed up: parquet files</a></li>
+  <li><a href="#lazy-evaluation" id="toc-lazy-evaluation" class="nav-link" data-scroll-target="#lazy-evaluation">Lazy evaluation</a></li>
+  <li><a href="#larger-than-memory-datasets" id="toc-larger-than-memory-datasets" class="nav-link" data-scroll-target="#larger-than-memory-datasets">Larger than memory datasets</a></li>
+  <li><a href="#lessons" id="toc-lessons" class="nav-link" data-scroll-target="#lessons">Lessons</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="quarto-code-links"><h2>Code Links</h2><ul><li><a href="https://github.com/ajl2718/python_learning/blob/master/polars_vs_pandas.ipynb"><i class="bi bi-file-code"></i>Polars vs Pandas</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <div class="quarto-code-links"><h2>Code Links</h2><ul><li><a href="https://github.com/ajl2718/python_learning/blob/master/polars_vs_pandas.ipynb"><i class="bi bi-file-code"></i>Polars vs Pandas</a></li></ul></div></div>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
@@ -223,7 +239,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>We should see that the top 5 streets are <em>LONSDALE</em>, <em>ABECKETT</em>, <em>COLLINS</em>, <em>LITTLE LONSDALE</em>, <em>LA TROBE</em> which have over 7000 addresses, while streets like <em>HEAPE</em>, <em>HARWOOD</em>, <em>RACING CLUB</em> and <em>DOMAIN</em> each have only one address.</p>
 <p>A nicer way of writing this code is to chain these statements into a single query. I learned this from reading <a href="https://twitter.com/__mharrison__?lang=en">Matt Harrison’s</a> tweets and articles.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>gnaf.query('POSTCODE == 3000').groupby('STREET_NAME').size().sort_values(ascending=False)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Notice that this uses the <strong>query</strong> method to filter the addresses and then a sequence of methods to carry the remaining operations. In a slightly more readable form</p>
+<p>Notice that this uses the <code>query</code> method to filter the addresses and then a sequence of methods to carry the remaining operations. In a slightly more readable form</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    gnaf</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .query('POSTCODE == 3000')</span>
@@ -231,7 +247,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    .size()</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    .sort_values(ascending=False)</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>This sequence of transformation now reads as a single ‘recipe’ with each transformation appearing in a single line, making it all much easier to interpret. It more closely resembles <strong>dplyr</strong> code in R and as we see, Polars code. It also avoids creating unneccessary variables and memory in the intermediate steps. So far, so good.</p>
+<p>This sequence of transformation now reads as a single ‘recipe’ with each transformation appearing in a single line, making it all much easier to interpret. It more closely resembles <strong>dplyr</strong> code in R and as we will see later, Polars code. It also avoids creating unneccessary variables and memory in the intermediate steps. So far, so good.</p>
 <p>Let’s answer another question: What is the distribution of starting letters for streets in New South Wales?</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    gnaf</span>
@@ -250,7 +266,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>gnaf = pl.read_csv('GNAF_CORE.psv', separator='|', infer_schema_length=10000)</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>gnaf.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The first thing you should notice is the speed in loading the csv. We’ll to a comparison with Pandas later.</p>
+<p>The first thing you should notice is the speed in loading the csv. We’ll do a comparison with Pandas later.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    gnaf</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .filter(pl.col("POSTCODE") == 3000)</span>
@@ -282,7 +298,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>gnaf = pd.read_csv(filename, sep='|')</span>
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>t2 = time()</span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>print(t2-t1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>On my Macbook M3, Polars takes around 1.7seconds and Pandas around 39.1 seconds, so Polars is over 20 times faster at loading this csv file!</p>
+<p>On my Macbook M3, Polars takes around 1.7s and Pandas around 39.1s, so Polars is over 20 times faster at loading this csv file!</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>t1 = time()</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    gnaf</span>
@@ -334,8 +350,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="another-speed-up-parquet-files" class="level2">
 <h2 class="anchored" data-anchor-id="another-speed-up-parquet-files">Another speed up: parquet files</h2>
-<p>Rather than using csv files we can convert them to parquet. This is a binary file format that represents tabular datasets as columns rather than rows; both of these properties result in smaller file sizes that are quicker to load. A better explanation of why this is the case can be found in <a href="https://wesmckinney.com/blog/python-parquet-multithreading/">this article</a> by Wes McKinney, the creator of Pandas.</p>
-<p>The original file is 3.2Gb in csv format but when converted to parquet it’s 970Mb. This is a pretty decent saving on space. From experience Parquet files can be up to 10% the size of csv file.</p>
+<p>Rather than using csv files we can convert them to parquet. This is a binary file format that represents tabular datasets as columns rather than rows; both of these properties result in smaller file sizes that are quicker to load and faster to analyse. A more in-depth explanation for why this is the case can be found in <a href="https://wesmckinney.com/blog/python-parquet-multithreading/">this article</a> by Wes McKinney, the creator of Pandas.</p>
+<p>The original file is 3.2Gb in csv format but when converted to parquet it’s 970Mb. This is a decent saving on space. From experience Parquet files can be up to 10% the size of csv file.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a># load in pandas</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>t1 = time()</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>gnaf = pd.read_parquet(filename)</span>
@@ -401,7 +417,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    .collect()</span>
 <span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    .head(10)</span>
 <span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>There are around 1.4 billion trips, with a median fare of $9. These queries are all run out of the memory so can take 10s or so. Finally let’s consider a more interesting question: how do credit card vs cash payments vary over time?</p>
+<p>There are around 1.4 billion trips, with a median fare of $9. These queries are all run out of the memory so can take 10s or so.</p>
+<p>Finally let’s consider a more interesting question: how do credit card vs cash payments vary over time?</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>payment_types_year = (</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    nyc_taxis</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    .with_columns(pl.col('tpep_pickup_datetime').dt.year().alias('pickup_year'))</span>
