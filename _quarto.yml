@@ -5,7 +5,8 @@ website:
   open-graph: true
   navbar:
    # background: "#111344"
-    background: "#CEDBD5"
+  #  background: "#CEDBD5"
+    background: "#A2999E"
     title: "Data meanderings"
     search: true
     collapse: true
@@ -21,7 +22,8 @@ format:
       - united
       - custom.scss
     anchor-sections: true
-    backgroundcolor: "#E8EDDF"
+  #  backgroundcolor: "#E8EDDF"
+    backgroundcolor: "#EEF0F2"
    # monobackgroundcolor: "#EE3333"
   #  css: styles.css
  #   highlight-style: dracula
