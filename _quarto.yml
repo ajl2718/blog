@@ -4,7 +4,8 @@ project:
 website:
   open-graph: true
   navbar:
-    background: "#E07A5F"
+   # background: "#111344"
+    background: "#CEDBD5"
     title: "Data meanderings"
     search: true
     collapse: true
@@ -16,8 +17,11 @@ website:
         href: https://twitter.com/saunteringcat
 format:
   html:
-    theme: united
+    theme: 
+      - united
+      - custom.scss
     anchor-sections: true
-    backgroundcolor: "#F4F1DE"
-    css: styles.css
+    backgroundcolor: "#E8EDDF"
+   # monobackgroundcolor: "#EE3333"
+  #  css: styles.css
  #   highlight-style: dracula
