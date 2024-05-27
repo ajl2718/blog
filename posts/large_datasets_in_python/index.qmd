@@ -266,7 +266,7 @@ Since the main point of this article is to better understand how to work with la
 Some work is needed to transform the data so that each file has the same column names and datatypes. This is done in this [notebook](https://www.github.com/ajl2718/python_learning/polars_vs_pandas.ipynb). We can then 'lazy load' all the parquet files as follows
 
 ```default
-nyc_yaxis = pl.scan_parquet('taxi_trips/*.parquet')
+nyc_taxis = pl.scan_parquet('taxi_trips/*.parquet')
 ```
 
 And we can do some basic queries
