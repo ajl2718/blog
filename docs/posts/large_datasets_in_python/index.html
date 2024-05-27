@@ -399,7 +399,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="larger-than-memory-datasets" class="level2">
 <h2 class="anchored" data-anchor-id="larger-than-memory-datasets">Larger than memory datasets</h2>
-<p>Since the main point of this article is to better understand how to work with larger than memory data in Python, let’s look at a collection of datasets from <a href="https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page">New York City taxi trips</a>. From 2011 to 2023 these files total to around 20Gb and are forunately already in parquet format.</p>
+<p>Since the main point of this article is to better understand how to work with larger than memory data in Python, let’s look at a collection of datasets from <a href="https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page">New York City taxi trips</a>. From 2011 to 2023 these files total to around 20Gb and are fortunately already in parquet format.</p>
 <p>Some work is needed to transform the data so that each file has the same column names and datatypes. This is done in this <a href="https://www.github.com/ajl2718/python_learning/polars_vs_pandas.ipynb">notebook</a>. We can then ‘lazy load’ all the parquet files as follows</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>nyc_yaxis = pl.scan_parquet('taxi_trips/*.parquet')</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>And we can do some basic queries</p>

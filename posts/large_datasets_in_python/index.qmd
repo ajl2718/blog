@@ -8,6 +8,7 @@ format:
   html:
     toc: true
     toc-location: left
+    toc-color: "#F4F1DE"
     code-links:
       - text: Polars vs Pandas
         icon: file-code
@@ -260,7 +261,7 @@ Which takes 0.25 seconds.
 
 ## Larger than memory datasets
 
-Since the main point of this article is to better understand how to work with larger than memory data in Python, let's look at a collection of datasets from [New York City taxi trips](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page). From 2011 to 2023 these files total to around 20Gb and are forunately already in parquet format.
+Since the main point of this article is to better understand how to work with larger than memory data in Python, let's look at a collection of datasets from [New York City taxi trips](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page). From 2011 to 2023 these files total to around 20Gb and are fortunately already in parquet format.
 
 Some work is needed to transform the data so that each file has the same column names and datatypes. This is done in this [notebook](https://www.github.com/ajl2718/python_learning/polars_vs_pandas.ipynb). We can then 'lazy load' all the parquet files as follows
 

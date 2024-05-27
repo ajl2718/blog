@@ -4,7 +4,7 @@ project:
 website:
   open-graph: true
   navbar:
- #  background: "#DDDDDD"
+    background: "#E07A5F"
     title: "Data meanderings"
     search: true
     collapse: true
@@ -18,5 +18,6 @@ format:
   html:
     theme: united
     anchor-sections: true
+    backgroundcolor: "#F4F1DE"
     css: styles.css
  #   highlight-style: dracula
