@@ -155,10 +155,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#querying-data-in-pandas-the-messy-way-and-the-pretty-way" id="toc-querying-data-in-pandas-the-messy-way-and-the-pretty-way" class="nav-link active" data-scroll-target="#querying-data-in-pandas-the-messy-way-and-the-pretty-way">Querying data in Pandas: the messy way and the pretty way</a></li>
+  <li><a href="#querying-data-in-pandas-using-method-chainings" id="toc-querying-data-in-pandas-using-method-chainings" class="nav-link active" data-scroll-target="#querying-data-in-pandas-using-method-chainings">Querying data in Pandas using method chainings</a></li>
   <li><a href="#why-polars" id="toc-why-polars" class="nav-link" data-scroll-target="#why-polars">Why Polars?</a></li>
-  <li><a href="#comparing-the-speeds" id="toc-comparing-the-speeds" class="nav-link" data-scroll-target="#comparing-the-speeds">Comparing the speeds</a></li>
-  <li><a href="#another-speed-up-parquet-files" id="toc-another-speed-up-parquet-files" class="nav-link" data-scroll-target="#another-speed-up-parquet-files">Another speed up: parquet files</a></li>
+  <li><a href="#speed-comparison" id="toc-speed-comparison" class="nav-link" data-scroll-target="#speed-comparison">Speed comparison</a></li>
+  <li><a href="#another-speed-up-parquet-files" id="toc-another-speed-up-parquet-files" class="nav-link" data-scroll-target="#another-speed-up-parquet-files">Another speed-up: parquet files</a></li>
   <li><a href="#lazy-evaluation" id="toc-lazy-evaluation" class="nav-link" data-scroll-target="#lazy-evaluation">Lazy evaluation</a></li>
   <li><a href="#larger-than-memory-datasets" id="toc-larger-than-memory-datasets" class="nav-link" data-scroll-target="#larger-than-memory-datasets">Larger than memory datasets</a></li>
   <li><a href="#lessons" id="toc-lessons" class="nav-link" data-scroll-target="#lessons">Lessons</a></li>
@@ -218,8 +218,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>When to use one and not the other?</li>
 </ul>
 <p>In addition to Polars, there are other tools in this area, including <a href="https://www.duckdb.org">DuckDB</a> and <a href="https://ibis-project.org">Ibis</a>. And if you are using R there is <a href="https://blog.djnavarro.net/posts/2021-11-19_starting-apache-arrow-in-r/">an excellent tutorial</a> on how to use the <a href="https://blog.djnavarro.net/posts/2021-11-19_starting-apache-arrow-in-r/">Arrow</a> package for working with large datasets.</p>
-<section id="querying-data-in-pandas-the-messy-way-and-the-pretty-way" class="level2">
-<h2 class="anchored" data-anchor-id="querying-data-in-pandas-the-messy-way-and-the-pretty-way">Querying data in Pandas: the messy way and the pretty way</h2>
+<section id="querying-data-in-pandas-using-method-chainings" class="level2">
+<h2 class="anchored" data-anchor-id="querying-data-in-pandas-using-method-chainings">Querying data in Pandas using method chainings</h2>
 <p>First let’s download a largish dataset. <a href="https://geoscape.com.au/data/g-naf-core/">GNAF Core</a> is a quarterly-updated dataset containing all street addresses in Australia. It’s a single csv (well actually psv file) around 3.2Gb in size, so can fit in memory and analysed using Pandas.</p>
 <p>Let’s load data and carry out some simple transformations.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>import pandas as pd</span>
@@ -285,8 +285,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Ok, not quite as elegant, especially with the <code>with_columns</code> syntax but it gives the same results.</p>
 </section>
-<section id="comparing-the-speeds" class="level2">
-<h2 class="anchored" data-anchor-id="comparing-the-speeds">Comparing the speeds</h2>
+<section id="speed-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="speed-comparison">Speed comparison</h2>
 <p>So loading the csv file was faster, let’s compare how fast</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>t1 = time()</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>gnaf = pl.read_csv(filename, separator='|', infer_schema_length=10000)</span>
@@ -348,7 +348,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>1.39s in Polars and 0.43s in Pandas. So Pandas is the winner here.</p>
 </section>
 <section id="another-speed-up-parquet-files" class="level2">
-<h2 class="anchored" data-anchor-id="another-speed-up-parquet-files">Another speed up: parquet files</h2>
+<h2 class="anchored" data-anchor-id="another-speed-up-parquet-files">Another speed-up: parquet files</h2>
 <p>Rather than using csv files we can convert them to parquet. This is a binary file format that represents tabular datasets as columns rather than rows; both of these properties result in smaller file sizes that are quicker to load and faster to analyse. A more in-depth explanation for why this is the case can be found in <a href="https://wesmckinney.com/blog/python-parquet-multithreading/">this article</a> by Wes McKinney, the creator of Pandas.</p>
 <p>The original file is 3.2Gb in csv format but when converted to parquet it’s 970Mb. This is a decent saving on space. From experience Parquet files can be up to 10% the size of csv file.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a># load in pandas</span>
