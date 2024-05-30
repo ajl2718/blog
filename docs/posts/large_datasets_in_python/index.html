@@ -155,7 +155,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#querying-data-in-pandas-using-method-chainings" id="toc-querying-data-in-pandas-using-method-chainings" class="nav-link active" data-scroll-target="#querying-data-in-pandas-using-method-chainings">Querying data in Pandas using method chainings</a></li>
+  <li><a href="#data-transformations-using-method-chaining" id="toc-data-transformations-using-method-chaining" class="nav-link active" data-scroll-target="#data-transformations-using-method-chaining">Data transformations using method chaining</a></li>
   <li><a href="#why-polars" id="toc-why-polars" class="nav-link" data-scroll-target="#why-polars">Why Polars?</a></li>
   <li><a href="#speed-comparison" id="toc-speed-comparison" class="nav-link" data-scroll-target="#speed-comparison">Speed comparison</a></li>
   <li><a href="#another-speed-up-parquet-files" id="toc-another-speed-up-parquet-files" class="nav-link" data-scroll-target="#another-speed-up-parquet-files">Another speed-up: parquet files</a></li>
@@ -218,8 +218,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>When to use one and not the other?</li>
 </ul>
 <p>In addition to Polars, there are other tools in this area, including <a href="https://www.duckdb.org">DuckDB</a> and <a href="https://ibis-project.org">Ibis</a>. And if you are using R there is <a href="https://blog.djnavarro.net/posts/2021-11-19_starting-apache-arrow-in-r/">an excellent tutorial</a> on how to use the <a href="https://blog.djnavarro.net/posts/2021-11-19_starting-apache-arrow-in-r/">Arrow</a> package for working with large datasets.</p>
-<section id="querying-data-in-pandas-using-method-chainings" class="level2">
-<h2 class="anchored" data-anchor-id="querying-data-in-pandas-using-method-chainings">Querying data in Pandas using method chainings</h2>
+<section id="data-transformations-using-method-chaining" class="level2">
+<h2 class="anchored" data-anchor-id="data-transformations-using-method-chaining">Data transformations using method chaining</h2>
 <p>First let’s download a largish dataset. <a href="https://geoscape.com.au/data/g-naf-core/">GNAF Core</a> is a quarterly-updated dataset containing all street addresses in Australia. It’s a single csv (well actually psv file) around 3.2Gb in size, so can fit in memory and analysed using Pandas.</p>
 <p>Let’s load data and carry out some simple transformations.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>import pandas as pd</span>

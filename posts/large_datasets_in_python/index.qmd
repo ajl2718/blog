@@ -26,7 +26,7 @@ This article is a summary of some tinkering with these tools. These turn out to 
 
 In addition to Polars, there are other tools in this area, including [DuckDB](https://www.duckdb.org) and [Ibis](https://ibis-project.org). And if you are using R there is [an excellent tutorial](https://blog.djnavarro.net/posts/2021-11-19_starting-apache-arrow-in-r/) on how to use the [Arrow](https://blog.djnavarro.net/posts/2021-11-19_starting-apache-arrow-in-r/) package for working with large datasets.
 
-## Querying data in Pandas using method chainings
+## Data transformations using method chaining
 
 First let's download a largish dataset. [GNAF Core](https://geoscape.com.au/data/g-naf-core/) is a quarterly-updated dataset containing all street addresses in Australia. It's a single csv (well actually psv file) around 3.2Gb in size, so can fit in memory and analysed using Pandas.
 
