@@ -1,0 +1,50 @@
+---
+title: "Experiments with Large Language Models"
+author: "Alex Lee"
+date: "2024-06-07"
+categories: [LLM]
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-color: "#F4F1DE"
+    code-links:
+      - text: Large Language Models experiments
+        icon: file-code
+        href: https://github.com/ajl2718/python_learning/blob/master/llm_experiments1.ipynb
+---
+
+Like most people in the world, for the past 12 months or so I have been doing some experimenting with Large Language Models (LLMs). For the past month I have been doing this in a more a more focused way, to understand what their capabilities are and how suitable they might be for my day-to-day work and for research. 
+
+I have been using ChapGPT as a code assistant for quite a while (in lieu of StackOverflow. whose data OpenAI stole anyway). However, I hadn't built anything using LLMs and, despite the huge number of papers that are published about them every week, I had yet to do any serious experimenting with them in a research sense.
+
+Here are a collection of some recent experiments.
+
+## Getting started
+I found that playing around with different prompts using ChapGPT or Claude are good starting points to see how to interact with LLMs. 
+
+## Externally hosted vs local models
+For my work which uses clinical data it is prohbited to send data to external APIs, so I have been particularly interested in the capabilities of open-source models like Mistral-7B and Llama3. These can be run on my own machine and I can create Jupyter notebooks and Python scripts that make use of them too.
+
+### Ollama for running local models
+This is a great tool for running models on my Mac. Once installed you can interact with an LLM from the command line. Furthermore, you can make requests to these models using the `requests` library and so interact with them via a Jupyter notebook.
+
+## Prompting
+LLMs take as an input a **prompt**, i.e., a string, and then produce some outputs based on this. There is some experimentation used to *steer* the model into providing the output that you would like, through communicating with the model in particular ways. Some people have given this the pretentious name of *prompt engineering*.
+
+One way to get a model to produce an output that is more inline with what you intend is to provide some examples to guide it.
+
+## Example: Text anonymization
+With these concepts in mind, I am now able to re-produce some results from a paper I noticed earlier in the year. 
+
+## Example: Data Cleaning
+
+## Example: Inforamtion extraction from tabular data
+
+## Lessons
+
+LLMs are good at the following:
+- Using indirect information, e.g., with text anonymization, that traditional ML models fail at
+- Handling a wide variety of inputs and instructions
+- Handling a broad range of tasks
+- Handling a broad range of data types, since many of these can be converted to text anyway.

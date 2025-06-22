@@ -6,7 +6,7 @@ website:
   navbar:
    # background: "#111344"
   #  background: "#CEDBD5"
-    background: "#A2999E"
+    background: "#8097F2"
     title: "Data meanderings"
     search: true
     collapse: true

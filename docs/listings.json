@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/llm_experiments/index.html",
       "/posts/large_datasets_in_python/index.html",
       "/posts/virtual-environments-with-jupyter/index.html",
       "/posts/local-geospatial-analysis/index.html",

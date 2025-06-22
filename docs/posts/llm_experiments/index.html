@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Alex Lee">
+<meta name="dcterms.date" content="2024-06-07">
 
-<title>Articles</title>
+<title>Experiments with Large Language Models</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +25,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,77 +68,20 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
 
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<meta property="og:title" content="Articles">
+<meta property="og:title" content="Experiments with Large Language Models">
+<meta property="og:description" content="">
 </head>
 
-<body class="nav-fixed">
+<body class="floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Data meanderings</span>
     </a>
   </div>
@@ -149,7 +92,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -170,23 +113,58 @@ window.Quarto = {
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link active" data-scroll-target="#getting-started">Getting started</a></li>
+  <li><a href="#externally-hosted-vs-local-models" id="toc-externally-hosted-vs-local-models" class="nav-link" data-scroll-target="#externally-hosted-vs-local-models">Externally hosted vs local models</a>
+  <ul class="collapse">
+  <li><a href="#ollama-for-running-local-models" id="toc-ollama-for-running-local-models" class="nav-link" data-scroll-target="#ollama-for-running-local-models">Ollama for running local models</a></li>
+  </ul></li>
+  <li><a href="#prompting" id="toc-prompting" class="nav-link" data-scroll-target="#prompting">Prompting</a></li>
+  <li><a href="#example-text-anonymization" id="toc-example-text-anonymization" class="nav-link" data-scroll-target="#example-text-anonymization">Example: Text anonymization</a></li>
+  <li><a href="#example-data-cleaning" id="toc-example-data-cleaning" class="nav-link" data-scroll-target="#example-data-cleaning">Example: Data Cleaning</a></li>
+  <li><a href="#example-inforamtion-extraction-from-tabular-data" id="toc-example-inforamtion-extraction-from-tabular-data" class="nav-link" data-scroll-target="#example-inforamtion-extraction-from-tabular-data">Example: Inforamtion extraction from tabular data</a></li>
+  <li><a href="#lessons" id="toc-lessons" class="nav-link" data-scroll-target="#lessons">Lessons</a></li>
+  </ul>
+<div class="quarto-code-links"><h2>Code Links</h2><ul><li><a href="https://github.com/ajl2718/python_learning/blob/master/llm_experiments1.ipynb"><i class="bi bi-file-code"></i>Large Language Models experiments</a></li></ul></div></nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
 <!-- main -->
-<main class="content column-page" id="quarto-document-content">
+<main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Articles</h1>
-</div>
+<h1 class="title">Experiments with Large Language Models</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">LLM</div>
+  </div>
+  </div>
 
 
 
-<div class="quarto-title-meta column-page">
+<div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Alex Lee </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 7, 2024</p>
+    </div>
+  </div>
   
     
   </div>
@@ -196,120 +174,44 @@ window.Quarto = {
 </header>
 
 
+<p>Like most people in the world, for the past 12 months or so I have been doing some experimenting with Large Language Models (LLMs). For the past month I have been doing this in a more a more focused way, to understand what their capabilities are and how suitable they might be for my day-to-day work and for research.</p>
+<p>I have been using ChapGPT as a code assistant for quite a while (in lieu of StackOverflow. whose data OpenAI stole anyway). However, I hadn’t built anything using LLMs and, despite the huge number of papers that are published about them every week, I had yet to do any serious experimenting with them in a research sense.</p>
+<p>Here are a collection of some recent experiments.</p>
+<section id="getting-started" class="level2">
+<h2 class="anchored" data-anchor-id="getting-started">Getting started</h2>
+<p>I found that playing around with different prompts using ChapGPT or Claude are good starting points to see how to interact with LLMs.</p>
+</section>
+<section id="externally-hosted-vs-local-models" class="level2">
+<h2 class="anchored" data-anchor-id="externally-hosted-vs-local-models">Externally hosted vs local models</h2>
+<p>For my work which uses clinical data it is prohbited to send data to external APIs, so I have been particularly interested in the capabilities of open-source models like Mistral-7B and Llama3. These can be run on my own machine and I can create Jupyter notebooks and Python scripts that make use of them too.</p>
+<section id="ollama-for-running-local-models" class="level3">
+<h3 class="anchored" data-anchor-id="ollama-for-running-local-models">Ollama for running local models</h3>
+<p>This is a great tool for running models on my Mac. Once installed you can interact with an LLM from the command line. Furthermore, you can make requests to these models using the <code>requests</code> library and so interact with them via a Jupyter notebook.</p>
+</section>
+</section>
+<section id="prompting" class="level2">
+<h2 class="anchored" data-anchor-id="prompting">Prompting</h2>
+<p>LLMs take as an input a <strong>prompt</strong>, i.e., a string, and then produce some outputs based on this. There is some experimentation used to <em>steer</em> the model into providing the output that you would like, through communicating with the model in particular ways. Some people have given this the pretentious name of <em>prompt engineering</em>.</p>
+<p>One way to get a model to produce an output that is more inline with what you intend is to provide some examples to guide it.</p>
+</section>
+<section id="example-text-anonymization" class="level2">
+<h2 class="anchored" data-anchor-id="example-text-anonymization">Example: Text anonymization</h2>
+<p>With these concepts in mind, I am now able to re-produce some results from a paper I noticed earlier in the year.</p>
+</section>
+<section id="example-data-cleaning" class="level2">
+<h2 class="anchored" data-anchor-id="example-data-cleaning">Example: Data Cleaning</h2>
+</section>
+<section id="example-inforamtion-extraction-from-tabular-data" class="level2">
+<h2 class="anchored" data-anchor-id="example-inforamtion-extraction-from-tabular-data">Example: Inforamtion extraction from tabular data</h2>
+</section>
+<section id="lessons" class="level2">
+<h2 class="anchored" data-anchor-id="lessons">Lessons</h2>
+<p>LLMs are good at the following: - Using indirect information, e.g., with text anonymization, that traditional ML models fail at - Handling a wide variety of inputs and instructions - Handling a broad range of tasks - Handling a broad range of data types, since many of these can be converted to text anyway.</p>
 
 
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-table" id="listing-listing">
-<table class="quarto-listing-table table">
-<thead>
-<tr>
-<th>
-Date
-</th>
-<th>
-Title
-</th>
-<th>
-Categories
-</th>
-</tr>
-</thead>
-<tbody class="list">
-<tr data-index="0" data-categories="LLM" data-listing-date-sort="1717682400000" data-listing-file-modified-sort="1717761362878" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="416" data-listing-title-sort="Experiments with Large Language Models" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Jun 7, 2024</span>
-</td>
-<td>
-<a href="./posts/llm_experiments/index.html" class="title listing-title">Experiments with Large Language Models</a>
-</td>
-<td>
-<span class="listing-categories">LLM</span>
-</td>
-</tr>
-<tr data-index="1" data-categories="python,polars,large data" data-listing-date-sort="1711803600000" data-listing-file-modified-sort="1717067033988" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1579" data-listing-title-sort="Larger than memory datasets in Python using Polars" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Mar 31, 2024</span>
-</td>
-<td>
-<a href="./posts/large_datasets_in_python/index.html" class="title listing-title">Larger than memory datasets in Python using Polars</a>
-</td>
-<td>
-<span class="listing-categories">python, polars, large data</span>
-</td>
-</tr>
-<tr data-index="2" data-categories="python,jupyter" data-listing-date-sort="1657288800000" data-listing-file-modified-sort="1712052768798" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="346" data-listing-title-sort="Virtual environments with Jupyter Notebooks" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Jul 9, 2022</span>
-</td>
-<td>
-<a href="./posts/virtual-environments-with-jupyter/index.html" class="title listing-title">Virtual environments with Jupyter Notebooks</a>
-</td>
-<td>
-<span class="listing-categories">python, jupyter</span>
-</td>
-</tr>
-<tr data-index="3" data-categories="python,geospatial" data-listing-date-sort="1652450400000" data-listing-file-modified-sort="1712020456918" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="371" data-listing-title-sort="Geospatial analysis in a secure environment" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">May 14, 2022</span>
-</td>
-<td>
-<a href="./posts/local-geospatial-analysis/index.html" class="title listing-title">Geospatial analysis in a secure environment</a>
-</td>
-<td>
-<span class="listing-categories">python, geospatial</span>
-</td>
-</tr>
-<tr data-index="4" data-categories="python,docker,jupyter" data-listing-date-sort="1617282000000" data-listing-file-modified-sort="1711770347148" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="337" data-listing-title-sort="Setting up a scratch space using Poetry, Docker and Jupyter" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Apr 2, 2021</span>
-</td>
-<td>
-<a href="./posts/using-docker/index.html" class="title listing-title">Setting up a scratch space using Poetry, Docker and Jupyter</a>
-</td>
-<td>
-<span class="listing-categories">python, docker, jupyter</span>
-</td>
-</tr>
-<tr data-index="5" data-categories="python,postgres,geospatial" data-listing-date-sort="1615640400000" data-listing-file-modified-sort="1711157844728" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="747" data-listing-title-sort="A simple geocoder using Postgres and Python" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Mar 14, 2021</span>
-</td>
-<td>
-<a href="./posts/geocoding/index.html" class="title listing-title">A simple geocoder using Postgres and Python</a>
-</td>
-<td>
-<span class="listing-categories">python, postgres, geospatial</span>
-</td>
-</tr>
-<tr data-index="6" data-categories="python,webscraping,requests,open data" data-listing-date-sort="1609419600000" data-listing-file-modified-sort="1712052326995" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1649" data-listing-title-sort="Intro to webscraping" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Jan 1, 2021</span>
-</td>
-<td>
-<a href="./posts/intro-to-webscraping/index.html" class="title listing-title">Intro to webscraping</a>
-</td>
-<td>
-<span class="listing-categories">python, webscraping, requests, open data</span>
-</td>
-</tr>
-<tr data-index="7" data-categories="python,geopandas,geospatial visualisation" data-listing-date-sort="1609333200000" data-listing-file-modified-sort="1711157844735" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="170" data-listing-title-sort="Regular lattice shapefiles with geopandas" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Dec 31, 2020</span>
-</td>
-<td>
-<a href="./posts/regular-lattice-shapefiles/index.html" class="title listing-title">Regular lattice shapefiles with geopandas</a>
-</td>
-<td>
-<span class="listing-categories">python, geopandas, geospatial visualisation</span>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
