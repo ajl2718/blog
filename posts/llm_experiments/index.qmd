@@ -1,0 +1,83 @@
+---
+title: "Experiments with Large Language Models"
+author: "Alex Lee"
+date: "2024-06-07"
+categories: [LLM]
+draft: true
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-color: "#F4F1DE"
+    code-links:
+      - text: Large Language Models experiments
+        icon: file-code
+        href: https://github.com/ajl2718/python_learning/blob/master/llm_experiments1.ipynb
+---
+
+Like most people in the world, for the past twelive months or so I have been doing some experimenting with Large Language Models (LLMs). For the past month I have been doing this in a more focused way, to understand what their capabilities are and how suitable they might be for my day-to-day work and for research. 
+
+I have been using ChapGPT as a code assistant for quite a while (in lieu of StackOverflow, whose data OpenAI stole anyway). However, I hadn't built anything using LLMs and, despite the huge number of papers that are published about them every week, I had yet to do any serious experimenting with them in a research sense.
+
+Here are a collection of some recent experiments.
+
+## Getting started with local models
+Probably the best starting point is [Ollama](https://www.ollama.com/), a tool that you can use to download and run open models (e.g., Mistral, Llama3, Phi-2) from the command line. For example, to run Mistral all you need is the run the following command.
+
+```
+ollama run mistral:latest
+```
+
+Ollama also allows you to interact with models from Python.
+### Ollama for running local models
+This is a great tool for running models on my Mac. Once installed you can interact with an LLM from the command line. Furthermore, you can make requests to these models using the `requests` library and so interact with them via a Jupyter notebook.
+
+## Prompting
+LLMs take as an input a **prompt**, i.e., a string, and then produce some outputs based on this. There is some experimentation used to *steer* the model into providing the output that you would like, through communicating with the model in particular ways. Some people have given this the pretentious name of *prompt engineering*.
+
+One way to get a model to produce an output that is more inline with what you intend is to provide some examples to guide it.
+
+Now for a few different examples.
+
+## Example: Text anonymization
+Earlier in the year a pre-print came out [Large Language Models are advanced anonymizers](https://arxiv.org/abs/2402.13846). The idea is to use LLMs to take some text that contains identifying information (e.g., location, age, gender) and use an LLM to rewrite is so that not only is this information replaced, but indirectly identifying information is also removed. Traditional Named Entity Recognition models are able to extract direct identifers but it turns out LLMs can do much more.
+
+The idea is to have one LLM to extract identifying information from the text and another to de-identify the text. Once the extractor LLM can no longer pull out any more identifiying information, then the text is said to be anonymized.
+
+Here are the prompts
+```
+\\ system prompt
+You are an expert...
+
+\\ user prompt
+{query}
+```
+
+```
+\\ system prompt
+You are an expert anonymizer
+```
+
+Let's see an example. In Melbourne there is a famous bar called Young and Jackson's. Inside there is a 19th century nude portrait called Chloe. This second piece of information is therefore enough to indirectly identify the location of the bar and therefore the city.
+
+```
+Over the weekend I went to that place near the station with the painting of chloe. There we had a few drinks and watched the game.
+```
+
+The LLM does an excellent job of extracting the information and then rewriting so that it is less specific.
+
+## Example: Data Cleaning
+One of my key motivations for using LLMs is to automate some of the drudgery of data work, namely data cleaning. Clinical data can be extremely messy with many variations for a given piece of information. 
+
+
+## Example: Inforamtion extraction from tabular data
+
+With very little effort, LLMs can also be used to extract information from tabular data, through converting the data to JSON or some other serialized format.
+
+## Lessons
+
+- LLMs can solve a broad range of tasks, through the use of a carefully crafted prompt.
+- They exceed the capabilities of many traditional ML models at tasks such as anonymization through the ability to use indirect pieces of information in the text and effectively reason with this.
+- They can be incorporated into data analysis workflows in a fairly straightforward way so tasks such as data cleaning be streamlined, though there are some limitations and caveats. 
+- Tabular data information is also feasible.
+- There are still some significant limitations to them namely their apparent dependence on particular phrasing of the prompt and the fact that the same prompt can give multiple conflicting responses.

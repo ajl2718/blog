@@ -1,0 +1,44 @@
+---
+title: "Tokenisation"
+author: "Alex Lee"
+date: "2025-03-22"
+categories: [natural language processing]
+draft: true
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-color: "#F4F1DE"
+    code-links:
+      - text: BPE notebook
+        icon: file-code
+        href: https://github.com/ajl2718/python_learning/blob/master/bpe.ipynb
+
+---
+
+# From text to numbers
+Data is naturally represented as numerical variables but useful information is often stored in text. A key step in natural language processing is to convert the raw information that is initially represented as strings into a numerical representation that is suitable for downstream tasks such as text classification, named entity recognition or machine translation. 
+
+# Tokenisation
+One type of numerical representation in to convert the original string to an array of integers, through a process knownn as *tokenisation*, where pieces of the original text are converted to integers. 
+
+A simple tokenisation algorithm involves creating separate token for each substring that is separated by whitespace. For example the string
+
+`I bought a mango lassi and a vindaloo for $24`
+
+Could be separated out into the sequence of tokens `['I', 'bought', 'a',  'mango', 'lassi', 'and', 'a', 'vindaloo', 'for', '$4']` which can then be converted to the integer sequence `[0, 1, 2, 3, 4, 5, 2, 6, 7, 8]`
+
+Alternatively, we could separate out each individual character, including the whitespace
+
+`['I', ' ', 'b', 'o', 'u', 'g', 'h', 't', ' ' , 'a', 'm', 'a', 'n', 'g', 'o', ' ', 'l', 'a', 's', 's', 'i', ' ', 'a', 'n', 'd', ' ', 'a', 'v', 'i', 'n', 'd', 'a', 'l', 'o', 'o', ' ', 'f', 'o', 'r', ' ', '$', '4']`
+
+# Key challenges
+Two key challenges in a good tokenisation algorithm are:
+
+- Finding representations that require less storage space
+- Handling spelling corrections and variations
+
+# Byte Pair Encoding
+
+# Other tokenisation schemes
+## Tokenisation for large language models

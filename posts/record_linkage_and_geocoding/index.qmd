@@ -1,0 +1,106 @@
+---
+title: "An overview of record linkage and geocoding"
+author: "Alex Lee"
+date: "2025-06-11"
+categories: [python, record linkage]
+draft: true
+---
+
+Record linkage is a key step in enabling analysis of population-level trends and patterns, which is relevant to a broad range of questions in the public sector and healthcare. Examples include:
+
+- Linking primary care and other health datasets to understand patterns of patients' utilisation of healthcare services
+- Deduplication of customer address data
+- 
+
+It is generally the case that relevant information is stored in disparate data sources, which need to be linked together to develop a harmonised pictuure of populations.
+
+A key challenge is that information about a given person can be recorded in many different ways: for example a person's name may contain be recorded using initials in one dataset, a nickname in another and a complete name in a third.  Similarly, street addresses often contain spelling errors, missing postcode or suburb names, or unusual formatting. 
+
+Record linkage, also called data linkage or entity resolution is a key step to harmonise these sources to obtain a more complete picture of the population's use of different services. In addition to being robust to variations in how items are recorded, record linkage algorithms also need to scale, often to tens of millions of records. Brute force string similarity approaches are therefore out of the question.
+
+In this article we will give a brief overview of what record linkage is and some record linkage techniques as applied to both person-level and address-level dataset. These two types of record linkage problems are related, but require slightly different approaches.
+
+Finally we will present two open source Python packages - [Splink](https://moj-analytical-services.github.io/splink/index.html) and [whereabouts](https://pypi.org/project/whereabouts/) - that solve each of these problems.
+
+## 1. An example synthetic dataset
+
+Let's begin by considering the following dataset consisting of names and addresses.
+
+| Name             | Address                           |
+|------------------|------------------------------------|
+| Jonh Smth        | 123 Aplee St, New Yrok, NY 10001   |
+| Maria Gonsalez   | 56b, Elm Street, los angeles CA    |
+| A. K. Patel      | Apt#4 78-King's Rd London          |
+| lucy o'conner    | 8890 wElmwood av., dallas TX       |
+| Chen, Wei        | No. 77, HuaiHai Rd, shanghi        |
+
+
+## 2. Formulation of the record linkage problem
+
+Consider just the two sets of addresses in the above examples. They are two different sets of strings and we need to find a mapping from one set to the other, in such a way that equivalent addresses are deemed to be true matches while those that do not match are correctly identified as such.
+
+(Diagram showing two sets and maps between them)
+
+This mapping is called a *score function* and assigns a number between each pair of records in the two datasets. Roughly this can be thought of as a *probability* of a match between them, although since the function is not necessarily calibrated we prefer the term score.
+
+### 2.1. Blocking
+
+- Problem: large search space
+- Solution: reduce the search space by only searching over candidate matches
+- How do we reduce the search space?
+
+### 2.2. Scoring
+
+Once we have a set of candidate records to compare against, we need to be able to assign a ranking to each candidate based on high likely it is to be a correct match. This is known as *scoring*.
+
+### 2.3. Tokenisation
+
+### 2.4. Privacy 
+
+## 3. Specific algorithms
+
+Let's look at some specific approaches
+
+### 3.1. Felligi-Sunter
+
+
+### 3.2. Signature-based approaches
+
+- Problem: How to define blocks
+- Solution: Use terms that serve as approximate *signatures* of the record, i.e., substrings within the original string that almost uniquely identify it. Intuitively: Peter MacCallum Cancer Centre -> Peter Mac
+- Paper by Tania Churchill, Kee Siong Ng, etc:
+
+### 3.3. Implementation
+
+Now that we understand some of the theory and algorithms, let's implement them. Some desirable characteristics of a good implementation include:
+
+- Ease of installation: most data scientists are lazy when it comes to deciding which software to use, so the fewer steps it takes to install a package, the better
+- Clear documentation: simple code examples to demonstrate the software makes a package much more appealing.
+- Using well-tested tools ensure that algorithm implementations will be more performant and have fewer errors
+
+For these reasons an obvious choice is [DuckDB](https://duckdb.org/). It's an open source tool based on SQL with a Python API. Unlike other SQL implementations such as Postgres is has the advantage of not requiring a user to create a SQL server instance, in order word, all the data is stored directly on a file.
+
+
+## 4. Evaluation
+
+How do we test the performance? This is actually a non-trivial problem. Unlike for many machine learning tasks, there are few publicly available datasets that are representative of the kinds of records that are encountered 'in the wild.'
+
+- The lack of available benchmarking datasets
+- Variations in types of errors
+
+
+## 5. Reference datasets
+
+### 5.1. Address databases
+Building a geocoder depends on having a good quality reference dataset, i.e., a complete set of clean, standardised street addresses, with corresponding latitude and longitude values. 
+
+The availability of such datasets varies widely between countries. In Australia, the [Geocoded National Address File](https://data.gov.au/data/dataset/geocoded-national-address-file-g-naf) is a quarterly-updated, free and publicly available reference dataset covering the entire country. In the UK, in comparison, such data sources are ownly available commerically. 
+
+
+## 6. Other challenges
+
+<h1>References</h1>
+- [Exploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes](https://arxiv.org/abs/1708.01402)
+- [Splink](https://moj-analytical-services.github.io/splink/index.html)
+- [whereabouts](https://github.com/ajl2718/whereabouts)
+- Data Matching: Concepts and Techniques for Record Linkage, Entity Resolution, and Duplicate Detection, Peter Christen
