@@ -14,29 +14,31 @@ format:
         href: https://github.com/ajl2718/blankit
 
 ---
-This post describes a step-by-step template for how to go about setting up a Python project using [uv](https://docs.astral.sh/uv/) and [github](https://www.github.com) and publishing the end result as a package on PyPi. The result is a simple Python package (< 200 lines of code) for finding and removing Personally Identifiable Information (PII) from text. I have published the result as [blankit](https://www.pypi.org/project/blankit) but you can call your version whatever you like. 
+This post describes a step-by-step template for how to go about creating a Python project using [uv](https://docs.astral.sh/uv/) and [Github](https://www.github.com) and publishing the end result as a package on PyPi. 
 
-More specifically this post describes:
+As a example we create a simple Python package (< 200 lines of code) for finding and removing Personally Identifiable Information (PII) from text. I have published the result as [blankit](https://www.pypi.org/project/blankit). Call your version whatever you like.
 
-1) Using the uv Python package manager to initialise a project with a basic folder structure
+I will go through the following steps:
+
+1) Using the uv Python package manager to initialise a project
 2) Creating a Github repository for the project
 3) Incorporating unit tests
 4) Automating tests in different deployment environments using Github Actions
-5) Using [sphinx](https://www.sphinx-doc.org/en/master/) to produced automated documentation from the codebase
+5) Producing automated documentation from the codebase using [sphinx](https://www.sphinx-doc.org/en/master/)
 6) Building and publishing the package to PyPi.
 
 ## 1. Project structure
-I have recently switched to [uv](https://docs.astral.sh/uv/) as an alternative to [poetry](https://python-poetry.org/) as my preferred package manager. In other instances I have used [conda](https://anaconda.org/anaconda/conda) but uv addresses all my issues with both of these. It is extremely fast at resolving package dependencies and convenient for managing projects. One caveat is that it is VC backed so, while it is currently free and open source, that may change at some point.
+I have recently switched to [uv](https://docs.astral.sh/uv/) as an alternative to [poetry](https://python-poetry.org/) as my preferred package manager. In other instances I have used [conda](https://anaconda.org/anaconda/conda) but uv addresses all my issues with both of these. It is extremely fast at resolving package dependencies and convenient for managing projects. One caveat is that it is VC backed so, while it is currently free and open source, that may well change.
 
 Firstly, install uv by following the instructions on the [uv website](https://docs.astral.sh/uv/getting-started/installation/).
 
-Now you can set up a project in the command line via
+Now you can easily set up a project in the command line via
 
 ```
 uv init --package project_name
 ```
 
-This will create a uv project with the following structure
+This will create a uv project with the following basic structure
 
 ```
 project_name
@@ -51,9 +53,9 @@ project_name
 We get a `README.md` (for giving users a basic overview of our project), a `pyproject.toml` (for listing all the dependencies of your project), `.python-version` that contains the python version and a `src` folder for storing all the project code.
 
 ### 1.1. What is a pyproject.toml file?
-This file is the modern approach for listing dependencies in a python package. Along with these dependencies it is also used to describe important metadata for your project, including the author name and contact details, project name, description and version. More details can be found in the [Python packaging user guide](https://packaging.python.org/en/latest/specifications/pyproject-toml/).
+From what I understand this is the modern approach for listing dependencies in a python package. Along with these dependencies the `pyprofile.toml` file is also used to describe important metadata for your project, including the author name and contact details, project name, description and version. More details can be found in the [Python packaging user guide](https://packaging.python.org/en/latest/specifications/pyproject-toml/).
 
-Let's modify this file with some useful information.
+Let's modify this file to include some more information about our project.
 
 ```
 [project]
@@ -75,10 +77,10 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 ```
 
-Now let's add a package that will be key to solving our PII detection task.
+Now we can start adding dependencies.
 
 ### 1.2. Named Entity Recognition for PII detection
-We will user the [GLiNER](https://github.com/urchade/GLiNER) package that does zero-shot named entity recognition. Since PII consists of explicit references to names, locations and other identifiers, this is a good option.
+[GLiNER](https://github.com/urchade/GLiNER) is a widely used package for zero-shot named entity recognition. This just means that we can give a description of the categories that we are interest in detecting and, without any training, the model will do a pretty good job of detecting them. This is an effective out-of-the-box solution for PII detection since PII consists of explicit references to names, locations and other identifiers.
 
 Let's add this package to our project
 
@@ -99,24 +101,26 @@ And we will also add a couple of other packages that will be useful later on:
 uv add pandas blank ruff pytest
 ```
 
-You will notice that uv has created a new file `uv.lock` which all the resolved dependencies for these packages required by our project, and also a folder `.venv` for our virtual environment.
+You will notice that uv has created a new file `uv.lock` with all the resolved dependencies for these packages required by our project, and also a folder `.venv` for our virtual environment.
 
-Once a project is cloned from our repo if we run `uv run python` this will install all the required dependences, in other words, there is no `requirements.txt` file as is the case for pip.
+If someone clones our project from a repo (see the next step), they can run `uv run python` to install all the required dependences. In other words, there is no `requirements.txt` file as is the case when using pip.
 
 ### 1.3. Write some code that solves our task
-The [final package](https://github.com/ajl2718/blankit/tree/main/src/blankit) contains two files: a `utils.py` file and a `scanner.py` file. The first contains functions for things like parsing text, replacing the identified PII with generic text and redacting the text. The second file describes a `Scanner` class that provides an API for users to identify and redact a given string or list of strings.
+The [final package](https://github.com/ajl2718/blankit/tree/main/src/blankit) contains two files: a `utils.py` file and a `scanner.py` file. The first contains functions for things like parsing text, replacing the identified PII with generic text and redacting the text. The second file describes a `Scanner` class that provides an API for users to identify and redact a given string or list of strings. You can create these files in the `src` folder and copy the code across.
 
 ## 2. Create a Github repository for our project
-We now have enough ingredients for our project to create a project respository on Github.
+We now have the key ingredients for our project. Let's create a respository for our project on Github.
 
 ### 2.1. Initialise the github repo locally
-Firstly we will intialise git:
+Firstly we intialise git. This is done in the base folder of the project:
 
 ```
 git init
 ```
 
-This will create two new files `.gitignore` that tells the repo which files should not be tracked and pushed to the repo, and a folder `.git` for tracking changes.
+This will create: a file called `.gitignore` that tells the repo which files should not be tracked by git when we make a push request; and a folder `.git` for tracking changes.
+
+If you're not comfortable with git there are [plenty](https://www.freecodecamp.org/news/learn-the-basics-of-git-in-under-10-minutes-da548267cc91/) [of](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F) [tutorials](https://docs.github.com/en/get-started/start-your-journey/git-and-github-learning-resources) [online](https://www.atlassian.com/git)
 
 Now we can carry out our initial commit.
 
@@ -126,7 +130,7 @@ git commit -m "Initial commit"
 ```
 
 ### 2.2. Create a github respository in your Github account and push your code
-Now log in to your Github account and create a repostiory. Once that is created, you can push all the current project code to this repo.
+Now log in to your Github account and create a repository. Once that is created, you can push all the current project code to this repo.
 
 ```
 git remote add origin https://github.com/yourusername/your-repo-name.git
@@ -171,9 +175,11 @@ git push
 
 ## 4. Automation with Github Actions
 
-We are almost there. One useful addition to our project is to run a series of tests each time we commit to Github. Most users will not be working within our exact set up (operating system or python version) and so having tests performed by Github It will reduce the likelihood that the users of your package will encounter bugs that you didn't anticipate.
+We are almost there. One useful addition to our project is to run a series our tests each time we commit to Github, so that anything that breaks can be detected before committing the code.
 
-This is done via a so-called [Github Action](https://github.com/features/actions).
+Also, most users will not be working within our exact set up (operating system and python version) and so having tests performed by Github in different environments (Windows, Mac, Linux) will reduce the chance that the users of the package will encounter bugs that you didn't anticipate.
+
+This can be done via a [Github Action](https://github.com/features/actions). 
 
 We will add an action for carrying out tests. Create a file `test.yml` under a new folder `.github/workflows/` and include the following in the file
 ```
@@ -208,7 +214,7 @@ jobs:
       run: uv run pytest tests
 ```
 
-When a change is committed to the repo, this will run an action that installs uv and the project files and runs the tests in the tests folder. Furthermore it will carry out these actions in a Mac OS and Ubuntu environment and three different Python versions, making the tests more robust.
+Each time a commit is made this action will run, which installs uv and the project files and runs the tests in the tests folder. Furthermore it will carry out these actions in a Mac OS and Ubuntu environment for three different Python versions.
 
 There are many different actions that can be carried out upon a commit. For this one I copied the code from the following:
 
@@ -217,9 +223,9 @@ There are many different actions that can be carried out upon a commit. For this
 
 ## 5. Documentation
 
-It is handy to have some automation to write documentation for your project. This avoids the need to manually edit and update documentation each time you make a change. Rather, you can use a tool such as [Sphinx]() and [readthedocs](https://about.readthedocs.com/) to build the documentation from your code base. The documentation will be rebuilt with each push.
+In addition to automated testing, t is handy to have some automation to create documentation. This avoids the need to manually edit and update documentation each time you make a change. Rather, you can use a tool such as [Sphinx]() and [readthedocs](https://about.readthedocs.com/) to build the documentation from your code base. The documentation will be rebuilt with each push.
 
-Firstly create a new folder under `docs/source` called `conf.py`:
+Firstly, create a new folder under `docs/source` called `conf.py`:
 
 ```
 # Configuration file for the Sphinx documentation builder.
@@ -286,23 +292,27 @@ Read the Docs doesn't yet support pyproject.toml files so we have to create a `r
 uv pip compile pyproject.toml > docs/requirements.txt
 ```
 
-Next log into Read The Docs and import your Github repo. Finally, when you push your latest commit the documentation will be built and available at https://project_name.readthedocs.io/en/latest/
+Next log into Read The Docs and import your Github repo (you will need to first create an account if you haven't). 
+
+Finally, when you push your latest commit the documentation will be built and available at https://project_name.readthedocs.io/en/latest/
 
 ## 6. Build and distribute the package
 
-Finally now that our package has been tested and documented, we can build and publish it. With uv this is very straightforward. Firstly, create a distribution of the package:
+Now we are ready to build the package and publish it to make it available to the world. With uv this is straightforward. Firstly, create a distribution of the package:
 
 `uv build`
 
-This will create a `.tar.gz` and `.whl` file under the new `dist` folder. Let's publish it to [PyPI](https://www.pypi.org).
+This will create a `.tar.gz` and `.whl` file under the new `dist` folder. 
+
+Let's publish it to [PyPI](https://www.pypi.org).
 
 `uv publish`
 
-The package is now available for the entire world to use via `uv`, `conda`, `poetry` or `pip`
+The package is now listed on the python package index and can be installed via `uv`, `conda`, `poetry` or `pip`
 
 
 ## Summary
-And that's it! You can now create a project in uv, make it available on github, incorporate some automated testing and creation of documentation and make your project available to the rest of the Python community via Pypi. As a bonus we have an easy-to-use Python package for redacting PII from text, a pretty common task when working with sensitive data. 
+And that's it! You can now create a project in uv, make it available on github, incorporate some automated testing and documentation creation and make your project available to the rest of the Python community. As a bonus we have an easy-to-use Python package for redacting PII from text, a pretty common task when working with sensitive data. 
 
 ## References
 - [A Beginner's Guide to Creating an Open Source Python Package](https://nishanthjkumar.com/blog/2022/A-Beginner's-Guide-To-Creating-An-Open-Source-Python-Package/)
