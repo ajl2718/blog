@@ -200,62 +200,279 @@
     "href": "posts/llm_experiments/index.html",
     "title": "Experiments with Large Language Models",
     "section": "",
-    "text": "Like most people in the world, for the past 12 months or so I have been doing some experimenting with Large Language Models (LLMs). For the past month I have been doing this in a more a more focused way, to understand what their capabilities are and how suitable they might be for my day-to-day work and for research.\nI have been using ChapGPT as a code assistant for quite a while (in lieu of StackOverflow. whose data OpenAI stole anyway). However, I hadn’t built anything using LLMs and, despite the huge number of papers that are published about them every week, I had yet to do any serious experimenting with them in a research sense.\nHere are a collection of some recent experiments."
+    "text": "Like most people in the world, for the past twelive months or so I have been doing some experimenting with Large Language Models (LLMs). For the past month I have been doing this in a more focused way, to understand what their capabilities are and how suitable they might be for my day-to-day work and for research.\nI have been using ChapGPT as a code assistant for quite a while (in lieu of StackOverflow, whose data OpenAI stole anyway). However, I hadn’t built anything using LLMs and, despite the huge number of papers that are published about them every week, I had yet to do any serious experimenting with them in a research sense.\nHere are a collection of some recent experiments."
   },
   {
-    "objectID": "posts/llm_experiments/index.html#getting-started",
-    "href": "posts/llm_experiments/index.html#getting-started",
+    "objectID": "posts/llm_experiments/index.html#getting-started-with-local-models",
+    "href": "posts/llm_experiments/index.html#getting-started-with-local-models",
     "title": "Experiments with Large Language Models",
-    "section": "Getting started",
-    "text": "Getting started\nI found that playing around with different prompts using ChapGPT or Claude are good starting points to see how to interact with LLMs."
-  },
-  {
-    "objectID": "posts/llm_experiments/index.html#externally-hosted-vs-local-models",
-    "href": "posts/llm_experiments/index.html#externally-hosted-vs-local-models",
-    "title": "Experiments with Large Language Models",
-    "section": "Externally hosted vs local models",
-    "text": "Externally hosted vs local models\nFor my work which uses clinical data it is prohbited to send data to external APIs, so I have been particularly interested in the capabilities of open-source models like Mistral-7B and Llama3. These can be run on my own machine and I can create Jupyter notebooks and Python scripts that make use of them too.\n\nOllama for running local models\nThis is a great tool for running models on my Mac. Once installed you can interact with an LLM from the command line. Furthermore, you can make requests to these models using the requests library and so interact with them via a Jupyter notebook."
+    "section": "Getting started with local models",
+    "text": "Getting started with local models\nProbably the best starting point is Ollama, a tool that you can use to download and run open models (e.g., Mistral, Llama3, Phi-2) from the command line. For example, to run Mistral all you need is the run the following command.\nollama run mistral:latest\nOllama also allows you to interact with models from Python. ### Ollama for running local models This is a great tool for running models on my Mac. Once installed you can interact with an LLM from the command line. Furthermore, you can make requests to these models using the requests library and so interact with them via a Jupyter notebook."
   },
   {
     "objectID": "posts/llm_experiments/index.html#prompting",
     "href": "posts/llm_experiments/index.html#prompting",
     "title": "Experiments with Large Language Models",
     "section": "Prompting",
-    "text": "Prompting\nLLMs take as an input a prompt, i.e., a string, and then produce some outputs based on this. There is some experimentation used to steer the model into providing the output that you would like, through communicating with the model in particular ways. Some people have given this the pretentious name of prompt engineering.\nOne way to get a model to produce an output that is more inline with what you intend is to provide some examples to guide it."
+    "text": "Prompting\nLLMs take as an input a prompt, i.e., a string, and then produce some outputs based on this. There is some experimentation used to steer the model into providing the output that you would like, through communicating with the model in particular ways. Some people have given this the pretentious name of prompt engineering.\nOne way to get a model to produce an output that is more inline with what you intend is to provide some examples to guide it.\nNow for a few different examples."
   },
   {
     "objectID": "posts/llm_experiments/index.html#example-text-anonymization",
     "href": "posts/llm_experiments/index.html#example-text-anonymization",
     "title": "Experiments with Large Language Models",
     "section": "Example: Text anonymization",
-    "text": "Example: Text anonymization\nWith these concepts in mind, I am now able to re-produce some results from a paper I noticed earlier in the year."
+    "text": "Example: Text anonymization\nEarlier in the year a pre-print came out Large Language Models are advanced anonymizers. The idea is to use LLMs to take some text that contains identifying information (e.g., location, age, gender) and use an LLM to rewrite is so that not only is this information replaced, but indirectly identifying information is also removed. Traditional Named Entity Recognition models are able to extract direct identifers but it turns out LLMs can do much more.\nThe idea is to have one LLM to extract identifying information from the text and another to de-identify the text. Once the extractor LLM can no longer pull out any more identifiying information, then the text is said to be anonymized.\nHere are the prompts\n\\\\ system prompt\nYou are an expert...\n\n\\\\ user prompt\n{query}\n\\\\ system prompt\nYou are an expert anonymizer\nLet’s see an example. In Melbourne there is a famous bar called Young and Jackson’s. Inside there is a 19th century nude portrait called Chloe. This second piece of information is therefore enough to indirectly identify the location of the bar and therefore the city.\nOver the weekend I went to that place near the station with the painting of chloe. There we had a few drinks and watched the game.\nThe LLM does an excellent job of extracting the information and then rewriting so that it is less specific."
   },
   {
     "objectID": "posts/llm_experiments/index.html#example-data-cleaning",
     "href": "posts/llm_experiments/index.html#example-data-cleaning",
     "title": "Experiments with Large Language Models",
     "section": "Example: Data Cleaning",
-    "text": "Example: Data Cleaning"
+    "text": "Example: Data Cleaning\nOne of my key motivations for using LLMs is to automate some of the drudgery of data work, namely data cleaning. Clinical data can be extremely messy with many variations for a given piece of information."
   },
   {
     "objectID": "posts/llm_experiments/index.html#example-inforamtion-extraction-from-tabular-data",
     "href": "posts/llm_experiments/index.html#example-inforamtion-extraction-from-tabular-data",
     "title": "Experiments with Large Language Models",
     "section": "Example: Inforamtion extraction from tabular data",
-    "text": "Example: Inforamtion extraction from tabular data"
+    "text": "Example: Inforamtion extraction from tabular data\nWith very little effort, LLMs can also be used to extract information from tabular data, through converting the data to JSON or some other serialized format."
   },
   {
     "objectID": "posts/llm_experiments/index.html#lessons",
     "href": "posts/llm_experiments/index.html#lessons",
     "title": "Experiments with Large Language Models",
     "section": "Lessons",
-    "text": "Lessons\nLLMs are good at the following: - Using indirect information, e.g., with text anonymization, that traditional ML models fail at - Handling a wide variety of inputs and instructions - Handling a broad range of tasks - Handling a broad range of data types, since many of these can be converted to text anyway."
+    "text": "Lessons\n\nLLMs can solve a broad range of tasks, through the use of a carefully crafted prompt.\nThey exceed the capabilities of many traditional ML models at tasks such as anonymization through the ability to use indirect pieces of information in the text and effectively reason with this.\nThey can be incorporated into data analysis workflows in a fairly straightforward way so tasks such as data cleaning be streamlined, though there are some limitations and caveats.\nTabular data information is also feasible.\nThere are still some significant limitations to them namely their apparent dependence on particular phrasing of the prompt and the fact that the same prompt can give multiple conflicting responses."
   },
   {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Articles",
     "section": "",
-    "text": "Date\n\n\nTitle\n\n\nCategories\n\n\n\n\n\n\nJun 7, 2024\n\n\nExperiments with Large Language Models\n\n\nLLM\n\n\n\n\nMar 31, 2024\n\n\nLarger than memory datasets in Python using Polars\n\n\npython, polars, large data\n\n\n\n\nJul 9, 2022\n\n\nVirtual environments with Jupyter Notebooks\n\n\npython, jupyter\n\n\n\n\nMay 14, 2022\n\n\nGeospatial analysis in a secure environment\n\n\npython, geospatial\n\n\n\n\nApr 2, 2021\n\n\nSetting up a scratch space using Poetry, Docker and Jupyter\n\n\npython, docker, jupyter\n\n\n\n\nMar 14, 2021\n\n\nA simple geocoder using Postgres and Python\n\n\npython, postgres, geospatial\n\n\n\n\nJan 1, 2021\n\n\nIntro to webscraping\n\n\npython, webscraping, requests, open data\n\n\n\n\nDec 31, 2020\n\n\nRegular lattice shapefiles with geopandas\n\n\npython, geopandas, geospatial visualisation\n\n\n\n\n\nNo matching items"
+    "text": "Date\n\n\nTitle\n\n\nCategories\n\n\n\n\n\n\nJun 11, 2025\n\n\nAn overview of record linkage and geocoding\n\n\npython, record linkage\n\n\n\n\nMay 18, 2025\n\n\nCreating and publishing your first Python package\n\n\npython development, natural language processing\n\n\n\n\nMar 22, 2025\n\n\nTokenisation\n\n\nnatural language processing\n\n\n\n\nJun 7, 2024\n\n\nExperiments with Large Language Models\n\n\nLLM\n\n\n\n\nMar 31, 2024\n\n\nLarger than memory datasets in Python using Polars\n\n\npython, polars, large data\n\n\n\n\nJul 9, 2022\n\n\nVirtual environments with Jupyter Notebooks\n\n\npython, jupyter\n\n\n\n\nMay 14, 2022\n\n\nGeospatial analysis in a secure environment\n\n\npython, geospatial\n\n\n\n\nApr 2, 2021\n\n\nSetting up a scratch space using Poetry, Docker and Jupyter\n\n\npython, docker, jupyter\n\n\n\n\nMar 14, 2021\n\n\nA simple geocoder using Postgres and Python\n\n\npython, postgres, geospatial\n\n\n\n\nJan 1, 2021\n\n\nIntro to webscraping\n\n\npython, webscraping, requests, open data\n\n\n\n\nDec 31, 2020\n\n\nRegular lattice shapefiles with geopandas\n\n\npython, geopandas, geospatial visualisation\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/bpe/index.html",
+    "href": "posts/bpe/index.html",
+    "title": "Tokenisation",
+    "section": "",
+    "text": "Data is naturally represented as numerical variables but useful information is often stored in text. A key step in natural language processing is to convert the raw information that is initially represented as strings into a numerical representation that is suitable for downstream tasks such as text classification, named entity recognition or machine translation."
+  },
+  {
+    "objectID": "posts/bpe/index.html#tokenisation-for-large-language-models",
+    "href": "posts/bpe/index.html#tokenisation-for-large-language-models",
+    "title": "Tokenisation",
+    "section": "Tokenisation for large language models",
+    "text": "Tokenisation for large language models"
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html",
+    "href": "posts/setting-up-a-github-project/index.html",
+    "title": "Creating and publishing your first Python package",
+    "section": "",
+    "text": "This post describes a step-by-step template for how to go about setting up a Python project using uv and github and publishing the end result as a package on PyPi. The result is a simple Python package (&lt; 200 lines of code) for finding and removing Personally Identifiable Information (PII) from text. I have published the result as blankit but you can call your version whatever you like.\nMore specifically this post describes:"
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#project-structure",
+    "href": "posts/setting-up-a-github-project/index.html#project-structure",
+    "title": "Creating and publishing your first Python package",
+    "section": "1. Project structure",
+    "text": "1. Project structure\nI have recently switched to uv as an alternative to poetry as my preferred package manager. In other instances I have used conda but uv addresses all my issues with both of these. It is extremely fast at resolving package dependencies and convenient for managing projects. One caveat is that it is VC backed so, while it is currently free and open source, that may change at some point.\nFirstly, install uv by following the instructions on the uv website.\nNow you can set up a project in the command line via\nuv init --package project_name\nThis will create a uv project with the following structure\nproject_name\n|--- .python-version\n|--- README.md\n|--- pyproject.toml\n|___ src \n     |___ project_name \n          |___ __init__.py\nWe get a README.md (for giving users a basic overview of our project), a pyproject.toml (for listing all the dependencies of your project), .python-version that contains the python version and a src folder for storing all the project code.\n\n1.1. What is a pyproject.toml file?\nThis file is the modern approach for listing dependencies in a python package. Along with these dependencies it is also used to describe important metadata for your project, including the author name and contact details, project name, description and version. More details can be found in the Python packaging user guide.\nLet’s modify this file with some useful information.\n[project]\nname = \"project-name\"\nversion = \"0.1.0\"\ndescription = \"My PII detection project\"\nreadme = \"README.md\"\nauthors = [\n    { name = \"Alex Lee\", email = \"ajlee3141@gmail.com\" }\n]\nrequires-python = \"&gt;=3.10\"\ndependencies = []\n\n[project.scripts]\nproject-name = \"project_name:main\"\n\n[build-system]\nrequires = [\"hatchling\"]\nbuild-backend = \"hatchling.build\"\nNow let’s add a package that will be key to solving our PII detection task.\n\n\n1.2. Named Entity Recognition for PII detection\nWe will user the GLiNER package that does zero-shot named entity recognition. Since PII consists of explicit references to names, locations and other identifiers, this is a good option.\nLet’s add this package to our project\nuv add gliner\nThe pyproject.toml file has now been updated with this additional dependencies\ndependencies = [\n    \"gliner&gt;=0.2.19\",\n]\nAnd we will also add a couple of other packages that will be useful later on:\nuv add pandas blank ruff pytest\nYou will notice that uv has created a new file uv.lock which all the resolved dependencies for these packages required by our project, and also a folder .venv for our virtual environment.\nOnce a project is cloned from our repo if we run uv run python this will install all the required dependences, in other words, there is no requirements.txt file as is the case for pip.\n\n\n1.3. Write some code that solves our task\nThe final package contains two files: a utils.py file and a scanner.py file. The first contains functions for things like parsing text, replacing the identified PII with generic text and redacting the text. The second file describes a Scanner class that provides an API for users to identify and redact a given string or list of strings."
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#environment",
+    "href": "posts/setting-up-a-github-project/index.html#environment",
+    "title": "Setting up a github project",
+    "section": "Environment",
+    "text": "Environment"
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#using-uv",
+    "href": "posts/setting-up-a-github-project/index.html#using-uv",
+    "title": "Creating and publishing your first Python package",
+    "section": "",
+    "text": "pyproject.toml file to store the dependencies, including python version\nuv.lock file that contains detailed information on the resolved dependencies\n\nOnce project is cloned uv run python will install all the required dependencies the first time. E.g., there is no need to do uv pip install -r requirements.txt if there were a requirements.txt file"
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#unit-tests-and-integration-tests",
+    "href": "posts/setting-up-a-github-project/index.html#unit-tests-and-integration-tests",
+    "title": "Creating and publishing your first Python package",
+    "section": "",
+    "text": "We are still missing a couple of things, one of which is some unit tests. This helps us to check that when we make changes to our code, we don’t break other things. We will add a couple of these, to check the functionality of our utility functions.\nCreate a folder tests under the project parent directory and a file test_function.py in this folder\ndef test_basic():\n    assert len(\"mango\") == 5\nWe will use pytest to run tests and so we add a few lines to our pyproject.toml file\n[tool.pytest.ini_options]\ntestpaths = [\"tests\"]\npython_files = [\"test_*.py\"]\npython_functions = \"test_*\"\nAnd we can run pytest as follows\nuv run pytest\nYou should see that 2 of out 2 tests have passed (assuming nothing broke in the code). You can also commit these and push to your git repo\ngit add tests\ngit add pyproject.toml\ngit commit -m 'Update with tests'\ngit push"
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#using-github-actions",
+    "href": "posts/setting-up-a-github-project/index.html#using-github-actions",
+    "title": "Creating and publishing your first Python package",
+    "section": "",
+    "text": "Adding in github action for installing uv (https://docs.astral.sh/uv/guides/integration/github/#installation)\nWhat they are: https://docs.github.com/en/actions/about-github-actions/understanding-github-actions"
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#make-a-package-and-push-it-to-pypi",
+    "href": "posts/setting-up-a-github-project/index.html#make-a-package-and-push-it-to-pypi",
+    "title": "Creating and publishing your first Python package",
+    "section": "",
+    "text": "We first need to build the package. This will create a .whl file and .tar.gz file under /dist with the packages that are ready for distribution:\nuv build\nNow we can publish the file to (PyPI)[https://www.pypi.org]\nuv publish\nThe file can then be installed using a package manager such as uv, conda, poetry or pip as you usually do, and it can be incorporated into other developer’s projects."
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#documentation",
+    "href": "posts/setting-up-a-github-project/index.html#documentation",
+    "title": "Creating and publishing your first Python package",
+    "section": "5. Documentation",
+    "text": "5. Documentation\nIt is handy to have some automation to write documentation for your project. This avoids the need to manually edit and update documentation each time you make a change. Rather, you can use a tool such as Sphinx and readthedocs to build the documentation from your code base. The documentation will be rebuilt with each push.\nFirstly create a new folder under docs/source called conf.py:\n# Configuration file for the Sphinx documentation builder.\nimport os\nimport sys\n\nsys.path.insert(0, os.path.abspath('../..'))\n\n# -- Project information\n\nproject = 'project_name'\ncopyright = '2025, Alex Lee'\nauthor = 'Alex Lee'\n\nrelease = '0.1.0'\nversion = \"0.1.0\"\n\n# -- General configuration\n\nextensions = [\n    'sphinx.ext.duration',\n    'sphinx.ext.doctest',\n    'sphinx.ext.autodoc',\n    'sphinx.ext.autosummary',\n    'sphinx.ext.intersphinx',\n    'sphinx.ext.napoleon',\n]\n\nintersphinx_mapping = {\n    'python': ('https://docs.python.org/3/', None),\n    'sphinx': ('https://www.sphinx-doc.org/en/master/', None),\n}\nintersphinx_disabled_domains = ['std']\n\n# -- Options for HTML output\nhtml_theme = 'alabaster'\n\n# -- Options for EPUB output\nepub_show_urls = 'footnote'\nAlso add a .readthedocs.yaml file to the root directory of your repo:\nversion: \"2\"\n\nsphinx:\n  configuration: docs/source/conf.py\n\nbuild:\n  os: \"ubuntu-22.04\"\n  tools:\n    python: \"3.10\"\n\npython:\n  install:\n    - method: pip\n      path: .\nRead the Docs doesn’t yet support pyproject.toml files so we have to create a requirements.txt file:\nuv pip compile pyproject.toml &gt; docs/requirements.txt\nNext log into Read The Docs and import your Github repo. Finally, when you push your latest commit the documentation will be built and available at https://project_name.readthedocs.io/en/latest/"
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#references",
+    "href": "posts/setting-up-a-github-project/index.html#references",
+    "title": "Creating and publishing your first Python package",
+    "section": "References",
+    "text": "References\n\nA Beginner’s Guide to Creating an Open Source Python Package\nFrom a Python Project to an Open Source Package: An A to Z Guide\nWriting pyproject.toml\nSetting Up Testing with Pytest and UV"
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#outline",
+    "href": "posts/setting-up-a-github-project/index.html#outline",
+    "title": "Creating and publishing your first Python package",
+    "section": "",
+    "text": "More specifically I will describe:\n\nUsing the uv Python package manager to initialise a project with a basic folder structure\nCreating a Github repository for the project\nIncorporating unit tests\nAutomating tests in different deployment environments using Github Actions\nUsing sphinx to produced automated documentation from the codebase\nBuilding and publishing the package to PyPi."
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#write-some-code-that-solves-our-task",
+    "href": "posts/setting-up-a-github-project/index.html#write-some-code-that-solves-our-task",
+    "title": "Creating and publishing your first Python package",
+    "section": "",
+    "text": "The final package contains two files: a utils.py file and a scanner.py file. The first contains functions for things like parsing text, replacing the identified PII with generic text and redacting the text. The second file describes a Scanner class that provides an API for users to identifying and redacting PII."
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#create-a-github-repository-for-our-project",
+    "href": "posts/setting-up-a-github-project/index.html#create-a-github-repository-for-our-project",
+    "title": "Creating and publishing your first Python package",
+    "section": "2. Create a Github repository for our project",
+    "text": "2. Create a Github repository for our project\nWe now have enough ingredients for our project to create a project respository on Github.\n\n2.1. Initialise the github repo locally\nFirstly we will intialise git:\ngit init\nThis will create two new files .gitignore that tells the repo which files should not be tracked and pushed to the repo, and a folder .git for tracking changes.\nNow we can carry out our initial commit.\ngit add .\ngit commit -m \"Initial commit\"\n\n\n2.2. Create a github respository in your Github account and push your code\nNow log in to your Github account and create a repostiory. Once that is created, you can push all the current project code to this repo.\ngit remote add origin https://github.com/yourusername/your-repo-name.git\ngit branch -M main\ngit push -u origin main"
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#automation-with-github-actions",
+    "href": "posts/setting-up-a-github-project/index.html#automation-with-github-actions",
+    "title": "Creating and publishing your first Python package",
+    "section": "4. Automation with Github Actions",
+    "text": "4. Automation with Github Actions\nWe are almost there. One useful addition to our project is to run a series of tests each time we commit to Github. Most users will not be working within our exact set up (operating system or python version) and so having tests performed by Github It will reduce the likelihood that the users of your package will encounter bugs that you didn’t anticipate.\nThis is done via a so-called Github Action.\nWe will add an action for carrying out tests. Create a file test.yml under a new folder .github/workflows/ and include the following in the file\nname: project_name\n\non: [push, pull_request]\n\njobs:\n  test:\n    runs-on: ${{ matrix.os }}\n    strategy:\n      matrix:\n        os: [ubuntu-latest, macos-latest]\n        python-version: ['3.10', '3.11', '3.12']\n\n    steps:\n    - uses: actions/checkout@v4\n\n    - name: Install uv\n      uses: astral-sh/setup-uv@v5\n\n    - name: \"Set up Python\"\n      uses: actions/setup-python@v5\n      with:\n        python-version: ${{ matrix.python-version }}\n\n    - name: Install the project\n      run: uv sync --locked --all-extras --dev\n\n    - name: Run tests (Linux/macOS)\n      if: runner.os != 'Windows'\n      run: uv run pytest tests\nWhen a change is committed to the repo, this will run an action that installs uv and the project files and runs the tests in the tests folder. Furthermore it will carry out these actions in a Mac OS and Ubuntu environment and three different Python versions, making the tests more robust.\nThere are many different actions that can be carried out upon a commit. For this one I copied the code from the following:\n\nAdding in github action for installing uv\nUnderstanding Github Actions"
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#build-and-distribute-the-package",
+    "href": "posts/setting-up-a-github-project/index.html#build-and-distribute-the-package",
+    "title": "Creating and publishing your first Python package",
+    "section": "6. Build and distribute the package",
+    "text": "6. Build and distribute the package\nFinally now that our package has been tested and documented, we can build and publish it. With uv this is very straightforward. Firstly, create a distribution of the package:\nuv build\nThis will create a .tar.gz and .whl file under the new dist folder. Let’s publish it to PyPI.\nuv publish\nThe package is now available for the entire world to use via uv, conda, poetry or pip"
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#add-some-unit-tests",
+    "href": "posts/setting-up-a-github-project/index.html#add-some-unit-tests",
+    "title": "Creating and publishing your first Python package",
+    "section": "3. Add some unit tests",
+    "text": "3. Add some unit tests\nWe are still missing a couple of things, one of which is some unit tests. This helps us to check that when we make changes to our code, we don’t break other things. We will add a couple of these, to check the functionality of our utility functions.\nCreate a folder tests under the project parent directory and a file test_function.py in this folder\ndef test_basic():\n    assert len(\"mango\") == 5\nWe will use pytest to run tests and so we add a few lines to our pyproject.toml file\n[tool.pytest.ini_options]\ntestpaths = [\"tests\"]\npython_files = [\"test_*.py\"]\npython_functions = \"test_*\"\nAnd we can run pytest as follows\nuv run pytest\nYou should see that 2 of out 2 tests have passed (assuming nothing broke in the code). You can also commit these and push to your git repo\ngit add tests\ngit add pyproject.toml\ngit commit -m 'Update with tests'\ngit push"
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#summary",
+    "href": "posts/setting-up-a-github-project/index.html#summary",
+    "title": "Creating and publishing your first Python package",
+    "section": "Summary",
+    "text": "Summary\nAnd that’s it! You can now create a project in uv, make it available on github, incorporate some automated testing and creation of documentation and make your project available to the rest of the Python community via Pypi. As a bonus we have an easy-to-use Python package for redacting PII from text, a pretty common task when working with sensitive data."
+  },
+  {
+    "objectID": "posts/record_linkage_and_geocoding/index.html",
+    "href": "posts/record_linkage_and_geocoding/index.html",
+    "title": "An overview of record linkage and geocoding",
+    "section": "",
+    "text": "Record linkage is a key step in enabling analysis of population-level trends and patterns, which is relevant to a broad range of questions in the public sector and healthcare. Examples include:\nIt is generally the case that relevant information is stored in disparate data sources, which need to be linked together to develop a harmonised pictuure of populations.\nA key challenge is that information about a given person can be recorded in many different ways: for example a person’s name may contain be recorded using initials in one dataset, a nickname in another and a complete name in a third. Similarly, street addresses often contain spelling errors, missing postcode or suburb names, or unusual formatting.\nRecord linkage, also called data linkage or entity resolution is a key step to harmonise these sources to obtain a more complete picture of the population’s use of different services. In addition to being robust to variations in how items are recorded, record linkage algorithms also need to scale, often to tens of millions of records. Brute force string similarity approaches are therefore out of the question.\nIn this article we will give a brief overview of what record linkage is and some record linkage techniques as applied to both person-level and address-level dataset. These two types of record linkage problems are related, but require slightly different approaches.\nFinally we will present two open source Python packages - Splink and whereabouts - that solve each of these problems."
+  },
+  {
+    "objectID": "posts/record_linkage_and_geocoding/index.html#an-example-synthetic-dataset",
+    "href": "posts/record_linkage_and_geocoding/index.html#an-example-synthetic-dataset",
+    "title": "An overview of record linkage and geocoding",
+    "section": "1. An example synthetic dataset",
+    "text": "1. An example synthetic dataset\nLet’s begin by considering the following dataset consisting of names and addresses.\n\n\n\nName\nAddress\n\n\n\n\nJonh Smth\n123 Aplee St, New Yrok, NY 10001\n\n\nMaria Gonsalez\n56b, Elm Street, los angeles CA\n\n\nA. K. Patel\nApt#4 78-King’s Rd London\n\n\nlucy o’conner\n8890 wElmwood av., dallas TX\n\n\nChen, Wei\nNo. 77, HuaiHai Rd, shanghi"
+  },
+  {
+    "objectID": "posts/record_linkage_and_geocoding/index.html#formulation-of-the-record-linkage-problem",
+    "href": "posts/record_linkage_and_geocoding/index.html#formulation-of-the-record-linkage-problem",
+    "title": "An overview of record linkage and geocoding",
+    "section": "2. Formulation of the record linkage problem",
+    "text": "2. Formulation of the record linkage problem\nConsider just the two sets of addresses in the above examples. They are two different sets of strings and we need to find a mapping from one set to the other, in such a way that equivalent addresses are deemed to be true matches while those that do not match are correctly identified as such.\n(Diagram showing two sets and maps between them)\nThis mapping is called a score function and assigns a number between each pair of records in the two datasets. Roughly this can be thought of as a probability of a match between them, although since the function is not necessarily calibrated we prefer the term score.\n\n2.1. Blocking\n\nProblem: large search space\nSolution: reduce the search space by only searching over candidate matches\nHow do we reduce the search space?\n\n\n\n2.2. Scoring\nOnce we have a set of candidate records to compare against, we need to be able to assign a ranking to each candidate based on high likely it is to be a correct match. This is known as scoring.\n\n\n2.3. Tokenisation\n\n\n2.4. Privacy"
+  },
+  {
+    "objectID": "posts/record_linkage_and_geocoding/index.html#section",
+    "href": "posts/record_linkage_and_geocoding/index.html#section",
+    "title": "An overview of record linkage and geocoding",
+    "section": "",
+    "text": "References\n\n\nExploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes\nGithub repo for PhraseGeocoder"
+  },
+  {
+    "objectID": "posts/record_linkage_and_geocoding/index.html#common-errors",
+    "href": "posts/record_linkage_and_geocoding/index.html#common-errors",
+    "title": "An overview of record linkage and geocoding",
+    "section": "Common errors",
+    "text": "Common errors"
+  },
+  {
+    "objectID": "posts/record_linkage_and_geocoding/index.html#scaling",
+    "href": "posts/record_linkage_and_geocoding/index.html#scaling",
+    "title": "An overview of record linkage and geocoding",
+    "section": "Scaling",
+    "text": "Scaling"
+  },
+  {
+    "objectID": "posts/record_linkage_and_geocoding/index.html#approach",
+    "href": "posts/record_linkage_and_geocoding/index.html#approach",
+    "title": "An overview of record linkage and geocoding",
+    "section": "Approach",
+    "text": "Approach\n\nReferences\n\n\nExploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes\nSplink\nwhereabouts\nData Matching: Concepts and Techniques for Record Linkage, Entity Resolution, and Duplicate Detection, Peter Christen"
+  },
+  {
+    "objectID": "posts/record_linkage_and_geocoding/index.html#challenges",
+    "href": "posts/record_linkage_and_geocoding/index.html#challenges",
+    "title": "An overview of record linkage and geocoding",
+    "section": "Challenges",
+    "text": "Challenges"
+  },
+  {
+    "objectID": "posts/record_linkage_and_geocoding/index.html#evaluation",
+    "href": "posts/record_linkage_and_geocoding/index.html#evaluation",
+    "title": "An overview of record linkage and geocoding",
+    "section": "4. Evaluation",
+    "text": "4. Evaluation\nHow do we test the performance? This is actually a non-trivial problem. Unlike for many machine learning tasks, there are few publicly available datasets that are representative of the kinds of records that are encountered ‘in the wild.’\n\nThe lack of available benchmarking datasets\nVariations in types of errors"
+  },
+  {
+    "objectID": "posts/record_linkage_and_geocoding/index.html#data-quality",
+    "href": "posts/record_linkage_and_geocoding/index.html#data-quality",
+    "title": "An overview of record linkage and geocoding",
+    "section": "Data quality",
+    "text": "Data quality"
+  },
+  {
+    "objectID": "posts/record_linkage_and_geocoding/index.html#implementation",
+    "href": "posts/record_linkage_and_geocoding/index.html#implementation",
+    "title": "An overview of record linkage and geocoding",
+    "section": "Implementation",
+    "text": "Implementation\nNow that we understand some of the theory and algorithms, let’s implement them. Some desirable characteristics of a good implementation include:\n\nEase of installation: most data scientists are lazy when it comes to deciding which software to use, so the fewer steps it takes to install a package, the better\nClear documentation: simple code examples to demonstrate the software makes a package much more appealing.\nUsing well-tested tools ensure that algorithm implementations will be more performant and have fewer errors\n\nFor these reasons an obvious choice is DuckDB. It’s an open source tool based on SQL with a Python API. Unlike other SQL implementations such as Postgres is has the advantage of not requiring a user to create a SQL server instance, in order word, all the data is stored directly on a file.\n\nPrivacy considerations"
+  },
+  {
+    "objectID": "posts/record_linkage_and_geocoding/index.html#reference-datasets",
+    "href": "posts/record_linkage_and_geocoding/index.html#reference-datasets",
+    "title": "An overview of record linkage and geocoding",
+    "section": "5. Reference datasets",
+    "text": "5. Reference datasets\n\n5.1. Address databases\nBuilding a geocoder depends on having a good quality reference dataset, i.e., a complete set of clean, standardised street addresses, with corresponding latitude and longitude values.\nThe availability of such datasets varies widely between countries. In Australia, the Geocoded National Address File is a quarterly-updated, free and publicly available reference dataset covering the entire country. In the UK, in comparison, such data sources are ownly available commerically."
+  },
+  {
+    "objectID": "posts/record_linkage_and_geocoding/index.html#specific-algorithms",
+    "href": "posts/record_linkage_and_geocoding/index.html#specific-algorithms",
+    "title": "An overview of record linkage and geocoding",
+    "section": "3. Specific algorithms",
+    "text": "3. Specific algorithms\nLet’s look at some specific approaches\n\n3.1. Felligi-Sunter\n\n\n3.2. Signature-based approaches\n\nProblem: How to define blocks\nSolution: Use terms that serve as approximate signatures of the record, i.e., substrings within the original string that almost uniquely identify it. Intuitively: Peter MacCallum Cancer Centre -&gt; Peter Mac\nPaper by Tania Churchill, Kee Siong Ng, etc:\n\n\n\n3.3. Implementation\nNow that we understand some of the theory and algorithms, let’s implement them. Some desirable characteristics of a good implementation include:\n\nEase of installation: most data scientists are lazy when it comes to deciding which software to use, so the fewer steps it takes to install a package, the better\nClear documentation: simple code examples to demonstrate the software makes a package much more appealing.\nUsing well-tested tools ensure that algorithm implementations will be more performant and have fewer errors\n\nFor these reasons an obvious choice is DuckDB. It’s an open source tool based on SQL with a Python API. Unlike other SQL implementations such as Postgres is has the advantage of not requiring a user to create a SQL server instance, in order word, all the data is stored directly on a file."
+  },
+  {
+    "objectID": "posts/record_linkage_and_geocoding/index.html#other-challenges",
+    "href": "posts/record_linkage_and_geocoding/index.html#other-challenges",
+    "title": "An overview of record linkage and geocoding",
+    "section": "6. Other challenges",
+    "text": "6. Other challenges\n\nReferences\n\n\nExploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes\nSplink\nwhereabouts\nData Matching: Concepts and Techniques for Record Linkage, Entity Resolution, and Duplicate Detection, Peter Christen"
   }
 ]
