@@ -1,0 +1,15 @@
+[
+  {
+    "listing": "/index.html",
+    "items": [
+      "/posts/setting-up-a-github-project/index.html",
+      "/posts/large_datasets_in_python/index.html",
+      "/posts/virtual-environments-with-jupyter/index.html",
+      "/posts/local-geospatial-analysis/index.html",
+      "/posts/using-docker/index.html",
+      "/posts/geocoding/index.html",
+      "/posts/intro-to-webscraping/index.html",
+      "/posts/regular-lattice-shapefiles/index.html"
+    ]
+  }
+]
