@@ -234,7 +234,7 @@ build-backend = "hatchling.build"</code></pre>
 </section>
 <section id="named-entity-recognition-for-pii-detection" class="level3">
 <h3 class="anchored" data-anchor-id="named-entity-recognition-for-pii-detection">1.2. Named Entity Recognition for PII detection</h3>
-<p><a href="https://github.com/urchade/GLiNER">GLiNER</a> is a widely used package for zero-shot named entity recognition. This just means that we can give a description of the categories that we are interest in detecting and, without any training, the model will do a pretty good job of detecting them. This is an effective out-of-the-box solution for PII detection since PII consists of explicit references to names, locations and other identifiers.</p>
+<p><a href="https://github.com/urchade/GLiNER">GLiNER</a> is a widely used package for zero-shot named entity recognition. This just means that we can give a description of the categories that we are interested in detecting and, without any training, the model will do a pretty good job of detecting them. This makes it an effective out-of-the-box solution for PII detection since PII consists of explicit references to names, locations and other identifiers.</p>
 <p>Let’s add this package to our project</p>
 <pre><code>uv add gliner</code></pre>
 <p>The <code>pyproject.toml</code> file has now been updated with this additional dependencies</p>
@@ -243,12 +243,12 @@ build-backend = "hatchling.build"</code></pre>
 ]</code></pre>
 <p>And we will also add a couple of other packages that will be useful later on:</p>
 <pre><code>uv add pandas blank ruff pytest</code></pre>
-<p>You will notice that uv has created a new file <code>uv.lock</code> with all the resolved dependencies for these packages required by our project, and also a folder <code>.venv</code> for our virtual environment.</p>
-<p>If someone clones our project from a repo (see the next step), they can run <code>uv run python</code> to install all the required dependences. In other words, there is no <code>requirements.txt</code> file as is the case when using pip.</p>
+<p>You will notice that uv has created a new file - <code>uv.lock</code> - with all the resolved dependencies for these packages required by our project, and also a folder <code>.venv</code> for our virtual environment.</p>
+<p>If someone clones our project from a repo (see the next step), they can run <code>uv run python</code> to install all the required dependences. In other words, there is no <code>requirements.txt</code> file needed as for pip.</p>
 </section>
 <section id="write-some-code-that-solves-our-task" class="level3">
 <h3 class="anchored" data-anchor-id="write-some-code-that-solves-our-task">1.3. Write some code that solves our task</h3>
-<p>The <a href="https://github.com/ajl2718/blankit/tree/main/src/blankit">final package</a> contains two files: a <code>utils.py</code> file and a <code>scanner.py</code> file. The first contains functions for things like parsing text, replacing the identified PII with generic text and redacting the text. The second file describes a <code>Scanner</code> class that provides an API for users to identify and redact a given string or list of strings. You can create these files in the <code>src</code> folder and copy the code across.</p>
+<p>The <a href="https://github.com/ajl2718/blankit/tree/main/src/blankit">final package</a> contains two files: a <code>utils.py</code> file and a <code>scanner.py</code> file. The first contains functions for basic tasks like parsing and replacing the identified PII with generic PII labels. The second file implements a <code>Scanner</code> class that provides an API for users to identify and redact a given string or list of strings. You can create these files in the <code>src</code> folder and copy the code across from the <a href="https://github.com/ajl2718/blankit/tree/main/src/blankit">blankit repo</a>.</p>
 </section>
 </section>
 <section id="create-a-github-repository-for-our-project" class="level2">
@@ -256,11 +256,11 @@ build-backend = "hatchling.build"</code></pre>
 <p>We now have the key ingredients for our project. Let’s create a respository for our project on Github.</p>
 <section id="initialise-the-github-repo-locally" class="level3">
 <h3 class="anchored" data-anchor-id="initialise-the-github-repo-locally">2.1. Initialise the github repo locally</h3>
-<p>Firstly we intialise git. This is done in the base folder of the project:</p>
+<p>Firstly we intialise git (assuming you already have it installed). This is done in the base folder of the project:</p>
 <pre><code>git init</code></pre>
-<p>This will create: a file called <code>.gitignore</code> that tells the repo which files should not be tracked by git when we make a push request; and a folder <code>.git</code> for tracking changes.</p>
+<p>This will create: a file called <code>.gitignore</code> that tells the repo which files should not be tracked by git when we make a push request; and a folder named <code>.git</code> for tracking changes.</p>
 <p>If you’re not comfortable with git there are <a href="https://www.freecodecamp.org/news/learn-the-basics-of-git-in-under-10-minutes-da548267cc91/">plenty</a> <a href="https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F">of</a> <a href="https://docs.github.com/en/get-started/start-your-journey/git-and-github-learning-resources">tutorials</a> <a href="https://www.atlassian.com/git">online</a></p>
-<p>Now we can carry out our initial commit.</p>
+<p>Now we can add our changes and make our initial commit.</p>
 <pre><code>git add .
 git commit -m "Initial commit"</code></pre>
 </section>
@@ -279,12 +279,12 @@ git push -u origin main
 <p>Create a folder <code>tests</code> under the project parent directory and a file <code>test_function.py</code> in this folder</p>
 <pre><code>def test_basic():
     assert len("mango") == 5</code></pre>
-<p>We will use <a href="https://docs.pytest.org/en/stable/">pytest</a> to run tests and so we add a few lines to our <code>pyproject.toml</code> file</p>
+<p>We will use <a href="https://docs.pytest.org/en/stable/">pytest</a> to run tests and so we add a few lines to our <code>pyproject.toml</code> file to specify where to find the test functions</p>
 <pre><code>[tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = "test_*"</code></pre>
-<p>And we can run pytest as follows</p>
+<p>Now we can run pytest as follows</p>
 <pre><code>uv run pytest</code></pre>
 <p>You should see that 2 of out 2 tests have passed (assuming nothing broke in the code). You can also commit these and push to your git repo</p>
 <pre><code>git add tests
@@ -294,9 +294,9 @@ git push</code></pre>
 </section>
 <section id="automation-with-github-actions" class="level2">
 <h2 class="anchored" data-anchor-id="automation-with-github-actions">4. Automation with Github Actions</h2>
-<p>We are almost there. One useful addition to our project is to run a series our tests each time we commit to Github, so that anything that breaks can be detected before committing the code.</p>
-<p>Also, most users will not be working within our exact set up (operating system and python version) and so having tests performed by Github in different environments (Windows, Mac, Linux) will reduce the chance that the users of the package will encounter bugs that you didn’t anticipate.</p>
-<p>This can be done via a <a href="https://github.com/features/actions">Github Action</a>.</p>
+<p>We are almost there. One useful addition to our project is to run a series our tests each time we commit to Github, so that anything that breaks can be detected before the code is pushed. In other words, it helps to avoid pushing broken code.</p>
+<p>Also, since most users will not be working within our exact set up (operating system and python version), ensuring unit tests performed by Github in different environments (Windows, Mac, Linux) will reduce the chance that the users of the package will encounter bugs that you didn’t anticipate.</p>
+<p>This can all be done via a <a href="https://github.com/features/actions">Github Action</a>.</p>
 <p>We will add an action for carrying out tests. Create a file <code>test.yml</code> under a new folder <code>.github/workflows/</code> and include the following in the file</p>
 <pre><code>name: project_name
 
@@ -327,8 +327,8 @@ jobs:
     - name: Run tests (Linux/macOS)
       if: runner.os != 'Windows'
       run: uv run pytest tests</code></pre>
-<p>Each time a commit is made this action will run, which installs uv and the project files and runs the tests in the tests folder. Furthermore it will carry out these actions in a Mac OS and Ubuntu environment for three different Python versions.</p>
-<p>There are many different actions that can be carried out upon a commit. For this one I copied the code from the following:</p>
+<p>Each time we push code to the repo this action will run, which installs uv and the project files and runs the tests in the tests folder. It will carry out these actions in a Mac OS and Ubuntu environment for three different Python versions.</p>
+<p>There are a whole range of github actions. For this one I copied the code from the following:</p>
 <ul>
 <li><a href="https://docs.astral.sh/uv/guides/integration/github/#installation">Adding in github action for installing uv</a></li>
 <li><a href="https://docs.github.com/en/actions/about-github-actions/understanding-github-actions">Understanding Github Actions</a></li>
@@ -336,7 +336,7 @@ jobs:
 </section>
 <section id="documentation" class="level2">
 <h2 class="anchored" data-anchor-id="documentation">5. Documentation</h2>
-<p>In addition to automated testing, t is handy to have some automation to create documentation. This avoids the need to manually edit and update documentation each time you make a change. Rather, you can use a tool such as <a href="">Sphinx</a> and <a href="https://about.readthedocs.com/">readthedocs</a> to build the documentation from your code base. The documentation will be rebuilt with each push.</p>
+<p>In addition to automated testing, it is handy to use automation to create documentation. This avoids the need to manually edit and update documentation each time you make a change. Instead, you can use a tool such as <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> and <a href="https://about.readthedocs.com/">readthedocs</a> to build the documentation from your code base. The documentation will be rebuilt whenever code is pushed to the repo.</p>
 <p>Firstly, create a new folder under <code>docs/source</code> called <code>conf.py</code>:</p>
 <pre><code># Configuration file for the Sphinx documentation builder.
 import os
@@ -390,17 +390,17 @@ python:
   install:
     - method: pip
       path: .</code></pre>
-<p>Read the Docs doesn’t yet support pyproject.toml files so we have to create a <code>requirements.txt</code> file:</p>
+<p>Read the Docs doesn’t yet support pyproject.toml files so we have to now create a <code>requirements.txt</code> file. This is straightforward in uv:</p>
 <pre><code>uv pip compile pyproject.toml &gt; docs/requirements.txt</code></pre>
-<p>Next log into Read The Docs and import your Github repo (you will need to first create an account if you haven’t).</p>
-<p>Finally, when you push your latest commit the documentation will be built and available at https://project_name.readthedocs.io/en/latest/</p>
+<p>Next log into Read The Docs and import your Github repo (you will need to first create an account on RTD if you haven’t).</p>
+<p>Now, each time we push code to our repo, the documentation will be automatically built and available at https://project_name.readthedocs.io/en/latest/</p>
 </section>
 <section id="build-and-distribute-the-package" class="level2">
 <h2 class="anchored" data-anchor-id="build-and-distribute-the-package">6. Build and distribute the package</h2>
-<p>Now we are ready to build the package and publish it to make it available to the world. With uv this is straightforward. Firstly, create a distribution of the package:</p>
+<p>Now we are ready to build the package and publish it to make it available to the world. Firstly, create a distribution of the package:</p>
 <p><code>uv build</code></p>
 <p>This will create a <code>.tar.gz</code> and <code>.whl</code> file under the new <code>dist</code> folder.</p>
-<p>Let’s publish it to <a href="https://www.pypi.org">PyPI</a>.</p>
+<p>Let’s publish it to <a href="https://www.pypi.org">PyPI</a> (note that you will need to setup a PyPI account with authentication to do this).</p>
 <p><code>uv publish</code></p>
 <p>The package is now listed on the python package index and can be installed via <code>uv</code>, <code>conda</code>, <code>poetry</code> or <code>pip</code></p>
 </section>
