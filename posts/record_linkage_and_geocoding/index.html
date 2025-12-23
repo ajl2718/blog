@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Alex Lee">
-<meta name="dcterms.date" content="2025-06-11">
+<meta name="dcterms.date" content="2025-07-06">
 
-<title>An overview of record linkage and geocoding</title>
+<title>Implementing record linkage and geocoding algorithms in SQL</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -69,9 +69,38 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
-<meta property="og:title" content="An overview of record linkage and geocoding">
+<meta property="og:title" content="Implementing record linkage and geocoding algorithms in SQL">
 <meta property="og:description" content="">
 </head>
 
@@ -123,9 +152,8 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">An overview of record linkage and geocoding</h1>
+<h1 class="title">Implementing record linkage and geocoding algorithms in SQL</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">python</div>
     <div class="quarto-category">record linkage</div>
   </div>
   </div>
@@ -144,7 +172,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 11, 2025</p>
+      <p class="date">July 6, 2025</p>
     </div>
   </div>
   
@@ -156,20 +184,8 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Record linkage is a key step in enabling analysis of population-level trends and patterns, which is relevant to a broad range of questions in the public sector and healthcare. Examples include:</p>
-<ul>
-<li>Linking primary care and other health datasets to understand patterns of patients’ utilisation of healthcare services</li>
-<li>Deduplication of customer address data</li>
-<li></li>
-</ul>
-<p>It is generally the case that relevant information is stored in disparate data sources, which need to be linked together to develop a harmonised pictuure of populations.</p>
-<p>A key challenge is that information about a given person can be recorded in many different ways: for example a person’s name may contain be recorded using initials in one dataset, a nickname in another and a complete name in a third. Similarly, street addresses often contain spelling errors, missing postcode or suburb names, or unusual formatting.</p>
-<p>Record linkage, also called data linkage or entity resolution is a key step to harmonise these sources to obtain a more complete picture of the population’s use of different services. In addition to being robust to variations in how items are recorded, record linkage algorithms also need to scale, often to tens of millions of records. Brute force string similarity approaches are therefore out of the question.</p>
-<p>In this article we will give a brief overview of what record linkage is and some record linkage techniques as applied to both person-level and address-level dataset. These two types of record linkage problems are related, but require slightly different approaches.</p>
-<p>Finally we will present two open source Python packages - <a href="https://moj-analytical-services.github.io/splink/index.html">Splink</a> and <a href="https://pypi.org/project/whereabouts/">whereabouts</a> - that solve each of these problems.</p>
-<section id="an-example-synthetic-dataset" class="level2">
-<h2 class="anchored" data-anchor-id="an-example-synthetic-dataset">1. An example synthetic dataset</h2>
-<p>Let’s begin by considering the following dataset consisting of names and addresses.</p>
+<p>Record linkage is a key step in enabling analysis of population-level trends and patterns. For example, to understand patients’ interactions with the health system it is necessary to link together datasets from the various services that they iteract with.</p>
+<p>The basic problem is illustrated in the diagram below.</p>
 <table class="table">
 <thead>
 <tr class="header">
@@ -200,19 +216,28 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
+<p>We have two tables and wish to find a mapping of the rows from one to the other. The problem is complicated due to differences in the way that two entities are recorded, for example via spelling errors, differences in notation and missing information.</p>
+<p>If there was a unique identifier for each table we could do a left join, but usually we don’t have this. Instead we need to establish a mapping rule based on the information available in the data.</p>
+<section id="brute-force-string-similarity" class="level2">
+<h2 class="anchored" data-anchor-id="brute-force-string-similarity">1. Brute force string similarity</h2>
+<p>Let’s start with one approach: comparing all pairs of rows using a string similarity function. This is a function that assigns a score to each pair, with high scores indicating a more likely match.</p>
+<p><strong>Jaccard similarity</strong>, <strong>Levenshtein distance</strong>, <strong>cosine similarity</strong></p>
+<p>We can see that the scores correspond to roughly what we expect…</p>
+<p>The problem of course is that comparing all possible pairs of records does not scale: With <span class="math inline">\(N\)</span> records in one table and <span class="math inline">\(M\)</span> in another, <span class="math inline">\(NM\)</span> comparisons are needed. In Australia, where there are over 15 million street addresses, this simply isn’t feasible.</p>
+<p>Instead we reduce our search space by dividing the tables into <em>blocks</em> each containing similar sets of strings.</p>
 </section>
-<section id="formulation-of-the-record-linkage-problem" class="level2">
-<h2 class="anchored" data-anchor-id="formulation-of-the-record-linkage-problem">2. Formulation of the record linkage problem</h2>
-<p>Consider just the two sets of addresses in the above examples. They are two different sets of strings and we need to find a mapping from one set to the other, in such a way that equivalent addresses are deemed to be true matches while those that do not match are correctly identified as such.</p>
-<p>(Diagram showing two sets and maps between them)</p>
-<p>This mapping is called a <em>score function</em> and assigns a number between each pair of records in the two datasets. Roughly this can be thought of as a <em>probability</em> of a match between them, although since the function is not necessarily calibrated we prefer the term score.</p>
-<section id="blocking" class="level3">
-<h3 class="anchored" data-anchor-id="blocking">2.1. Blocking</h3>
-<ul>
-<li>Problem: large search space</li>
-<li>Solution: reduce the search space by only searching over candidate matches</li>
-<li>How do we reduce the search space?</li>
-</ul>
+<section id="blocking" class="level2">
+<h2 class="anchored" data-anchor-id="blocking">2. Blocking</h2>
+<p>Each block is indexed by a <em>blocking key</em>. For example, the name of the suburb, assuming this is available, makes a sensible key, and each block then consists of addresses in the same suburb.</p>
+<p>However, records themselves are often not sufficiently neatly structured for such a key to be readily extracted. Instead we use the data itself to construct this.</p>
+<p>This is the approach taken in the paper <em>Record linkage in parallel databases using probabilistic signatures</em>.</p>
+<p>The idea is to split each string into substrings and count the frequenct with which each substring appears across the entire set of records. Those that are relatively infrequent make suitable <em>signatures</em> as they identify with high specificity the records associated with them. In other words, they make suitable blocking keys.</p>
+<section id="inverted-indexes" class="level3">
+<h3 class="anchored" data-anchor-id="inverted-indexes">2.1. Inverted indexes</h3>
+<p>Let’s create the inverted index table. We split each string into <em>phrases</em> and for each phrase group by addresses that belong to it.</p>
+<pre><code>create table phrases as (
+    select str_split(address, ' ') phrase from addresses
+);</code></pre>
 </section>
 <section id="scoring" class="level3">
 <h3 class="anchored" data-anchor-id="scoring">2.2. Scoring</h3>

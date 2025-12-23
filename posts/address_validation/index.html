@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Alex Lee">
-<meta name="dcterms.date" content="2021-03-14">
+<meta name="dcterms.date" content="2025-07-17">
 
-<title>A simple geocoder using Postgres and Python</title>
+<title>Using LLMs to validate geocoder outputs</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -71,11 +71,8 @@ ul.task-list li input[type="checkbox"] {
 
 
 <link rel="stylesheet" href="../../styles.css">
-<meta property="og:title" content="A simple geocoder using Postgres and Python">
+<meta property="og:title" content="Using LLMs to validate geocoder outputs">
 <meta property="og:description" content="">
-<meta property="og:image" content="https://ajl2718.github.io/blog/posts/geocoding/geocoder_output.png">
-<meta property="og:image:height" content="736">
-<meta property="og:image:width" content="1467">
 </head>
 
 <body class="nav-fixed fullcontent">
@@ -126,10 +123,10 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">A simple geocoder using Postgres and Python</h1>
+<h1 class="title">Using LLMs to validate geocoder outputs</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">postgres</div>
-    <div class="quarto-category">geospatial</div>
+    <div class="quarto-category">LLMs</div>
+    <div class="quarto-category">address data</div>
   </div>
   </div>
 
@@ -147,7 +144,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 14, 2021</p>
+      <p class="date">July 17, 2025</p>
     </div>
   </div>
   
@@ -159,58 +156,43 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>For a work project last year we needed to create at short notice a geocoder for Victorian addresses. While there are a number of open source options such as <a href="https://github.com/openvenues/libpostal">libpostal</a>, we decided to take a different approach, following the ideas in the paper <a href="https://arxiv.org/abs/1708.01402">Exploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes</a>. This allowed us to create a proof-of-concept within a few days and was relatively simple to code from scratch, using Python and Postgres.</p>
-<h1>
-An observation about street addresses
-</h1>
-<p>The paper is partly based on some observations about the statistics of street addresses which imply significant amount of redundancy in the way they are described. For example:</p>
-<blockquote class="blockquote">
-<p>Based on the <a href="https://data.gov.au/dataset/ds-dga-19432f89-dc3a-4ef3-b943-5326ef1dbecc/details">January 2021 release of the GNAF</a> there are 3,839,496 addresses in Victoria. 516,926 of which (i.e., over 13%) are uniquely defined by three numbers: flat number, street number and postcode.</p>
-</blockquote>
-<p>As a result, <strong>these addresses can be identified irrespective of typographical errors in the street name, suburb or other text</strong>. Furthermore, even where the text is necessary to identify an address, often only a subset of the text is needed, and this is generally the parts of the text that occur relatively infrequently.</p>
-<h1>
-The algorithm: general idea
-</h1>
-<p>The authors of the paper use this idea as the starting point for a geocoding algorithm (actually an address linking algorithm in their paper) that has some nice properties:</p>
+<p>Machine learning algorithms are typically compared using an independent validation dataset, but there doesn’t appear to be many publicly available benchmarking datasets for comparing geocoding algorithms. Furthermore, to evaluate the performance of an algorithm against an address dataset how do we define the <em>correctness</em> of a prediction? One way is to use the latitude, longitude values along with the <a href="https://en.wikipedia.org/wiki/Haversine_formula">Haversine Formula</a> to calculate the distance between each prediction and the ground truth. Alternatively we can evaluate each address that has been matched with a ground truth.</p>
+<p>This is a bit more involved since it is text, but I found a nice performance measure is to compare address pairs at four different levels:</p>
 <ul>
-<li>It can be coded up in SQL in a few queries;</li>
-<li>There is no need to <em>standardize</em> the addresses, i.e., to identify each of the address components and then re-write in a way that can be linked to the GNAF;</li>
-<li>It can be scaled up to allow for fast linking of large datasets (as the title suggests).</li>
+<li>Apartment / Unit / Tenancy number</li>
+<li>Street number</li>
+<li>Street name</li>
+<li>Suburb name</li>
 </ul>
-<p>Despite its simplicity it works surprisingly well and at least for me was a good project for getting more hands-on experience using Postgres.</p>
-<p>Based on these ideas, the authors developed a simple geocoding algorithm that represents each address in terms of <em>rare phrases</em>, i.e., pairs of consecutive tokens that occur below a certain frequency, along with other infrequently occuring elements.</p>
-<h1>
-The algorithm: details and implementation
-</h1>
-<p>Here are the basic steps of the algorithm for geocoding street addresses:</p>
-<ol type="1">
-<li>Create a database to store the GNAF data;</li>
-<li>For both the input addresses and GNAF create corresponding <strong>phrase tables</strong> which generate the phrases for each address, i.e., the pairs of consecutive tokens;</li>
-<li>An <strong>inverted index</strong> is generated on the phrases which maps each phrase to a set of addresses that contain these phrases;</li>
-<li>The inverted index tables for the input addresses and GNAF addresses are then linked, only considering those that appear below a certain frequency. This has the advantage of only requiring searches over a small subset of addresses. The result is a set of <strong>candidate matches</strong> for each of the input addresses;</li>
-<li>For each input address a <strong>similarity score is calculated</strong> with its set of candidate addresses. We used the <em>similarity</em> function from <em>pg_tgrm</em> module;</li>
-<li>As a final step, an additional constraint on the numeric tokens is imposed: <strong>the set of numeric tokens in the input address has to be a subset of those in the matched address</strong>. This ensures, for example, that the unit numbers are correct.</li>
-</ol>
-<p>The paper has SQL code for most of these steps, with the exception of the GNAF setup and the numerical constraint.</p>
-<p>I have written a Python module for geocoding that implements this algorithm in Postgres thanks to the nice <a href="https://pypi.org/project/results/">results library</a>. It is available in the repo <a href="https://github.com/saunteringcat/PhraseGeocoder">PhraseGeocoder</a>.</p>
-<h1>
-Summary and extensions to the algorithm
-</h1>
-<p>I found this an instructive project for learning more about Postgres, in particular things like Common Table Expressions, string similarity and operations that I wasn’t at all familiar with.</p>
-<p>There are a few obvious ways that this algorithm can be extended:</p>
-<ul>
-<li>Intead of using pairs of <em>consecutive</em> tokens as phrases, use pairs of <em>next-to-nearest neighbour</em> phrases.</li>
-<li>To better handle certain spelling errors, particularly those that occur in the text that is needed for the matching, construct phrases based on trigrams.</li>
-<li>Chain together a sequence of geocoding algorithms, so that with higher data quality addresses can be geocoded by the faster phrase-based geocoder and the lower quality ones then get filtered out and geocoded by the slower but more accurate trigram based geocoder (or another variant).</li>
-</ul>
-<p>Some of these variations I have coded up and will upload them at a later date.</p>
-<h1>
-References
-</h1>
-<ul>
-<li><a href="https://arxiv.org/abs/1708.01402">Exploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes</a></li>
-<li><a href="https://github.com/saunteringcat/PhraseGeocoder">Github repo for PhraseGeocoder</a></li>
-</ul>
+<p>So, for example if the correct address is <code>4 / 23 Johnston Avenue Burwood East 3151</code> and our geocoder produces <code>23 Johnston Avenue Burwood East 3151</code> then this is accurate up to street number but not the apartment number.</p>
+<p>Previously I would manually go through each pair of addresses to score the predictions. For example see <a href="https://github.com/ajl2718/whereabouts_testing">this notebook</a> where I compare <a href="https://www.github.com/ajl2718/whereabouts">whereabouts</a> with other geocoders.</p>
+<p>LLMs provide a nicer way to automate this. I found that the following prompt with GPT4 gives a structured outputs and assesses the accuracy at the four levels of geographic granularity above.</p>
+<pre><code>You are scoring the quality of a list of Australian street addresses with their corresponding matches.
+
+You should identify all the components of the street address, including unit or apartment number, shop / tenancy number, street number, 
+street name, suburb and postcode and use these components in creating a score. 
+
+You consider four levels of granularity for each address in order to assign a score: unit, property number (e.g., house number), 
+street name, suburb / postcode. A numerical score should be assigned as follows:
+
+- 4: unit number, street number, street name and suburb / postcode all match (including where there is no unit number)
+- 3: property number, street name and suburb / postcode match
+- 2: only the streetname and suburb / postcode match
+- 1: only the suburb / postcode match
+- 0: none of the components match or if the state is different, for example 'NSW' instead of 'QLD'
+
+Additional instructions:
+- Shop and tenancy are equivalent, as are unit and apartment number. Level is not considered relevant. 
+- If the suburb name is different but the postcode and other components of the address match then we consider them the same suburb.
+- If there is no unit or shop number in the addresses then we consider that to be a match on the unit or shop number, since they are both empty
+
+Structure of the output:
+- The output should consist ONLY of a json list with keys for each entry: 
+  - input_address, matched_address, unit_match, street_number_match, street_name_match, suburb_match, postcode_match, overall_score
+- The columns with the '_match' suffix are binary. 
+- No other text should be shown in the output, ONLY THE JSON.
+
+The pairs of input and matched addresses are shown below:</code></pre>
 
 
 
