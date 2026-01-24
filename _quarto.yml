@@ -16,7 +16,7 @@ website:
 format:
   html:
     theme: 
-      - simplex
+      - spacelab
     #  - custom.scss
     anchor-sections: true
-    css: styles.css
+ #   css: styles.css

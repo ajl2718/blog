@@ -98,7 +98,7 @@ dependencies = [
 
 And we will also add a couple of other packages that will be useful later on:
 ```
-uv add pandas blank ruff pytest
+uv add pandas black ruff pytest
 ```
 
 You will notice that uv has created a new file - `uv.lock` - with all the resolved dependencies for these packages required by our project, and also a folder `.venv` for our virtual environment.
