@@ -264,47 +264,5 @@
     "title": "Creating and publishing your first Python package",
     "section": "References",
     "text": "References\n\nA Beginner’s Guide to Creating an Open Source Python Package\nFrom a Python Project to an Open Source Package: An A to Z Guide\nWriting pyproject.toml\nSetting Up Testing with Pytest and UV"
-  },
-  {
-    "objectID": "posts/bert_fine_tuning/index.html",
-    "href": "posts/bert_fine_tuning/index.html",
-    "title": "Fine-tuning and pre-training models",
-    "section": "",
-    "text": "Recently I have been experimenting with different neural network architectures that use BERT-style embeddings. LLMs are good general purpose models but there are some deficiencies - They are expensive (in terms of time and money) - You build in a dependency on an external API (e.g., OpenAI, Anthropic) - They are huge models and their level of complexity often isn’t needed\nI have found that a better alternative is smaller models such as BERT. They are small, cheap, open source and can be deployed in your own environment. The challenge is then to figure out how to train them.\nIn this post I will describe some experiments using BERT models for domain-specific NLP tasks including multi-class text classification and named entity recognition. I am not claiming to be an expert in this area, but these are the results of running experiments. Some key questions I wanted to understand are - What are some templates for fine-tuning and pre-training BERT models for different tasks? - How can I estimate the training time for a given size model, dataset and hardware specifications? - How can I optimise the training using different tricks and libraries, particularly when working with multi-GPU compute? - What are the idiosyncracies of databricks and how do they come into play?"
-  },
-  {
-    "objectID": "posts/bert_fine_tuning/index.html#what-is-bert",
-    "href": "posts/bert_fine_tuning/index.html#what-is-bert",
-    "title": "Fine-tuning and pre-training models",
-    "section": "What is BERT?",
-    "text": "What is BERT?"
-  },
-  {
-    "objectID": "posts/bert_fine_tuning/index.html#how-can-i-use-this-model",
-    "href": "posts/bert_fine_tuning/index.html#how-can-i-use-this-model",
-    "title": "Fine-tuning and pre-training models",
-    "section": "How can I use this model?",
-    "text": "How can I use this model?\nA simple example is to generate text embeddings. Unlike models such as Word2Vec and GLoVe, that encode text at the token level, BERT embeddings are able to encode richer structure by generating embeddings for the text as a whole. Well, Word2Vec and GLoVe can do this too but often it involves pooling the bag of embeddings for the text. Token-level embeddings struggle with polysemy, that is words that are written the same but can have different meanings. Whereas BERT can use the surrounding context of the sentence to generate a suitable embedding."
-  },
-  {
-    "objectID": "posts/bert_fine_tuning/index.html#pre-training-full-fine-tuning-and-partial-fine-tuning",
-    "href": "posts/bert_fine_tuning/index.html#pre-training-full-fine-tuning-and-partial-fine-tuning",
-    "title": "Fine-tuning and pre-training models",
-    "section": "Pre-training, full fine-tuning and partial fine-tuning",
-    "text": "Pre-training, full fine-tuning and partial fine-tuning\nBERT models are large, maybe not by the standards of today’s LLMs, but they are usually of the order of a 100 million parameters. This means that training and scaling become more significant hurdles, compared to your classical machine learning models. There are three related concepts when training BERT models (or many other large neural nets): pre-training, full fine-tuning and partial fine-tuning. These involve what proportion of the parameters in the model we choose to train.\n\nPre-training\nPre-training is where you use an enormous unlabelled dataset of text, with the objective being ‘Masked Language Modelling’. You can easily create labels for text from unlabelled text through the task of guess the missing word. So you essentially removes part of each chunk of text and treat the missing parts as labels that need to be predicted by the model.\nOnce you have a neural net architecture for language models, you can then do this from scratch, which takes a long time (e.g., days). The end result is a generic model that has learned a rich set of structures in written text, including semantic, syntax, and higher level meaning.\nThe end result is a model like BERT-base-uncased available on huggingcase. Example: embed some text and compare the similarity of the embeddings\nAs we see it does a pretty good job of clustering together sentence of similar meaning and distinguishing those that are different. It also handles spelling errors, differences in syntax and synonyms. One immediate challenge is that it isn’t so good at nuances within a specific domain. This is because it has been trainied on a large amount of generic text, rather than a specific set.\nIf we have a specific domain such as biomedical or mental health, how can we then adapt our model? The answer is fine-tuning\n\n\nFinetuning\nIn fine-tuning the original model is kept but we provide additional training data and update the weights using this data. We can think of this as ‘tweaking’ the weights slightly.\nThis can still be slow, however, since we are updating all the weights in the model (all 100 million or so). But a large amount of work in pre-training was done to get the model to a point of understanding existing linguistic structures, and we only need to learn additional vocabularly and context. So adjusting all weights seems like overkill.\n\n\nPartial fine-tuning\nInstead we can ‘freeze’ most of the layers of the neural network, and instead only update a few, for example the final four. The training process is then significantly sped up without much of an impact on performance..\n(code for pytorch fine-tuning)"
-  },
-  {
-    "objectID": "posts/bert_fine_tuning/index.html#applications-text-classification-and-ner",
-    "href": "posts/bert_fine_tuning/index.html#applications-text-classification-and-ner",
-    "title": "Fine-tuning and pre-training models",
-    "section": "Applications: text classification and NER",
-    "text": "Applications: text classification and NER\nBERT models generate text embeddings that capture rich structure as we just saw. But ultimately we want to solve a particular task. Here we look at text classification and named entity recognition. In text classification we will assign multiple labels to a text based on the clinical topics of interest. in NER we will extract specific names of drugs and conditions.\n\nText classification\nLet’s incorporate the BERT model into a broder architecture. The BERT model provides the embeddings, which are partially updated during training, while higher-level layers combine this information and produce predicted labels for the text. Here is the full code in pytorch\n(model definition, optimiser, dataset, loss function, training loop, evaluation loop)\n\n\nNamed Entity Recognition"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Articles",
-    "section": "",
-    "text": "Date\n\n\nTitle\n\n\nCategories\n\n\n\n\n\n\nJan 31, 2026\n\n\nFine-tuning and pre-training models\n\n\nLanguage Models, GPU training\n\n\n\n\nJul 3, 2025\n\n\nCreating and publishing your first Python package\n\n\npython development, natural language processing\n\n\n\n\nJan 25, 2025\n\n\nUsing LLMs to validate geocoder outputs\n\n\nLLMs, address data\n\n\n\n\nMar 31, 2024\n\n\nLarger than memory datasets in Python using Polars\n\n\npython, polars, large data\n\n\n\n\nJul 9, 2022\n\n\nVirtual environments with Jupyter Notebooks\n\n\npython, jupyter\n\n\n\n\nMay 14, 2022\n\n\nGeospatial analysis in a secure environment\n\n\ngeospatial\n\n\n\n\nApr 2, 2021\n\n\nSetting up a scratch space using Poetry, Docker and Jupyter\n\n\npython, docker, jupyter\n\n\n\n\nMar 14, 2021\n\n\nA simple geocoder using Postgres and Python\n\n\npostgres, geospatial\n\n\n\n\nJan 1, 2021\n\n\nIntro to webscraping\n\n\nwebscraping, requests, open data\n\n\n\n\nDec 31, 2020\n\n\nRegular lattice shapefiles with geopandas\n\n\npython, geopandas, geospatial visualisation\n\n\n\n\n\nNo matching items"
   }
 ]

@@ -155,9 +155,21 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Recently I have been experimenting with different neural network architectures that use BERT-style embeddings. LLMs are good general purpose models but there are some deficiencies - They are expensive (in terms of time and money) - You build in a dependency on an external API (e.g., OpenAI, Anthropic) - They are huge models and their level of complexity often isn’t needed</p>
-<p>I have found that a better alternative is smaller models such as BERT. They are small, cheap, open source and can be deployed in your own environment. The challenge is then to figure out how to train them.</p>
-<p>In this post I will describe some experiments using BERT models for domain-specific NLP tasks including multi-class text classification and named entity recognition. I am not claiming to be an expert in this area, but these are the results of running experiments. Some key questions I wanted to understand are - What are some templates for fine-tuning and pre-training BERT models for different tasks? - How can I estimate the training time for a given size model, dataset and hardware specifications? - How can I optimise the training using different tricks and libraries, particularly when working with multi-GPU compute? - What are the idiosyncracies of databricks and how do they come into play?</p>
+<p>Recently I have been experimenting with different neural network architectures that use BERT-style embeddings. LLMs are good general purpose models but there are some deficiencies:</p>
+<ul>
+<li>They are expensive (both in terms of time and money)</li>
+<li>You build in a dependency on an external API (e.g., OpenAI, Anthropic)</li>
+<li>They are huge models and their level of complexity often isn’t needed</li>
+</ul>
+<p>For many applications smaller models such as different variants of BERT are more suitable. They are small, cheap, open source and can be deployed in your own environment. The challenge is then to figure out how to train them.</p>
+<p>In this post I describe some experiments using BERT models for domain-specific NLP tasks including multi-class text classification and named entity recognition. An additional complication is that I have to work in a databricks environment. This can lead to some weird errors when training models.</p>
+<p>Some key questions I wanted to understand were:</p>
+<ul>
+<li>What are some templates for fine-tuning and pre-training BERT models for different tasks?</li>
+<li>How can I estimate the training time for a given size model, dataset and hardware specifications?</li>
+<li>How can I optimise the training using different tricks and libraries, particularly when working with multi-GPU compute?</li>
+<li>What are the idiosyncracies of databricks and how do they come into play?</li>
+</ul>
 <section id="what-is-bert" class="level2">
 <h2 class="anchored" data-anchor-id="what-is-bert">What is BERT?</h2>
 </section>
