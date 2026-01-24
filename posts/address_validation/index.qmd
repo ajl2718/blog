@@ -1,0 +1,50 @@
+---
+title: "Using LLMs to validate geocoder outputs"
+author: "Alex Lee"
+date: "2025-01-25"
+categories: [LLMs, address data]
+---
+
+Machine learning algorithms are typically compared using an independent validation dataset, but there doesn't appear to be many publicly available benchmarking datasets for comparing geocoding algorithms. Furthermore, to evaluate the performance of an algorithm against an address dataset how do we define the *correctness* of a prediction? One way is to use the latitude, longitude values along with the [Haversine Formula](https://en.wikipedia.org/wiki/Haversine_formula) to calculate the distance between each prediction and the ground truth. Alternatively we can evaluate each address that has been matched with a ground truth. 
+
+This is a bit more involved since it is text, but I found a nice performance measure is to compare address pairs at four different levels:
+
+- Apartment / Unit / Tenancy number
+- Street number
+- Street name
+- Suburb name
+
+So, for example if the correct address is `4 / 23 Johnston Avenue Burwood East 3151` and our geocoder produces `23 Johnston Avenue Burwood East 3151` then this is accurate up to street number but not the apartment number.
+
+Previously I would manually go through each pair of addresses to score the predictions. For example see [this notebook](https://github.com/ajl2718/whereabouts_testing) where I compare [whereabouts](https://www.github.com/ajl2718/whereabouts) with other geocoders.
+
+LLMs provide a nicer way to automate this. I found that the following prompt with GPT4 gives a structured outputs and assesses the accuracy at the four levels of geographic granularity above.
+
+```
+You are scoring the quality of a list of Australian street addresses with their corresponding matches.
+
+You should identify all the components of the street address, including unit or apartment number, shop / tenancy number, street number, 
+street name, suburb and postcode and use these components in creating a score. 
+
+You consider four levels of granularity for each address in order to assign a score: unit, property number (e.g., house number), 
+street name, suburb / postcode. A numerical score should be assigned as follows:
+
+- 4: unit number, street number, street name and suburb / postcode all match (including where there is no unit number)
+- 3: property number, street name and suburb / postcode match
+- 2: only the streetname and suburb / postcode match
+- 1: only the suburb / postcode match
+- 0: none of the components match or if the state is different, for example 'NSW' instead of 'QLD'
+
+Additional instructions:
+- Shop and tenancy are equivalent, as are unit and apartment number. Level is not considered relevant. 
+- If the suburb name is different but the postcode and other components of the address match then we consider them the same suburb.
+- If there is no unit or shop number in the addresses then we consider that to be a match on the unit or shop number, since they are both empty
+
+Structure of the output:
+- The output should consist ONLY of a json list with keys for each entry: 
+  - input_address, matched_address, unit_match, street_number_match, street_name_match, suburb_match, postcode_match, overall_score
+- The columns with the '_match' suffix are binary. 
+- No other text should be shown in the output, ONLY THE JSON.
+
+The pairs of input and matched addresses are shown below:
+```
