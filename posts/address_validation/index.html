@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Alex Lee">
-<meta name="dcterms.date" content="2025-07-17">
+<meta name="dcterms.date" content="2025-01-25">
 
 <title>Using LLMs to validate geocoder outputs</title>
 <style>
@@ -70,7 +70,6 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="../../styles.css">
 <meta property="og:title" content="Using LLMs to validate geocoder outputs">
 <meta property="og:description" content="">
 </head>
@@ -144,7 +143,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">July 17, 2025</p>
+      <p class="date">January 25, 2025</p>
     </div>
   </div>
   
@@ -156,8 +155,8 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Machine learning algorithms are typically compared using an independent validation dataset, but there doesn’t appear to be many publicly available benchmarking datasets for comparing geocoding algorithms. Furthermore, to evaluate the performance of an algorithm against an address dataset how do we define the <em>correctness</em> of a prediction? One way is to use the latitude, longitude values along with the <a href="https://en.wikipedia.org/wiki/Haversine_formula">Haversine Formula</a> to calculate the distance between each prediction and the ground truth. Alternatively we can evaluate each address that has been matched with a ground truth.</p>
-<p>This is a bit more involved since it is text, but I found a nice performance measure is to compare address pairs at four different levels:</p>
+<p>Machine learning algorithms are typically evaluated and compared against one another by using some sort of independent validation dataset. For geocoding algorithms such datasets don’t appear to be readily available. Furthermore, to evaluate the performance of an algorithm against an address dataset how do we define the <em>correctness</em> of a prediction? One way is to use the latitude, longitude values along with the <a href="https://en.wikipedia.org/wiki/Haversine_formula">Haversine Formula</a> to calculate the distance between each prediction and the ground truth. Alternatively we can evaluate each address that has been matched with a ground truth.</p>
+<p>This is a bit more involved since the results are text. One performance measure I find useful is to compare address pairs at four different levels:</p>
 <ul>
 <li>Apartment / Unit / Tenancy number</li>
 <li>Street number</li>
@@ -165,12 +164,11 @@ ul.task-list li input[type="checkbox"] {
 <li>Suburb name</li>
 </ul>
 <p>So, for example if the correct address is <code>4 / 23 Johnston Avenue Burwood East 3151</code> and our geocoder produces <code>23 Johnston Avenue Burwood East 3151</code> then this is accurate up to street number but not the apartment number.</p>
-<p>Previously I would manually go through each pair of addresses to score the predictions. For example see <a href="https://github.com/ajl2718/whereabouts_testing">this notebook</a> where I compare <a href="https://www.github.com/ajl2718/whereabouts">whereabouts</a> with other geocoders.</p>
-<p>LLMs provide a nicer way to automate this. I found that the following prompt with GPT4 gives a structured outputs and assesses the accuracy at the four levels of geographic granularity above.</p>
+<p>Depending on the application, a geocoder that is accurate to the street name (or even suburb name) may be sufficient, for example if we are only interested in created aggregated statistics across suburbs. For other applications (e.g., a food delivery service) the exact apartment number may be required.</p>
+<p>When evaluating the outputs of my own geocoding algorithms I would previously have to manually review each pair of addresses to score the predictions. For example see <a href="https://github.com/ajl2718/whereabouts_testing">this notebook</a> where I compare <a href="https://www.github.com/ajl2718/whereabouts">whereabouts</a> with other geocoders. LLMs provide a more streamlined way to automate this. I found that the following prompt with GPT4 gives a structured outputs and assesses the accuracy at the four levels of geographic granularity above.</p>
 <pre><code>You are scoring the quality of a list of Australian street addresses with their corresponding matches.
 
-You should identify all the components of the street address, including unit or apartment number, shop / tenancy number, street number, 
-street name, suburb and postcode and use these components in creating a score. 
+You should identify all the components of the street address, including unit or apartment number, shop / tenancy number, street number,  street name, suburb and postcode and use these components in creating a score. 
 
 You consider four levels of granularity for each address in order to assign a score: unit, property number (e.g., house number), 
 street name, suburb / postcode. A numerical score should be assigned as follows:
@@ -193,6 +191,7 @@ Structure of the output:
 - No other text should be shown in the output, ONLY THE JSON.
 
 The pairs of input and matched addresses are shown below:</code></pre>
+<p>Another example of LLMs saving time on menial tasks.</p>
 
 
 

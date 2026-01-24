@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Alex Lee">
-<meta name="dcterms.date" content="2025-07-06">
+<meta name="dcterms.date" content="2025-12-31">
 
-<title>Implementing record linkage and geocoding algorithms in SQL</title>
+<title>Implementing a geocoding algorithm in SQL</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -69,38 +69,8 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<link rel="stylesheet" href="../../styles.css">
-<meta property="og:title" content="Implementing record linkage and geocoding algorithms in SQL">
+<meta property="og:title" content="Implementing a geocoding algorithm in SQL">
 <meta property="og:description" content="">
 </head>
 
@@ -152,9 +122,11 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Implementing record linkage and geocoding algorithms in SQL</h1>
+<h1 class="title">Implementing a geocoding algorithm in SQL</h1>
   <div class="quarto-categories">
     <div class="quarto-category">record linkage</div>
+    <div class="quarto-category">geocoding</div>
+    <div class="quarto-category">SQL</div>
   </div>
   </div>
 
@@ -172,7 +144,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">July 6, 2025</p>
+      <p class="date">December 31, 2025</p>
     </div>
   </div>
   
@@ -184,127 +156,11 @@ window.Quarto = {
 </header>
 
 
-<p>Record linkage is a key step in enabling analysis of population-level trends and patterns. For example, to understand patients’ interactions with the health system it is necessary to link together datasets from the various services that they iteract with.</p>
-<p>The basic problem is illustrated in the diagram below.</p>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Address</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Jonh Smth</td>
-<td>123 Aplee St, New Yrok, NY 10001</td>
-</tr>
-<tr class="even">
-<td>Maria Gonsalez</td>
-<td>56b, Elm Street, los angeles CA</td>
-</tr>
-<tr class="odd">
-<td>A. K. Patel</td>
-<td>Apt#4 78-King’s Rd London</td>
-</tr>
-<tr class="even">
-<td>lucy o’conner</td>
-<td>8890 wElmwood av., dallas TX</td>
-</tr>
-<tr class="odd">
-<td>Chen, Wei</td>
-<td>No.&nbsp;77, HuaiHai Rd, shanghi</td>
-</tr>
-</tbody>
-</table>
-<p>We have two tables and wish to find a mapping of the rows from one to the other. The problem is complicated due to differences in the way that two entities are recorded, for example via spelling errors, differences in notation and missing information.</p>
-<p>If there was a unique identifier for each table we could do a left join, but usually we don’t have this. Instead we need to establish a mapping rule based on the information available in the data.</p>
-<section id="brute-force-string-similarity" class="level2">
-<h2 class="anchored" data-anchor-id="brute-force-string-similarity">1. Brute force string similarity</h2>
-<p>Let’s start with one approach: comparing all pairs of rows using a string similarity function. This is a function that assigns a score to each pair, with high scores indicating a more likely match.</p>
-<p><strong>Jaccard similarity</strong>, <strong>Levenshtein distance</strong>, <strong>cosine similarity</strong></p>
-<p>We can see that the scores correspond to roughly what we expect…</p>
-<p>The problem of course is that comparing all possible pairs of records does not scale: With <span class="math inline">\(N\)</span> records in one table and <span class="math inline">\(M\)</span> in another, <span class="math inline">\(NM\)</span> comparisons are needed. In Australia, where there are over 15 million street addresses, this simply isn’t feasible.</p>
-<p>Instead we reduce our search space by dividing the tables into <em>blocks</em> each containing similar sets of strings.</p>
-</section>
-<section id="blocking" class="level2">
-<h2 class="anchored" data-anchor-id="blocking">2. Blocking</h2>
-<p>Each block is indexed by a <em>blocking key</em>. For example, the name of the suburb, assuming this is available, makes a sensible key, and each block then consists of addresses in the same suburb.</p>
-<p>However, records themselves are often not sufficiently neatly structured for such a key to be readily extracted. Instead we use the data itself to construct this.</p>
-<p>This is the approach taken in the paper <em>Record linkage in parallel databases using probabilistic signatures</em>.</p>
-<p>The idea is to split each string into substrings and count the frequenct with which each substring appears across the entire set of records. Those that are relatively infrequent make suitable <em>signatures</em> as they identify with high specificity the records associated with them. In other words, they make suitable blocking keys.</p>
-<section id="inverted-indexes" class="level3">
-<h3 class="anchored" data-anchor-id="inverted-indexes">2.1. Inverted indexes</h3>
-<p>Let’s create the inverted index table. We split each string into <em>phrases</em> and for each phrase group by addresses that belong to it.</p>
-<pre><code>create table phrases as (
-    select str_split(address, ' ') phrase from addresses
-);</code></pre>
-</section>
-<section id="scoring" class="level3">
-<h3 class="anchored" data-anchor-id="scoring">2.2. Scoring</h3>
-<p>Once we have a set of candidate records to compare against, we need to be able to assign a ranking to each candidate based on high likely it is to be a correct match. This is known as <em>scoring</em>.</p>
-</section>
-<section id="tokenisation" class="level3">
-<h3 class="anchored" data-anchor-id="tokenisation">2.3. Tokenisation</h3>
-</section>
-<section id="privacy" class="level3">
-<h3 class="anchored" data-anchor-id="privacy">2.4. Privacy</h3>
-</section>
-</section>
-<section id="specific-algorithms" class="level2">
-<h2 class="anchored" data-anchor-id="specific-algorithms">3. Specific algorithms</h2>
-<p>Let’s look at some specific approaches</p>
-<section id="felligi-sunter" class="level3">
-<h3 class="anchored" data-anchor-id="felligi-sunter">3.1. Felligi-Sunter</h3>
-</section>
-<section id="signature-based-approaches" class="level3">
-<h3 class="anchored" data-anchor-id="signature-based-approaches">3.2. Signature-based approaches</h3>
-<ul>
-<li>Problem: How to define blocks</li>
-<li>Solution: Use terms that serve as approximate <em>signatures</em> of the record, i.e., substrings within the original string that almost uniquely identify it. Intuitively: Peter MacCallum Cancer Centre -&gt; Peter Mac</li>
-<li>Paper by Tania Churchill, Kee Siong Ng, etc:</li>
-</ul>
-</section>
-<section id="implementation" class="level3">
-<h3 class="anchored" data-anchor-id="implementation">3.3. Implementation</h3>
-<p>Now that we understand some of the theory and algorithms, let’s implement them. Some desirable characteristics of a good implementation include:</p>
-<ul>
-<li>Ease of installation: most data scientists are lazy when it comes to deciding which software to use, so the fewer steps it takes to install a package, the better</li>
-<li>Clear documentation: simple code examples to demonstrate the software makes a package much more appealing.</li>
-<li>Using well-tested tools ensure that algorithm implementations will be more performant and have fewer errors</li>
-</ul>
-<p>For these reasons an obvious choice is <a href="https://duckdb.org/">DuckDB</a>. It’s an open source tool based on SQL with a Python API. Unlike other SQL implementations such as Postgres is has the advantage of not requiring a user to create a SQL server instance, in order word, all the data is stored directly on a file.</p>
-</section>
-</section>
-<section id="evaluation" class="level2">
-<h2 class="anchored" data-anchor-id="evaluation">4. Evaluation</h2>
-<p>How do we test the performance? This is actually a non-trivial problem. Unlike for many machine learning tasks, there are few publicly available datasets that are representative of the kinds of records that are encountered ‘in the wild.’</p>
-<ul>
-<li>The lack of available benchmarking datasets</li>
-<li>Variations in types of errors</li>
-</ul>
-</section>
-<section id="reference-datasets" class="level2">
-<h2 class="anchored" data-anchor-id="reference-datasets">5. Reference datasets</h2>
-<section id="address-databases" class="level3">
-<h3 class="anchored" data-anchor-id="address-databases">5.1. Address databases</h3>
-<p>Building a geocoder depends on having a good quality reference dataset, i.e., a complete set of clean, standardised street addresses, with corresponding latitude and longitude values.</p>
-<p>The availability of such datasets varies widely between countries. In Australia, the <a href="https://data.gov.au/data/dataset/geocoded-national-address-file-g-naf">Geocoded National Address File</a> is a quarterly-updated, free and publicly available reference dataset covering the entire country. In the UK, in comparison, such data sources are ownly available commerically.</p>
-</section>
-</section>
-<section id="other-challenges" class="level2">
-<h2 class="anchored" data-anchor-id="other-challenges">6. Other challenges</h2>
-<h1>
-References
-</h1>
-<ul>
-<li><a href="https://arxiv.org/abs/1708.01402">Exploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes</a></li>
-<li><a href="https://moj-analytical-services.github.io/splink/index.html">Splink</a></li>
-<li><a href="https://github.com/ajl2718/whereabouts">whereabouts</a></li>
-<li>Data Matching: Concepts and Techniques for Record Linkage, Entity Resolution, and Duplicate Detection, Peter Christen</li>
-</ul>
+<p>A surprisingly fast and accurate geocoding algorithm can be implemented in SQL, based on work in <a href="https://arxiv.org/abs/1708.01402">Exploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes</a>.</p>
+<p>The algorithm is based on the observation that much of the text in a street address is largely redundant, i.e., only a small amount of information is required to link the address to an official database. For example the address <code>34 / 121 Exhibition St Melbourne 3000</code> contains the substring <code>34 / 121</code> of which there are likely to be only a few in Australia. Other parts of the string such as <code>Melbourne 3000</code> are so common that they provide very little useful information to correctly link the address.</p>
+<p>Consider a clean, reference database of addresses and corresponding latitude and longitude values, along with a table of addresses that we want to geocode by linking to it.</p>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

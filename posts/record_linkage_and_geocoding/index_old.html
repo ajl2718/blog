@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Alex Lee">
-<meta name="dcterms.date" content="2025-07-03">
+<meta name="dcterms.date" content="2025-07-06">
 
-<title>Creating and publishing your first Python package</title>
+<title>Implementing record linkage and geocoding algorithms in SQL</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -69,12 +69,41 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<meta property="og:title" content="Creating and publishing your first Python package">
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta property="og:title" content="Implementing record linkage and geocoding algorithms in SQL">
 <meta property="og:description" content="">
 </head>
 
-<body class="floating nav-fixed">
+<body class="nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -115,44 +144,16 @@ ul.task-list li input[type="checkbox"] {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#project-structure" id="toc-project-structure" class="nav-link active" data-scroll-target="#project-structure">1. Project structure</a>
-  <ul class="collapse">
-  <li><a href="#what-is-a-pyproject.toml-file" id="toc-what-is-a-pyproject.toml-file" class="nav-link" data-scroll-target="#what-is-a-pyproject.toml-file">1.1. What is a pyproject.toml file?</a></li>
-  <li><a href="#named-entity-recognition-for-pii-detection" id="toc-named-entity-recognition-for-pii-detection" class="nav-link" data-scroll-target="#named-entity-recognition-for-pii-detection">1.2. Named Entity Recognition for PII detection</a></li>
-  <li><a href="#write-some-code-that-solves-our-task" id="toc-write-some-code-that-solves-our-task" class="nav-link" data-scroll-target="#write-some-code-that-solves-our-task">1.3. Write some code that solves our task</a></li>
-  </ul></li>
-  <li><a href="#create-a-github-repository-for-our-project" id="toc-create-a-github-repository-for-our-project" class="nav-link" data-scroll-target="#create-a-github-repository-for-our-project">2. Create a Github repository for our project</a>
-  <ul class="collapse">
-  <li><a href="#initialise-the-github-repo-locally" id="toc-initialise-the-github-repo-locally" class="nav-link" data-scroll-target="#initialise-the-github-repo-locally">2.1. Initialise the github repo locally</a></li>
-  <li><a href="#create-a-github-respository-in-your-github-account-and-push-your-code" id="toc-create-a-github-respository-in-your-github-account-and-push-your-code" class="nav-link" data-scroll-target="#create-a-github-respository-in-your-github-account-and-push-your-code">2.2. Create a github respository in your Github account and push your code</a></li>
-  </ul></li>
-  <li><a href="#add-some-unit-tests" id="toc-add-some-unit-tests" class="nav-link" data-scroll-target="#add-some-unit-tests">3. Add some unit tests</a></li>
-  <li><a href="#automation-with-github-actions" id="toc-automation-with-github-actions" class="nav-link" data-scroll-target="#automation-with-github-actions">4. Automation with Github Actions</a></li>
-  <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">5. Documentation</a></li>
-  <li><a href="#build-and-distribute-the-package" id="toc-build-and-distribute-the-package" class="nav-link" data-scroll-target="#build-and-distribute-the-package">6. Build and distribute the package</a></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
-  </ul>
-<div class="quarto-code-links"><h2>Code Links</h2><ul><li><a href="https://github.com/ajl2718/blankit"><i class="bi bi-file-code"></i>blankit</a></li></ul></div></nav>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-    </div>
+    
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Creating and publishing your first Python package</h1>
+<h1 class="title">Implementing record linkage and geocoding algorithms in SQL</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">python development</div>
-    <div class="quarto-category">natural language processing</div>
+    <div class="quarto-category">record linkage</div>
   </div>
   </div>
 
@@ -170,7 +171,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">July 3, 2025</p>
+      <p class="date">July 6, 2025</p>
     </div>
   </div>
   
@@ -182,238 +183,123 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>This post describes a step-by-step template for how to go about creating a Python project using <a href="https://docs.astral.sh/uv/">uv</a> and <a href="https://www.github.com">Github</a> and publishing the end result as a package on PyPi.</p>
-<p>As a example we create a simple Python package (&lt; 200 lines of code) for finding and removing Personally Identifiable Information (PII) from text. I have published the result as <a href="https://www.pypi.org/project/blankit">blankit</a>. Call your version whatever you like.</p>
-<p>I will go through the following steps:</p>
-<ol type="1">
-<li>Using the uv Python package manager to initialise a project</li>
-<li>Creating a Github repository for the project</li>
-<li>Incorporating unit tests</li>
-<li>Automating tests in different deployment environments using Github Actions</li>
-<li>Producing automated documentation from the codebase using <a href="https://www.sphinx-doc.org/en/master/">sphinx</a></li>
-<li>Building and publishing the package to PyPi.</li>
-</ol>
-<section id="project-structure" class="level2">
-<h2 class="anchored" data-anchor-id="project-structure">1. Project structure</h2>
-<p>I have recently switched to <a href="https://docs.astral.sh/uv/">uv</a> as an alternative to <a href="https://python-poetry.org/">poetry</a> as my preferred package manager. In other instances I have used <a href="https://anaconda.org/anaconda/conda">conda</a> but uv addresses all my issues with both of these. It is extremely fast at resolving package dependencies and convenient for managing projects. One caveat is that it is VC backed so, while it is currently free and open source, that may well change.</p>
-<p>Firstly, install uv by following the instructions on the <a href="https://docs.astral.sh/uv/getting-started/installation/">uv website</a>.</p>
-<p>Now you can easily set up a project in the command line via</p>
-<pre><code>uv init --package project_name</code></pre>
-<p>This will create a uv project with the following basic structure</p>
-<pre><code>project_name
-|--- .python-version
-|--- README.md
-|--- pyproject.toml
-|___ src 
-     |___ project_name 
-          |___ __init__.py</code></pre>
-<p>We get a <code>README.md</code> (for giving users a basic overview of our project), a <code>pyproject.toml</code> (for listing all the dependencies of your project), <code>.python-version</code> that contains the python version and a <code>src</code> folder for storing all the project code.</p>
-<section id="what-is-a-pyproject.toml-file" class="level3">
-<h3 class="anchored" data-anchor-id="what-is-a-pyproject.toml-file">1.1. What is a pyproject.toml file?</h3>
-<p>From what I understand this is the modern approach for listing dependencies in a python package. Along with these dependencies the <code>pyprofile.toml</code> file is also used to describe important metadata for your project, including the author name and contact details, project name, description and version. More details can be found in the <a href="https://packaging.python.org/en/latest/specifications/pyproject-toml/">Python packaging user guide</a>.</p>
-<p>Let’s modify this file to include some more information about our project.</p>
-<pre><code>[project]
-name = "project-name"
-version = "0.1.0"
-description = "My PII detection project"
-readme = "README.md"
-authors = [
-    { name = "Alex Lee", email = "ajlee3141@gmail.com" }
-]
-requires-python = "&gt;=3.10"
-dependencies = []
-
-[project.scripts]
-project-name = "project_name:main"
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"</code></pre>
-<p>Now we can start adding dependencies.</p>
+<p>Record linkage is a key step in enabling analysis of population-level trends and patterns. For example, to understand patients’ interactions with the health system it is necessary to link together datasets from the various services that they iteract with.</p>
+<p>The basic problem is illustrated in the diagram below.</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Address</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Jonh Smth</td>
+<td>123 Aplee St, New Yrok, NY 10001</td>
+</tr>
+<tr class="even">
+<td>Maria Gonsalez</td>
+<td>56b, Elm Street, los angeles CA</td>
+</tr>
+<tr class="odd">
+<td>A. K. Patel</td>
+<td>Apt#4 78-King’s Rd London</td>
+</tr>
+<tr class="even">
+<td>lucy o’conner</td>
+<td>8890 wElmwood av., dallas TX</td>
+</tr>
+<tr class="odd">
+<td>Chen, Wei</td>
+<td>No.&nbsp;77, HuaiHai Rd, shanghi</td>
+</tr>
+</tbody>
+</table>
+<p>We have two tables and wish to find a mapping of the rows from one to the other. The problem is complicated due to differences in the way that two entities are recorded, for example via spelling errors, differences in notation and missing information.</p>
+<p>If there was a unique identifier for each table we could do a left join, but usually we don’t have this. Instead we need to establish a mapping rule based on the information available in the data.</p>
+<section id="brute-force-string-similarity" class="level2">
+<h2 class="anchored" data-anchor-id="brute-force-string-similarity">1. Brute force string similarity</h2>
+<p>Let’s start with one approach: comparing all pairs of rows using a string similarity function. This is a function that assigns a score to each pair, with high scores indicating a more likely match.</p>
+<p><strong>Jaccard similarity</strong>, <strong>Levenshtein distance</strong>, <strong>cosine similarity</strong></p>
+<p>We can see that the scores correspond to roughly what we expect…</p>
+<p>The problem of course is that comparing all possible pairs of records does not scale: With <span class="math inline">\(N\)</span> records in one table and <span class="math inline">\(M\)</span> in another, <span class="math inline">\(NM\)</span> comparisons are needed. In Australia, where there are over 15 million street addresses, this simply isn’t feasible.</p>
+<p>Instead we reduce our search space by dividing the tables into <em>blocks</em> each containing similar sets of strings.</p>
 </section>
-<section id="named-entity-recognition-for-pii-detection" class="level3">
-<h3 class="anchored" data-anchor-id="named-entity-recognition-for-pii-detection">1.2. Named Entity Recognition for PII detection</h3>
-<p><a href="https://github.com/urchade/GLiNER">GLiNER</a> is a widely used package for zero-shot named entity recognition. This just means that we can give a description of the categories that we are interested in detecting and, without any training, the model will do a pretty good job of detecting them. This makes it an effective out-of-the-box solution for PII detection since PII consists of explicit references to names, locations and other identifiers.</p>
-<p>Let’s add this package to our project</p>
-<pre><code>uv add gliner</code></pre>
-<p>The <code>pyproject.toml</code> file has now been updated with this additional dependencies</p>
-<pre><code>dependencies = [
-    "gliner&gt;=0.2.19",
-]</code></pre>
-<p>And we will also add a couple of other packages that will be useful later on:</p>
-<pre><code>uv add pandas black ruff pytest</code></pre>
-<p>You will notice that uv has created a new file - <code>uv.lock</code> - with all the resolved dependencies for these packages required by our project, and also a folder <code>.venv</code> for our virtual environment.</p>
-<p>If someone clones our project from a repo (see the next step), they can run <code>uv run python</code> to install all the required dependences. In other words, there is no <code>requirements.txt</code> file needed as for pip.</p>
+<section id="blocking" class="level2">
+<h2 class="anchored" data-anchor-id="blocking">2. Blocking</h2>
+<p>Each block is indexed by a <em>blocking key</em>. For example, the name of the suburb, assuming this is available, makes a sensible key, and each block then consists of addresses in the same suburb.</p>
+<p>However, records themselves are often not sufficiently neatly structured for such a key to be readily extracted. Instead we use the data itself to construct this.</p>
+<p>This is the approach taken in the paper <em>Record linkage in parallel databases using probabilistic signatures</em>.</p>
+<p>The idea is to split each string into substrings and count the frequenct with which each substring appears across the entire set of records. Those that are relatively infrequent make suitable <em>signatures</em> as they identify with high specificity the records associated with them. In other words, they make suitable blocking keys.</p>
+<section id="inverted-indexes" class="level3">
+<h3 class="anchored" data-anchor-id="inverted-indexes">2.1. Inverted indexes</h3>
+<p>Let’s create the inverted index table. We split each string into <em>phrases</em> and for each phrase group by addresses that belong to it.</p>
+<pre><code>create table phrases as (
+    select str_split(address, ' ') phrase from addresses
+);</code></pre>
 </section>
-<section id="write-some-code-that-solves-our-task" class="level3">
-<h3 class="anchored" data-anchor-id="write-some-code-that-solves-our-task">1.3. Write some code that solves our task</h3>
-<p>The <a href="https://github.com/ajl2718/blankit/tree/main/src/blankit">final package</a> contains two files: a <code>utils.py</code> file and a <code>scanner.py</code> file. The first contains functions for basic tasks like parsing and replacing the identified PII with generic PII labels. The second file implements a <code>Scanner</code> class that provides an API for users to identify and redact a given string or list of strings. You can create these files in the <code>src</code> folder and copy the code across from the <a href="https://github.com/ajl2718/blankit/tree/main/src/blankit">blankit repo</a>.</p>
+<section id="scoring" class="level3">
+<h3 class="anchored" data-anchor-id="scoring">2.2. Scoring</h3>
+<p>Once we have a set of candidate records to compare against, we need to be able to assign a ranking to each candidate based on high likely it is to be a correct match. This is known as <em>scoring</em>.</p>
+</section>
+<section id="tokenisation" class="level3">
+<h3 class="anchored" data-anchor-id="tokenisation">2.3. Tokenisation</h3>
+</section>
+<section id="privacy" class="level3">
+<h3 class="anchored" data-anchor-id="privacy">2.4. Privacy</h3>
 </section>
 </section>
-<section id="create-a-github-repository-for-our-project" class="level2">
-<h2 class="anchored" data-anchor-id="create-a-github-repository-for-our-project">2. Create a Github repository for our project</h2>
-<p>We now have the key ingredients for our project. Let’s create a respository for our project on Github.</p>
-<section id="initialise-the-github-repo-locally" class="level3">
-<h3 class="anchored" data-anchor-id="initialise-the-github-repo-locally">2.1. Initialise the github repo locally</h3>
-<p>Firstly we intialise git (assuming you already have it installed). This is done in the base folder of the project:</p>
-<pre><code>git init</code></pre>
-<p>This will create: a file called <code>.gitignore</code> that tells the repo which files should not be tracked by git when we make a push request; and a folder named <code>.git</code> for tracking changes.</p>
-<p>If you’re not comfortable with git there are <a href="https://www.freecodecamp.org/news/learn-the-basics-of-git-in-under-10-minutes-da548267cc91/">plenty</a> <a href="https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F">of</a> <a href="https://docs.github.com/en/get-started/start-your-journey/git-and-github-learning-resources">tutorials</a> <a href="https://www.atlassian.com/git">online</a></p>
-<p>Now we can add our changes and make our initial commit.</p>
-<pre><code>git add .
-git commit -m "Initial commit"</code></pre>
+<section id="specific-algorithms" class="level2">
+<h2 class="anchored" data-anchor-id="specific-algorithms">3. Specific algorithms</h2>
+<p>Let’s look at some specific approaches</p>
+<section id="felligi-sunter" class="level3">
+<h3 class="anchored" data-anchor-id="felligi-sunter">3.1. Felligi-Sunter</h3>
 </section>
-<section id="create-a-github-respository-in-your-github-account-and-push-your-code" class="level3">
-<h3 class="anchored" data-anchor-id="create-a-github-respository-in-your-github-account-and-push-your-code">2.2. Create a github respository in your Github account and push your code</h3>
-<p>Now log in to your Github account and create a repository. Once that is created, you can push all the current project code to this repo.</p>
-<pre><code>git remote add origin https://github.com/yourusername/your-repo-name.git
-git branch -M main
-git push -u origin main
-</code></pre>
-</section>
-</section>
-<section id="add-some-unit-tests" class="level2">
-<h2 class="anchored" data-anchor-id="add-some-unit-tests">3. Add some unit tests</h2>
-<p>We are still missing a couple of things, one of which is some unit tests. This helps us to check that when we make changes to our code, we don’t break other things. We will add a couple of these, to check the functionality of our utility functions.</p>
-<p>Create a folder <code>tests</code> under the project parent directory and a file <code>test_function.py</code> in this folder</p>
-<pre><code>def test_basic():
-    assert len("mango") == 5</code></pre>
-<p>We will use <a href="https://docs.pytest.org/en/stable/">pytest</a> to run tests and so we add a few lines to our <code>pyproject.toml</code> file to specify where to find the test functions</p>
-<pre><code>[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_functions = "test_*"</code></pre>
-<p>Now we can run pytest as follows</p>
-<pre><code>uv run pytest</code></pre>
-<p>You should see that 2 of out 2 tests have passed (assuming nothing broke in the code). You can also commit these and push to your git repo</p>
-<pre><code>git add tests
-git add pyproject.toml
-git commit -m 'Update with tests'
-git push</code></pre>
-</section>
-<section id="automation-with-github-actions" class="level2">
-<h2 class="anchored" data-anchor-id="automation-with-github-actions">4. Automation with Github Actions</h2>
-<p>We are almost there. One useful addition to our project is to run a series our tests each time we commit to Github, so that anything that breaks can be detected before the code is pushed. In other words, it helps to avoid pushing broken code.</p>
-<p>Also, since most users will not be working within our exact set up (operating system and python version), ensuring unit tests performed by Github in different environments (Windows, Mac, Linux) will reduce the chance that the users of the package will encounter bugs that you didn’t anticipate.</p>
-<p>This can all be done via a <a href="https://github.com/features/actions">Github Action</a>.</p>
-<p>We will add an action for carrying out tests. Create a file <code>test.yml</code> under a new folder <code>.github/workflows/</code> and include the following in the file</p>
-<pre><code>name: project_name
-
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ['3.10', '3.11', '3.12']
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Install uv
-      uses: astral-sh/setup-uv@v5
-
-    - name: "Set up Python"
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install the project
-      run: uv sync --locked --all-extras --dev
-
-    - name: Run tests (Linux/macOS)
-      if: runner.os != 'Windows'
-      run: uv run pytest tests</code></pre>
-<p>Each time we push code to the repo this action will run, which installs uv and the project files and runs the tests in the tests folder. It will carry out these actions in a Mac OS and Ubuntu environment for three different Python versions.</p>
-<p>There are a whole range of github actions. For this one I copied the code from the following:</p>
+<section id="signature-based-approaches" class="level3">
+<h3 class="anchored" data-anchor-id="signature-based-approaches">3.2. Signature-based approaches</h3>
 <ul>
-<li><a href="https://docs.astral.sh/uv/guides/integration/github/#installation">Adding in github action for installing uv</a></li>
-<li><a href="https://docs.github.com/en/actions/about-github-actions/understanding-github-actions">Understanding Github Actions</a></li>
+<li>Problem: How to define blocks</li>
+<li>Solution: Use terms that serve as approximate <em>signatures</em> of the record, i.e., substrings within the original string that almost uniquely identify it. Intuitively: Peter MacCallum Cancer Centre -&gt; Peter Mac</li>
+<li>Paper by Tania Churchill, Kee Siong Ng, etc:</li>
 </ul>
 </section>
-<section id="documentation" class="level2">
-<h2 class="anchored" data-anchor-id="documentation">5. Documentation</h2>
-<p>In addition to automated testing, it is handy to use automation to create documentation. This avoids the need to manually edit and update documentation each time you make a change. Instead, you can use a tool such as <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> and <a href="https://about.readthedocs.com/">readthedocs</a> to build the documentation from your code base. The documentation will be rebuilt whenever code is pushed to the repo.</p>
-<p>Firstly, create a new folder under <code>docs/source</code> called <code>conf.py</code>:</p>
-<pre><code># Configuration file for the Sphinx documentation builder.
-import os
-import sys
-
-sys.path.insert(0, os.path.abspath('../..'))
-
-# -- Project information
-
-project = 'project_name'
-copyright = '2025, Alex Lee'
-author = 'Alex Lee'
-
-release = '0.1.0'
-version = "0.1.0"
-
-# -- General configuration
-
-extensions = [
-    'sphinx.ext.duration',
-    'sphinx.ext.doctest',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.napoleon',
-]
-
-intersphinx_mapping = {
-    'python': ('https://docs.python.org/3/', None),
-    'sphinx': ('https://www.sphinx-doc.org/en/master/', None),
-}
-intersphinx_disabled_domains = ['std']
-
-# -- Options for HTML output
-html_theme = 'alabaster'
-
-# -- Options for EPUB output
-epub_show_urls = 'footnote'</code></pre>
-<p>Also add a <code>.readthedocs.yaml</code> file to the root directory of your repo:</p>
-<pre><code>version: "2"
-
-sphinx:
-  configuration: docs/source/conf.py
-
-build:
-  os: "ubuntu-22.04"
-  tools:
-    python: "3.10"
-
-python:
-  install:
-    - method: pip
-      path: .</code></pre>
-<p>Read the Docs doesn’t yet support pyproject.toml files so we have to now create a <code>requirements.txt</code> file. This is straightforward in uv:</p>
-<pre><code>uv pip compile pyproject.toml &gt; docs/requirements.txt</code></pre>
-<p>Next log into Read The Docs and import your Github repo (you will need to first create an account on RTD if you haven’t).</p>
-<p>Now, each time we push code to our repo, the documentation will be automatically built and available at https://project_name.readthedocs.io/en/latest/</p>
-</section>
-<section id="build-and-distribute-the-package" class="level2">
-<h2 class="anchored" data-anchor-id="build-and-distribute-the-package">6. Build and distribute the package</h2>
-<p>Now we are ready to build the package and publish it to make it available to the world. Firstly, create a distribution of the package:</p>
-<p><code>uv build</code></p>
-<p>This will create a <code>.tar.gz</code> and <code>.whl</code> file under the new <code>dist</code> folder.</p>
-<p>Let’s publish it to <a href="https://www.pypi.org">PyPI</a> (note that you will need to setup a PyPI account with authentication to do this).</p>
-<p><code>uv publish</code></p>
-<p>The package is now listed on the python package index and can be installed via <code>uv</code>, <code>conda</code>, <code>poetry</code> or <code>pip</code></p>
-</section>
-<section id="summary" class="level2">
-<h2 class="anchored" data-anchor-id="summary">Summary</h2>
-<p>And that’s it! You can now create a project in uv, make it available on github, incorporate some automated testing and documentation creation and make your project available to the rest of the Python community. As a bonus we have an easy-to-use Python package for redacting PII from text, a pretty common task when working with sensitive data.</p>
-</section>
-<section id="references" class="level2">
-<h2 class="anchored" data-anchor-id="references">References</h2>
+<section id="implementation" class="level3">
+<h3 class="anchored" data-anchor-id="implementation">3.3. Implementation</h3>
+<p>Now that we understand some of the theory and algorithms, let’s implement them. Some desirable characteristics of a good implementation include:</p>
 <ul>
-<li><a href="https://nishanthjkumar.com/blog/2022/A-Beginner's-Guide-To-Creating-An-Open-Source-Python-Package/">A Beginner’s Guide to Creating an Open Source Python Package</a></li>
-<li><a href="https://medium.com/free-code-camp/from-a-python-project-to-an-open-source-package-an-a-to-z-guide-c34cb7139a22">From a Python Project to an Open Source Package: An A to Z Guide</a></li>
-<li><a href="https://packaging.python.org/en/latest/guides/writing-pyproject-toml/">Writing pyproject.toml</a></li>
-<li><a href="https://pydevtools.com/handbook/tutorial/setting-up-testing-with-pytest-and-uv/">Setting Up Testing with Pytest and UV</a></li>
+<li>Ease of installation: most data scientists are lazy when it comes to deciding which software to use, so the fewer steps it takes to install a package, the better</li>
+<li>Clear documentation: simple code examples to demonstrate the software makes a package much more appealing.</li>
+<li>Using well-tested tools ensure that algorithm implementations will be more performant and have fewer errors</li>
+</ul>
+<p>For these reasons an obvious choice is <a href="https://duckdb.org/">DuckDB</a>. It’s an open source tool based on SQL with a Python API. Unlike other SQL implementations such as Postgres is has the advantage of not requiring a user to create a SQL server instance, in order word, all the data is stored directly on a file.</p>
+</section>
+</section>
+<section id="evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation">4. Evaluation</h2>
+<p>How do we test the performance? This is actually a non-trivial problem. Unlike for many machine learning tasks, there are few publicly available datasets that are representative of the kinds of records that are encountered ‘in the wild.’</p>
+<ul>
+<li>The lack of available benchmarking datasets</li>
+<li>Variations in types of errors</li>
+</ul>
+</section>
+<section id="reference-datasets" class="level2">
+<h2 class="anchored" data-anchor-id="reference-datasets">5. Reference datasets</h2>
+<section id="address-databases" class="level3">
+<h3 class="anchored" data-anchor-id="address-databases">5.1. Address databases</h3>
+<p>Building a geocoder depends on having a good quality reference dataset, i.e., a complete set of clean, standardised street addresses, with corresponding latitude and longitude values.</p>
+<p>The availability of such datasets varies widely between countries. In Australia, the <a href="https://data.gov.au/data/dataset/geocoded-national-address-file-g-naf">Geocoded National Address File</a> is a quarterly-updated, free and publicly available reference dataset covering the entire country. In the UK, in comparison, such data sources are ownly available commerically.</p>
+</section>
+</section>
+<section id="other-challenges" class="level2">
+<h2 class="anchored" data-anchor-id="other-challenges">6. Other challenges</h2>
+<h1>
+References
+</h1>
+<ul>
+<li><a href="https://arxiv.org/abs/1708.01402">Exploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes</a></li>
+<li><a href="https://moj-analytical-services.github.io/splink/index.html">Splink</a></li>
+<li><a href="https://github.com/ajl2718/whereabouts">whereabouts</a></li>
+<li>Data Matching: Concepts and Techniques for Record Linkage, Entity Resolution, and Duplicate Detection, Peter Christen</li>
 </ul>
 
 
