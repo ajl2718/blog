@@ -42,6 +42,97 @@
     "text": "For a project a while ago I wanted to create shapefiles of regular lattices (as opposed to the SA1 / SA2 boundaries that often are used in Austraila). For example a lattice of hexagons where each hexagon has side length 1km. Or alternatively a lattice of squares. Furthermore, it is often useful to be able to estimate a quantity in a new geometry, based on the quantity is another geometry. For example, we may want to estimate the population in each hexagon based on the values in the intersecting SA1 or SA2 polygons.\nI created three Jupyter notebooks to carry out these tasks:\n\nThe first generates a shapefile consisting of regular hexagons covering a particular area of interest;\nThe second is similar to the above but contains code for generating both hexagonal and square lattices;\nThe third one shows how to estimate the population contained in each of the hexagons based on the 2016 Census counts at the SA1 level.\n\nAnd here is a nice picture of a hexgrid:\n\n\n\nA hexgrid covering Victoria"
   },
   {
+    "objectID": "posts/local-geospatial-analysis/index.html",
+    "href": "posts/local-geospatial-analysis/index.html",
+    "title": "Geospatial analysis in a secure environment",
+    "section": "",
+    "text": "Sensitive data work involves stringent security constraints in the data science environments. For example, often I am forced to use virtual machines which are isolated from the public internet. This introduces many limitations to data science workflows, one in particular being the ability to perform geospatial analysis and visualisation. Packages like Folium require access to a web mapping service to download the map tiles for an area of interest. I therefore had to find a way around this.\nAfter some experimentation, I found a combination of contextily and geopandas were suitable as they allow you to download the map tiles and then plot them along with any data. There are two steps here:\n\nUse contextily to download the map tiles that are required for your application\nPlot the data and basemaps using geopandas.\n\nThe first step can lead to a large amount of data being downloaded (around 2Gb in my case).\n\nDownloading map tiles\nContextily requires the place name to be specified and uses OpenStreetMap’s Nominatim geocoder. This is suitable for geocoding suburbs, local government areas, states and other regions provided there are no spelling errors. Using a list of standard place names such as those from official government sources is therefore important.\nAs an example, the following code will download the map tile for the Local Government Area of Moreland in Australia.\nimport contextily as ctx\n\nlga = ctx.Place(\"Melbourne, Victoria, Australia\", \n                source=ctx.providers.CartoDB.DarkMatter, \n                path='data_folder/greater_melbourne_maptile.tiff')\nThere are a few different sources of freely available map tiles.\n\n\nVisualisation of data\nIt is now straightforward to write a script to loop through the areas of interest and download the corresponding map tile. Once the files are downloaded these can be plotted using contextily and geopandas. For example, using the SA2 shapefiles for greater melbourne we can plot each of these against our recently downloaded basemap, using shading based on the area.\nimport contextily as ctx\nimport geopandas\n\n%matplotlib inline\n\nax = sa2_gm.plot(figsize=(15, 15), linewidth=1, alpha=0.7, column='AREASQKM21')\nctx.add_basemap(ax, crs=sa2_gm.crs, source=f\"data_folder/greater_melbourne_maptile.tiff\")\nax.set_axis_off()\nAnd here is what the output should look like: \nThe notebook describing how to download the map tiles is available here and for visualisation here."
+  },
+  {
+    "objectID": "posts/address_validation/index.html",
+    "href": "posts/address_validation/index.html",
+    "title": "Using LLMs to validate geocoder outputs",
+    "section": "",
+    "text": "Machine learning algorithms are typically evaluated and compared against one another by using some sort of independent validation dataset. For geocoding algorithms such datasets don’t appear to be readily available. Furthermore, to evaluate the performance of an algorithm against an address dataset how do we define the correctness of a prediction? One way is to use the latitude, longitude values along with the Haversine Formula to calculate the distance between each prediction and the ground truth. Alternatively we can evaluate each address that has been matched with a ground truth.\nThis is a bit more involved since the results are text. One performance measure I find useful is to compare address pairs at four different levels:\n\nApartment / Unit / Tenancy number\nStreet number\nStreet name\nSuburb name\n\nSo, for example if the correct address is 4 / 23 Johnston Avenue Burwood East 3151 and our geocoder produces 23 Johnston Avenue Burwood East 3151 then this is accurate up to street number but not the apartment number.\nDepending on the application, a geocoder that is accurate to the street name (or even suburb name) may be sufficient, for example if we are only interested in created aggregated statistics across suburbs. For other applications (e.g., a food delivery service) the exact apartment number may be required.\nWhen evaluating the outputs of my own geocoding algorithms I would previously have to manually review each pair of addresses to score the predictions. For example see this notebook where I compare whereabouts with other geocoders. LLMs provide a more streamlined way to automate this. I found that the following prompt with GPT4 gives a structured outputs and assesses the accuracy at the four levels of geographic granularity above.\nYou are scoring the quality of a list of Australian street addresses with their corresponding matches.\n\nYou should identify all the components of the street address, including unit or apartment number, shop / tenancy number, street number,  street name, suburb and postcode and use these components in creating a score. \n\nYou consider four levels of granularity for each address in order to assign a score: unit, property number (e.g., house number), \nstreet name, suburb / postcode. A numerical score should be assigned as follows:\n\n- 4: unit number, street number, street name and suburb / postcode all match (including where there is no unit number)\n- 3: property number, street name and suburb / postcode match\n- 2: only the streetname and suburb / postcode match\n- 1: only the suburb / postcode match\n- 0: none of the components match or if the state is different, for example 'NSW' instead of 'QLD'\n\nAdditional instructions:\n- Shop and tenancy are equivalent, as are unit and apartment number. Level is not considered relevant. \n- If the suburb name is different but the postcode and other components of the address match then we consider them the same suburb.\n- If there is no unit or shop number in the addresses then we consider that to be a match on the unit or shop number, since they are both empty\n\nStructure of the output:\n- The output should consist ONLY of a json list with keys for each entry: \n  - input_address, matched_address, unit_match, street_number_match, street_name_match, suburb_match, postcode_match, overall_score\n- The columns with the '_match' suffix are binary. \n- No other text should be shown in the output, ONLY THE JSON.\n\nThe pairs of input and matched addresses are shown below:\nAnother example of LLMs saving time on menial tasks."
+  },
+  {
+    "objectID": "posts/intro-to-webscraping/index.html",
+    "href": "posts/intro-to-webscraping/index.html",
+    "title": "Intro to webscraping",
+    "section": "",
+    "text": "Webscraping involves writing small programs to automatically extract data from websites. It’s an extremely useful technique for creating large aggregated datasets using publicly available data as it’s inexpensive and fast. With the large amount of data available in the public domain it can also be the best way to obtain up-to-date and complete data for a given task.\nThere are plenty of applications of webscraping, across domains ranging from economic statistics to data journalism to compliance monitoring. Here are some specific ones:\nLearning the basics is straightforward and requires only a few lines of Python. The main challenge is identifying the relevant snippets of HTML, JSON or Javascript containing the data you are looking for; this is usually the most time-consuming part as well.\nIn this tutorial I will give an introduction to webscraping using two simple examples. All the code is in a Jupyter Notebook."
+  },
+  {
+    "objectID": "posts/intro-to-webscraping/index.html#ethics-and-best-practices",
+    "href": "posts/intro-to-webscraping/index.html#ethics-and-best-practices",
+    "title": "Intro to webscraping",
+    "section": "Ethics and best practices",
+    "text": "Ethics and best practices\nBefore we begin, there are some general tips to ensure you’re doing the right thing:\n\nRead the robots.txt file: this is found at (domain name of website)/robots.txt. It will tell you which parts of the website can and can’t be scraped;\nOnly make a single request to the website at a given time. This helps to avoid placing too much load on the server;\nRead the website Terms and Conditions, particularly if you are planning to use the data for commercial purposes.\n\nThe UK Office of National Statistics has a handy Webscraping Policy too. Unfortunately, no Australian jurisdiction appears to have created anything similar.\nNow, let’s begin."
+  },
+  {
+    "objectID": "posts/intro-to-webscraping/index.html#install-the-relevant-libraries",
+    "href": "posts/intro-to-webscraping/index.html#install-the-relevant-libraries",
+    "title": "Intro to webscraping",
+    "section": "Install the relevant libraries",
+    "text": "Install the relevant libraries\nWe’ll need Pandas and LXML for data wrangling and Requests to make HTTP requests.\npip install requests\npip install pandas\npip install lxml"
+  },
+  {
+    "objectID": "posts/intro-to-webscraping/index.html#make-your-first-http-request",
+    "href": "posts/intro-to-webscraping/index.html#make-your-first-http-request",
+    "title": "Intro to webscraping",
+    "section": "Make your first HTTP request",
+    "text": "Make your first HTTP request\nOpen up a Python terminal and type the following code\nimport requests\nurl = 'https://www.abc.net.au'\n\npage = requests.get(url)\nprint(f'Status: {page.status_code}')\nIf everything is working you should get:\n\nStatus: 200\n\nThere are a few different HTTP Verbs: GET, POST, DELETE, PUT and others. I have only ever used GET and POST (when you have to send some data). If you get a response code other than 200 then generally something has gone wrong. Here’s a full list of HTTP response codes."
+  },
+  {
+    "objectID": "posts/intro-to-webscraping/index.html#first-example-create-a-dataset-of-lonely-dogs",
+    "href": "posts/intro-to-webscraping/index.html#first-example-create-a-dataset-of-lonely-dogs",
+    "title": "Intro to webscraping",
+    "section": "First example: Create a dataset of lonely dogs",
+    "text": "First example: Create a dataset of lonely dogs\nIn this first example let’s scrape Pet Rescue, a site containing profiles of dogs and cats (and other animals) available for adoption. Perhaps we want a dataset of images of cats and dogs to train an object detection algorithm, or a dataset of common pet names, or maybe just want to know how the available pets are distributed throughout Australia.\n\nInspecting the data\nOnce you’re at the website, open up the Inspector (Tools → Web Developer → Inspector in Firefox) or Developer Tools (View → Developer → Developer Tools in Chrome).\n\n\n\nThe Inspector is located under Tools and Web Developer\n\n\nThen click on the ‘dogs’ link to get to the first page of ‘dog profiles’. You will see the window at the bottom under the Network tab fill up with links corresponding to different elements of the website. Note that the actual content will look slightly different as the pet listings change over time. Doing this we find the HTML snippet that relates to one of the dogs.\n\n\n\nSome cute dogs looking for a new home\n\n\nClick on the ‘dogs’ row under the Network tab (it should be the first row) and then Response and Response payload in the window on the right. This will show the HTML for the web page. We can do a quick search to get the name, location and characteristics of one of the dog profiles.\n\n\n\nThe HTML snippet corresponding to the entry for ‘Chase’\n\n\nThe entries for each of the dogs has the same structure and from this we can extract all the names, sizes and locations.\n\n\nUsing LXML to extract the relevant data\nNow we know where the relevant data is located, we can define some LXML paths to extract it. An alternative is Beautiful Soup. Here are LXML paths for the name and location data:\nname_path = '//article[@class=\"cards-listings-preview\"]/a/header/h3/text()'\nlocation_path = '//strong[@class=\"cards-listings-preview__content__section__location\"]/text()'\nThe LXML syntax can appear a bit clunky but the name_path variable is saying to look for every instance of the article tag with class value “cards-listing-preview” then look at the a tag below this, followed by the header tag, the h3 tag and then the text within this.\nThe code for extracting the names and locations is then:\nfrom lxml import html\nimport requests\n\nurl = 'https://www.petrescue.com.au/listings/search/dogs'\npage = requests.get(url)\n\ntree = html.fromstring(page.text)\n\nnames = tree.xpath(name_path)\nlocations = tree.xpath(location_path)\nBecause of the &lt;i&gt; tags we get additional strings returned in the location_path so we take every second one. The full Python code to get all the data from a single page is then:\nfrom lxml import html\nimport requests\n\nurl = 'https://www.petrescue.com.au/listings/search/dogs'\npage = requests.get(url)\n\ntree = html.fromstring(page.text)\n\nname_path = '//article[@class=\"cards-listings-preview\"]/a/header/h3/text()'\nlocation_path = '//strong[@class=\"cards-listings-preview__content__section__location\"]/text()'\n\nnames = tree.xpath(name_path)\nlocations = tree.xpath(location_path)\n\nlocations = locations[1::2]\nSkipping to the next page, the url is https://www.petrescue.com.au/listings/search/dogs?page=2 so we can scrape all the pages by looping over a range of integers and, for each request, appending an integer to the base url https://www.petrescue.com.au/listings/search/dogs?page=. Let’s add in this bit of code:\nfrom lxml import html\nimport requests\nimport pandas as pd\n\nurl_base = 'https://www.petrescue.com.au/listings/search/dogs?page='\n\nname_path = '//article[@class=\"cards-listings-preview\"]/a/header/h3/text()'\nlocation_path = '//strong[@class=\"cards-listings-preview__content__section__location\"]/text()'\n\nall_names = []\nall_locations = []\n\nfor n in range(1, 50):\n    print(f'Scraping page: {n}')\n    url = f'{url_base}{n}'\n    page = requests.get(url)\n    tree = html.fromstring(page.text)\n    names = tree.xpath(name_path)\n    locations = tree.xpath(location_path)\n    locations = locations[1::2]\n    all_names += names\n    all_locations += locations\nI like to print out which page is being scraped for debugging purposes and also as a sort of progress indicator. Finally, once we’ve scraped all this data, we can add put it all into a nice tidy Pandas Dataframe (with a tiny bit of text processing to remove unwanted spaces and new lines characters):\ndf = pd.DataFrame(data={'name': all_names, 'location': all_locations})\ndf['name'] = df['name'].str.strip()\ndf['location'] = df['location'].str.strip()\nAnd we have a nice tidy dataset of dog names and locations. Here are the first five rows:\n\n\n\nname\nlocation\n\n\n\n\nTeddy Yoric\nBrunswick, VIC\n\n\nTilly Goldsworthy\nRichmond, VIC\n\n\nMarnie & Panda Wazowski\nHampton, VIC\n\n\nBear Hartwell\nAltona Meadows, VIC\n\n\nShayla Caballero\nClifton Hill, VIC"
+  },
+  {
+    "objectID": "posts/intro-to-webscraping/index.html#second-example-atm-locations-in-australia",
+    "href": "posts/intro-to-webscraping/index.html#second-example-atm-locations-in-australia",
+    "title": "Intro to webscraping",
+    "section": "Second example: ATM locations in Australia",
+    "text": "Second example: ATM locations in Australia\nFor this example we’ll extract JSON data, which is usually a bit easier to work with than HTML as it’s naturally represented as Python dictionaries. We’ll do this by scraping all National Australia Bank ATMs.\nFirstly, with the developer tools / inspector open, navigate to https://www.nab.com.au/locations. In the inspector select the XHR tab in the right-hand pane. The reasoning is that, since there is a store locator in the page, there is an API behind the scenes that is delivering this data.\nScrolling through the different files we inspect the response provided by each. We find that file ‘4000?v=1’ produces a nice nested data structure of what appears to be locations and names of ATMs and branches. Clicking through to the headers tab we find the URL is:\nhttps://api.nab.com.au/info/nab/location/locationType/atm+brc/queryType/geo/-37.7787919055083/144.92910033652242/-37.74062261073386/144.99833566347752/1/4000?v=1\nThere is also some header information that we may need, so we include this too.\nNotice that four of the numbers in the URL look like latitude and longitude values and so these likely describe a bounding box for the search area. Since we are interested in all the ATMs and branches in the country we expand it to a box that encompasses all of Australia. The maximum and minimum latitude and longitude values of this bounding box are:\nlat_min, lng_min = -43.834124, 114.078644\nlat_max, lng_max = -10.400824, 154.508331\nThe code to scrape the locations of all NAB ATMS (which can in this case be done in only a single request) is:\nimport requests\nimport pandas as pd\n\nlat_min, lng_min = -43.834124, 114.078644\nlat_max, lng_max = -10.400824, 154.508331\n\nurl = f'https://api.nab.com.au/info/nab/location/locationType/atm+brc/queryType/geo/{lat_min}/{lng_min}/{lat_max}/{lng_max}/1/4000?v=1'\n\nheaders = {'Host': 'api.nab.com.au', \n'Origin': 'https://www.nab.com.au', \n'Referer': 'https://www.nab.com.au/',\n'x-nab-key': 'a8469c09-22f8-45c1-a0aa-4178438481ef'}\n\npage = requests.get(url=url, headers=headers)\ndata = page.json()\nNotice that since the output of the HTTP request is in JSON format it can immediately be converted to a Python dict. It is now a matter of finding where the location information is.\nThe final Python code is:\nimport requests\nimport pandas as pd\n\nlat_min, lng_min = -43.834124, 114.078644\nlat_max, lng_max = -10.400824, 154.508331\n\nurl = f'https://api.nab.com.au/info/nab/location/locationType/atm+brc/queryType/geo/{lat_min}/{lng_min}/{lat_max}/{lng_max}/1/4000?v=1'\n\nheaders = {'Host': 'api.nab.com.au', \n'Origin': 'https://www.nab.com.au', \n'Referer': 'https://www.nab.com.au/',\n'x-nab-key': 'a8469c09-22f8-45c1-a0aa-4178438481ef'}\n\npage = requests.get(url=url, headers=headers)\ndata = page.json()\n\ndf = pd.json_normalize(data['locationSearchResponse']['locations'])\ndf = df[['atm.address1', 'atm.suburb', 'atm.state', 'atm.postcode', 'atm.latitude', 'atm.longitude']].dropna()\nThe json_normalize method in Pandas is a handy way to flatten the nested JSON data into a flat data structure. Now we have a nice tidy data frame with the address, latitude and longitude of each ATM:\n\n\n\n\n\n\n\n\n\n\n\natm.address1\natm.suburb\natm.state\natm.postcode\natm.latitude\natm.longitude\n\n\n\n\nBrunswick City Centre, 94 Sydney Road\nBrunswick\nVIC\n3056\n-37.775660\n144.961047\n\n\n406 Sydney Road\nCoburg\nVIC\n3058\n-37.743756\n144.966389\n\n\n406 Sydney Road\nCoburg\nVIC\n3058\n-37.743756\n144.966389"
+  },
+  {
+    "objectID": "posts/intro-to-webscraping/index.html#summary-and-general-tips",
+    "href": "posts/intro-to-webscraping/index.html#summary-and-general-tips",
+    "title": "Intro to webscraping",
+    "section": "Summary and General tips",
+    "text": "Summary and General tips\nThat’s enough of an intro to get started. Using a couple of examples, we’ve covered the basics of scraping HTML and JSON, and parsing the data into tidy form using LXML and Pandas. To summarise:\n\nRemember to check the Terms and Conditions, robots.txt file and consider the application that you are using the data for;\nThe developer tools in the browser are a good way to identify the relevant elements in the web site;\nThere is fair amount of hack-work required to find where the relevant data is, and it changes from website to website. The two examples here illustrate how scraping works for a fair number of different websites;\nThose with store locators or unofficial APIs are generally much easier to scrape as the data is already in a relatively structured form.\n\nTo make things easy, all the code in this post is available in a (hopefully) easy-to-follow Jupyter Notebook."
+  },
+  {
+    "objectID": "posts/using-docker/index.html",
+    "href": "posts/using-docker/index.html",
+    "title": "Setting up a scratch space using Poetry, Docker and Jupyter",
+    "section": "",
+    "text": "Often I want to experiment with a new Python package but don’t want to have to set up a virtual environment, or affect the packages that I already have installed on my system. Jupyter Notebooks provide a great interface for quickly testing out new features of a library but using them inside a virtual environment can also be a pain.\nRunning a Jupyter Notebook inside a Docker container is a nice solution to this problem. This post gathers together my understanding of Docker in setting this up. I’m still very much learning about Docker and haven’t had many other opportunities to really see where it is essential but this is one simple use case, and a good intro for me to learn about it.\nThe Docker documentation has very useful and easy to follow tutorials to begin using Docker."
+  },
+  {
+    "objectID": "posts/using-docker/index.html#set-up-a-project-using-poetry",
+    "href": "posts/using-docker/index.html#set-up-a-project-using-poetry",
+    "title": "Setting up a scratch space using Poetry, Docker and Jupyter",
+    "section": "Set up a project using Poetry",
+    "text": "Set up a project using Poetry\nPoetry is handy for setting up the folder structure for a project, including tests, modules, a README.md and managing dependencies\npoetry new (project_name)\nNow enter into the Poetry shell and add the package that you’re interested in testing out\npoetry shell\npoetry add (package_name)\nAnd remember to add Jupyter notebook\npoetry add jupyter\nFinally export a requirements.txt file that we can use to create the Docker image.\npoetry export -f requirements.txt --without-hashes --output requirements.txt"
+  },
+  {
+    "objectID": "posts/using-docker/index.html#create-a-dockerfile",
+    "href": "posts/using-docker/index.html#create-a-dockerfile",
+    "title": "Setting up a scratch space using Poetry, Docker and Jupyter",
+    "section": "Create a Dockerfile",
+    "text": "Create a Dockerfile\nCreate a file Dockerfile (without any extension) in the working directory of the project. We use a Python 3.8 base image and then add the requirements.txt file with the necessary libraries.\nFROM python:3.8-slim-buster\nWORKDIR /app\nCOPY requirements.txt requirements.txt\nRUN pip install -r requirements.txt\nCOPY . .\nCMD [\"jupyter\", \"notebook\", \"--port=8888\", \"--no-browser\", \"--ip=0.0.0.0\", \"--allow-root\"]"
+  },
+  {
+    "objectID": "posts/using-docker/index.html#build-the-docker-image-and-then-run-it-to-test-out-the-library-in-the-notebook",
+    "href": "posts/using-docker/index.html#build-the-docker-image-and-then-run-it-to-test-out-the-library-in-the-notebook",
+    "title": "Setting up a scratch space using Poetry, Docker and Jupyter",
+    "section": "Build the Docker image and then run it to test out the library in the notebook",
+    "text": "Build the Docker image and then run it to test out the library in the notebook\nIn the same working directory build the image:\ndocker build --tag my_test_enviroment .\nand run it to start a container\ndocker run -p 8888:8888 my_test_environment\nNow you can open up a browser and create a new notebook which will have the necessary libraries from the Docker image. Because this is run inside a container, no data will be stored between stopping and running the container again so any notebooks cannot be saved."
+  },
+  {
     "objectID": "posts/large_datasets_in_python/index.html",
     "href": "posts/large_datasets_in_python/index.html",
     "title": "Larger than memory datasets in Python using Polars",
@@ -105,90 +196,6 @@
     "text": "References\n\nPolars documentation\nNotes from a data witch: getting started with Apache Arrow"
   },
   {
-    "objectID": "posts/using-docker/index.html",
-    "href": "posts/using-docker/index.html",
-    "title": "Setting up a scratch space using Poetry, Docker and Jupyter",
-    "section": "",
-    "text": "Often I want to experiment with a new Python package but don’t want to have to set up a virtual environment, or affect the packages that I already have installed on my system. Jupyter Notebooks provide a great interface for quickly testing out new features of a library but using them inside a virtual environment can also be a pain.\nRunning a Jupyter Notebook inside a Docker container is a nice solution to this problem. This post gathers together my understanding of Docker in setting this up. I’m still very much learning about Docker and haven’t had many other opportunities to really see where it is essential but this is one simple use case, and a good intro for me to learn about it.\nThe Docker documentation has very useful and easy to follow tutorials to begin using Docker."
-  },
-  {
-    "objectID": "posts/using-docker/index.html#set-up-a-project-using-poetry",
-    "href": "posts/using-docker/index.html#set-up-a-project-using-poetry",
-    "title": "Setting up a scratch space using Poetry, Docker and Jupyter",
-    "section": "Set up a project using Poetry",
-    "text": "Set up a project using Poetry\nPoetry is handy for setting up the folder structure for a project, including tests, modules, a README.md and managing dependencies\npoetry new (project_name)\nNow enter into the Poetry shell and add the package that you’re interested in testing out\npoetry shell\npoetry add (package_name)\nAnd remember to add Jupyter notebook\npoetry add jupyter\nFinally export a requirements.txt file that we can use to create the Docker image.\npoetry export -f requirements.txt --without-hashes --output requirements.txt"
-  },
-  {
-    "objectID": "posts/using-docker/index.html#create-a-dockerfile",
-    "href": "posts/using-docker/index.html#create-a-dockerfile",
-    "title": "Setting up a scratch space using Poetry, Docker and Jupyter",
-    "section": "Create a Dockerfile",
-    "text": "Create a Dockerfile\nCreate a file Dockerfile (without any extension) in the working directory of the project. We use a Python 3.8 base image and then add the requirements.txt file with the necessary libraries.\nFROM python:3.8-slim-buster\nWORKDIR /app\nCOPY requirements.txt requirements.txt\nRUN pip install -r requirements.txt\nCOPY . .\nCMD [\"jupyter\", \"notebook\", \"--port=8888\", \"--no-browser\", \"--ip=0.0.0.0\", \"--allow-root\"]"
-  },
-  {
-    "objectID": "posts/using-docker/index.html#build-the-docker-image-and-then-run-it-to-test-out-the-library-in-the-notebook",
-    "href": "posts/using-docker/index.html#build-the-docker-image-and-then-run-it-to-test-out-the-library-in-the-notebook",
-    "title": "Setting up a scratch space using Poetry, Docker and Jupyter",
-    "section": "Build the Docker image and then run it to test out the library in the notebook",
-    "text": "Build the Docker image and then run it to test out the library in the notebook\nIn the same working directory build the image:\ndocker build --tag my_test_enviroment .\nand run it to start a container\ndocker run -p 8888:8888 my_test_environment\nNow you can open up a browser and create a new notebook which will have the necessary libraries from the Docker image. Because this is run inside a container, no data will be stored between stopping and running the container again so any notebooks cannot be saved."
-  },
-  {
-    "objectID": "posts/intro-to-webscraping/index.html",
-    "href": "posts/intro-to-webscraping/index.html",
-    "title": "Intro to webscraping",
-    "section": "",
-    "text": "Webscraping involves writing small programs to automatically extract data from websites. It’s an extremely useful technique for creating large aggregated datasets using publicly available data as it’s inexpensive and fast. With the large amount of data available in the public domain it can also be the best way to obtain up-to-date and complete data for a given task.\nThere are plenty of applications of webscraping, across domains ranging from economic statistics to data journalism to compliance monitoring. Here are some specific ones:\nLearning the basics is straightforward and requires only a few lines of Python. The main challenge is identifying the relevant snippets of HTML, JSON or Javascript containing the data you are looking for; this is usually the most time-consuming part as well.\nIn this tutorial I will give an introduction to webscraping using two simple examples. All the code is in a Jupyter Notebook."
-  },
-  {
-    "objectID": "posts/intro-to-webscraping/index.html#ethics-and-best-practices",
-    "href": "posts/intro-to-webscraping/index.html#ethics-and-best-practices",
-    "title": "Intro to webscraping",
-    "section": "Ethics and best practices",
-    "text": "Ethics and best practices\nBefore we begin, there are some general tips to ensure you’re doing the right thing:\n\nRead the robots.txt file: this is found at (domain name of website)/robots.txt. It will tell you which parts of the website can and can’t be scraped;\nOnly make a single request to the website at a given time. This helps to avoid placing too much load on the server;\nRead the website Terms and Conditions, particularly if you are planning to use the data for commercial purposes.\n\nThe UK Office of National Statistics has a handy Webscraping Policy too. Unfortunately, no Australian jurisdiction appears to have created anything similar.\nNow, let’s begin."
-  },
-  {
-    "objectID": "posts/intro-to-webscraping/index.html#install-the-relevant-libraries",
-    "href": "posts/intro-to-webscraping/index.html#install-the-relevant-libraries",
-    "title": "Intro to webscraping",
-    "section": "Install the relevant libraries",
-    "text": "Install the relevant libraries\nWe’ll need Pandas and LXML for data wrangling and Requests to make HTTP requests.\npip install requests\npip install pandas\npip install lxml"
-  },
-  {
-    "objectID": "posts/intro-to-webscraping/index.html#make-your-first-http-request",
-    "href": "posts/intro-to-webscraping/index.html#make-your-first-http-request",
-    "title": "Intro to webscraping",
-    "section": "Make your first HTTP request",
-    "text": "Make your first HTTP request\nOpen up a Python terminal and type the following code\nimport requests\nurl = 'https://www.abc.net.au'\n\npage = requests.get(url)\nprint(f'Status: {page.status_code}')\nIf everything is working you should get:\n\nStatus: 200\n\nThere are a few different HTTP Verbs: GET, POST, DELETE, PUT and others. I have only ever used GET and POST (when you have to send some data). If you get a response code other than 200 then generally something has gone wrong. Here’s a full list of HTTP response codes."
-  },
-  {
-    "objectID": "posts/intro-to-webscraping/index.html#first-example-create-a-dataset-of-lonely-dogs",
-    "href": "posts/intro-to-webscraping/index.html#first-example-create-a-dataset-of-lonely-dogs",
-    "title": "Intro to webscraping",
-    "section": "First example: Create a dataset of lonely dogs",
-    "text": "First example: Create a dataset of lonely dogs\nIn this first example let’s scrape Pet Rescue, a site containing profiles of dogs and cats (and other animals) available for adoption. Perhaps we want a dataset of images of cats and dogs to train an object detection algorithm, or a dataset of common pet names, or maybe just want to know how the available pets are distributed throughout Australia.\n\nInspecting the data\nOnce you’re at the website, open up the Inspector (Tools → Web Developer → Inspector in Firefox) or Developer Tools (View → Developer → Developer Tools in Chrome).\n\n\n\nThe Inspector is located under Tools and Web Developer\n\n\nThen click on the ‘dogs’ link to get to the first page of ‘dog profiles’. You will see the window at the bottom under the Network tab fill up with links corresponding to different elements of the website. Note that the actual content will look slightly different as the pet listings change over time. Doing this we find the HTML snippet that relates to one of the dogs.\n\n\n\nSome cute dogs looking for a new home\n\n\nClick on the ‘dogs’ row under the Network tab (it should be the first row) and then Response and Response payload in the window on the right. This will show the HTML for the web page. We can do a quick search to get the name, location and characteristics of one of the dog profiles.\n\n\n\nThe HTML snippet corresponding to the entry for ‘Chase’\n\n\nThe entries for each of the dogs has the same structure and from this we can extract all the names, sizes and locations.\n\n\nUsing LXML to extract the relevant data\nNow we know where the relevant data is located, we can define some LXML paths to extract it. An alternative is Beautiful Soup. Here are LXML paths for the name and location data:\nname_path = '//article[@class=\"cards-listings-preview\"]/a/header/h3/text()'\nlocation_path = '//strong[@class=\"cards-listings-preview__content__section__location\"]/text()'\nThe LXML syntax can appear a bit clunky but the name_path variable is saying to look for every instance of the article tag with class value “cards-listing-preview” then look at the a tag below this, followed by the header tag, the h3 tag and then the text within this.\nThe code for extracting the names and locations is then:\nfrom lxml import html\nimport requests\n\nurl = 'https://www.petrescue.com.au/listings/search/dogs'\npage = requests.get(url)\n\ntree = html.fromstring(page.text)\n\nnames = tree.xpath(name_path)\nlocations = tree.xpath(location_path)\nBecause of the &lt;i&gt; tags we get additional strings returned in the location_path so we take every second one. The full Python code to get all the data from a single page is then:\nfrom lxml import html\nimport requests\n\nurl = 'https://www.petrescue.com.au/listings/search/dogs'\npage = requests.get(url)\n\ntree = html.fromstring(page.text)\n\nname_path = '//article[@class=\"cards-listings-preview\"]/a/header/h3/text()'\nlocation_path = '//strong[@class=\"cards-listings-preview__content__section__location\"]/text()'\n\nnames = tree.xpath(name_path)\nlocations = tree.xpath(location_path)\n\nlocations = locations[1::2]\nSkipping to the next page, the url is https://www.petrescue.com.au/listings/search/dogs?page=2 so we can scrape all the pages by looping over a range of integers and, for each request, appending an integer to the base url https://www.petrescue.com.au/listings/search/dogs?page=. Let’s add in this bit of code:\nfrom lxml import html\nimport requests\nimport pandas as pd\n\nurl_base = 'https://www.petrescue.com.au/listings/search/dogs?page='\n\nname_path = '//article[@class=\"cards-listings-preview\"]/a/header/h3/text()'\nlocation_path = '//strong[@class=\"cards-listings-preview__content__section__location\"]/text()'\n\nall_names = []\nall_locations = []\n\nfor n in range(1, 50):\n    print(f'Scraping page: {n}')\n    url = f'{url_base}{n}'\n    page = requests.get(url)\n    tree = html.fromstring(page.text)\n    names = tree.xpath(name_path)\n    locations = tree.xpath(location_path)\n    locations = locations[1::2]\n    all_names += names\n    all_locations += locations\nI like to print out which page is being scraped for debugging purposes and also as a sort of progress indicator. Finally, once we’ve scraped all this data, we can add put it all into a nice tidy Pandas Dataframe (with a tiny bit of text processing to remove unwanted spaces and new lines characters):\ndf = pd.DataFrame(data={'name': all_names, 'location': all_locations})\ndf['name'] = df['name'].str.strip()\ndf['location'] = df['location'].str.strip()\nAnd we have a nice tidy dataset of dog names and locations. Here are the first five rows:\n\n\n\nname\nlocation\n\n\n\n\nTeddy Yoric\nBrunswick, VIC\n\n\nTilly Goldsworthy\nRichmond, VIC\n\n\nMarnie & Panda Wazowski\nHampton, VIC\n\n\nBear Hartwell\nAltona Meadows, VIC\n\n\nShayla Caballero\nClifton Hill, VIC"
-  },
-  {
-    "objectID": "posts/intro-to-webscraping/index.html#second-example-atm-locations-in-australia",
-    "href": "posts/intro-to-webscraping/index.html#second-example-atm-locations-in-australia",
-    "title": "Intro to webscraping",
-    "section": "Second example: ATM locations in Australia",
-    "text": "Second example: ATM locations in Australia\nFor this example we’ll extract JSON data, which is usually a bit easier to work with than HTML as it’s naturally represented as Python dictionaries. We’ll do this by scraping all National Australia Bank ATMs.\nFirstly, with the developer tools / inspector open, navigate to https://www.nab.com.au/locations. In the inspector select the XHR tab in the right-hand pane. The reasoning is that, since there is a store locator in the page, there is an API behind the scenes that is delivering this data.\nScrolling through the different files we inspect the response provided by each. We find that file ‘4000?v=1’ produces a nice nested data structure of what appears to be locations and names of ATMs and branches. Clicking through to the headers tab we find the URL is:\nhttps://api.nab.com.au/info/nab/location/locationType/atm+brc/queryType/geo/-37.7787919055083/144.92910033652242/-37.74062261073386/144.99833566347752/1/4000?v=1\nThere is also some header information that we may need, so we include this too.\nNotice that four of the numbers in the URL look like latitude and longitude values and so these likely describe a bounding box for the search area. Since we are interested in all the ATMs and branches in the country we expand it to a box that encompasses all of Australia. The maximum and minimum latitude and longitude values of this bounding box are:\nlat_min, lng_min = -43.834124, 114.078644\nlat_max, lng_max = -10.400824, 154.508331\nThe code to scrape the locations of all NAB ATMS (which can in this case be done in only a single request) is:\nimport requests\nimport pandas as pd\n\nlat_min, lng_min = -43.834124, 114.078644\nlat_max, lng_max = -10.400824, 154.508331\n\nurl = f'https://api.nab.com.au/info/nab/location/locationType/atm+brc/queryType/geo/{lat_min}/{lng_min}/{lat_max}/{lng_max}/1/4000?v=1'\n\nheaders = {'Host': 'api.nab.com.au', \n'Origin': 'https://www.nab.com.au', \n'Referer': 'https://www.nab.com.au/',\n'x-nab-key': 'a8469c09-22f8-45c1-a0aa-4178438481ef'}\n\npage = requests.get(url=url, headers=headers)\ndata = page.json()\nNotice that since the output of the HTTP request is in JSON format it can immediately be converted to a Python dict. It is now a matter of finding where the location information is.\nThe final Python code is:\nimport requests\nimport pandas as pd\n\nlat_min, lng_min = -43.834124, 114.078644\nlat_max, lng_max = -10.400824, 154.508331\n\nurl = f'https://api.nab.com.au/info/nab/location/locationType/atm+brc/queryType/geo/{lat_min}/{lng_min}/{lat_max}/{lng_max}/1/4000?v=1'\n\nheaders = {'Host': 'api.nab.com.au', \n'Origin': 'https://www.nab.com.au', \n'Referer': 'https://www.nab.com.au/',\n'x-nab-key': 'a8469c09-22f8-45c1-a0aa-4178438481ef'}\n\npage = requests.get(url=url, headers=headers)\ndata = page.json()\n\ndf = pd.json_normalize(data['locationSearchResponse']['locations'])\ndf = df[['atm.address1', 'atm.suburb', 'atm.state', 'atm.postcode', 'atm.latitude', 'atm.longitude']].dropna()\nThe json_normalize method in Pandas is a handy way to flatten the nested JSON data into a flat data structure. Now we have a nice tidy data frame with the address, latitude and longitude of each ATM:\n\n\n\n\n\n\n\n\n\n\n\natm.address1\natm.suburb\natm.state\natm.postcode\natm.latitude\natm.longitude\n\n\n\n\nBrunswick City Centre, 94 Sydney Road\nBrunswick\nVIC\n3056\n-37.775660\n144.961047\n\n\n406 Sydney Road\nCoburg\nVIC\n3058\n-37.743756\n144.966389\n\n\n406 Sydney Road\nCoburg\nVIC\n3058\n-37.743756\n144.966389"
-  },
-  {
-    "objectID": "posts/intro-to-webscraping/index.html#summary-and-general-tips",
-    "href": "posts/intro-to-webscraping/index.html#summary-and-general-tips",
-    "title": "Intro to webscraping",
-    "section": "Summary and General tips",
-    "text": "Summary and General tips\nThat’s enough of an intro to get started. Using a couple of examples, we’ve covered the basics of scraping HTML and JSON, and parsing the data into tidy form using LXML and Pandas. To summarise:\n\nRemember to check the Terms and Conditions, robots.txt file and consider the application that you are using the data for;\nThe developer tools in the browser are a good way to identify the relevant elements in the web site;\nThere is fair amount of hack-work required to find where the relevant data is, and it changes from website to website. The two examples here illustrate how scraping works for a fair number of different websites;\nThose with store locators or unofficial APIs are generally much easier to scrape as the data is already in a relatively structured form.\n\nTo make things easy, all the code in this post is available in a (hopefully) easy-to-follow Jupyter Notebook."
-  },
-  {
-    "objectID": "posts/local-geospatial-analysis/index.html",
-    "href": "posts/local-geospatial-analysis/index.html",
-    "title": "Geospatial analysis in a secure environment",
-    "section": "",
-    "text": "Sensitive data work involves stringent security constraints in the data science environments. For example, often I am forced to use virtual machines which are isolated from the public internet. This introduces many limitations to data science workflows, one in particular being the ability to perform geospatial analysis and visualisation. Packages like Folium require access to a web mapping service to download the map tiles for an area of interest. I therefore had to find a way around this.\nAfter some experimentation, I found a combination of contextily and geopandas were suitable as they allow you to download the map tiles and then plot them along with any data. There are two steps here:\n\nUse contextily to download the map tiles that are required for your application\nPlot the data and basemaps using geopandas.\n\nThe first step can lead to a large amount of data being downloaded (around 2Gb in my case).\n\nDownloading map tiles\nContextily requires the place name to be specified and uses OpenStreetMap’s Nominatim geocoder. This is suitable for geocoding suburbs, local government areas, states and other regions provided there are no spelling errors. Using a list of standard place names such as those from official government sources is therefore important.\nAs an example, the following code will download the map tile for the Local Government Area of Moreland in Australia.\nimport contextily as ctx\n\nlga = ctx.Place(\"Melbourne, Victoria, Australia\", \n                source=ctx.providers.CartoDB.DarkMatter, \n                path='data_folder/greater_melbourne_maptile.tiff')\nThere are a few different sources of freely available map tiles.\n\n\nVisualisation of data\nIt is now straightforward to write a script to loop through the areas of interest and download the corresponding map tile. Once the files are downloaded these can be plotted using contextily and geopandas. For example, using the SA2 shapefiles for greater melbourne we can plot each of these against our recently downloaded basemap, using shading based on the area.\nimport contextily as ctx\nimport geopandas\n\n%matplotlib inline\n\nax = sa2_gm.plot(figsize=(15, 15), linewidth=1, alpha=0.7, column='AREASQKM21')\nctx.add_basemap(ax, crs=sa2_gm.crs, source=f\"data_folder/greater_melbourne_maptile.tiff\")\nax.set_axis_off()\nAnd here is what the output should look like: \nThe notebook describing how to download the map tiles is available here and for visualisation here."
-  },
-  {
     "objectID": "posts/geocoding/index.html",
     "href": "posts/geocoding/index.html",
     "title": "A simple geocoder using Postgres and Python",
@@ -196,130 +203,60 @@
     "text": "For a work project last year we needed to create at short notice a geocoder for Victorian addresses. While there are a number of open source options such as libpostal, we decided to take a different approach, following the ideas in the paper Exploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes. This allowed us to create a proof-of-concept within a few days and was relatively simple to code from scratch, using Python and Postgres.\n\nAn observation about street addresses\n\nThe paper is partly based on some observations about the statistics of street addresses which imply significant amount of redundancy in the way they are described. For example:\n\nBased on the January 2021 release of the GNAF there are 3,839,496 addresses in Victoria. 516,926 of which (i.e., over 13%) are uniquely defined by three numbers: flat number, street number and postcode.\n\nAs a result, these addresses can be identified irrespective of typographical errors in the street name, suburb or other text. Furthermore, even where the text is necessary to identify an address, often only a subset of the text is needed, and this is generally the parts of the text that occur relatively infrequently.\n\nThe algorithm: general idea\n\nThe authors of the paper use this idea as the starting point for a geocoding algorithm (actually an address linking algorithm in their paper) that has some nice properties:\n\nIt can be coded up in SQL in a few queries;\nThere is no need to standardize the addresses, i.e., to identify each of the address components and then re-write in a way that can be linked to the GNAF;\nIt can be scaled up to allow for fast linking of large datasets (as the title suggests).\n\nDespite its simplicity it works surprisingly well and at least for me was a good project for getting more hands-on experience using Postgres.\nBased on these ideas, the authors developed a simple geocoding algorithm that represents each address in terms of rare phrases, i.e., pairs of consecutive tokens that occur below a certain frequency, along with other infrequently occuring elements.\n\nThe algorithm: details and implementation\n\nHere are the basic steps of the algorithm for geocoding street addresses:\n\nCreate a database to store the GNAF data;\nFor both the input addresses and GNAF create corresponding phrase tables which generate the phrases for each address, i.e., the pairs of consecutive tokens;\nAn inverted index is generated on the phrases which maps each phrase to a set of addresses that contain these phrases;\nThe inverted index tables for the input addresses and GNAF addresses are then linked, only considering those that appear below a certain frequency. This has the advantage of only requiring searches over a small subset of addresses. The result is a set of candidate matches for each of the input addresses;\nFor each input address a similarity score is calculated with its set of candidate addresses. We used the similarity function from pg_tgrm module;\nAs a final step, an additional constraint on the numeric tokens is imposed: the set of numeric tokens in the input address has to be a subset of those in the matched address. This ensures, for example, that the unit numbers are correct.\n\nThe paper has SQL code for most of these steps, with the exception of the GNAF setup and the numerical constraint.\nI have written a Python module for geocoding that implements this algorithm in Postgres thanks to the nice results library. It is available in the repo PhraseGeocoder.\n\nSummary and extensions to the algorithm\n\nI found this an instructive project for learning more about Postgres, in particular things like Common Table Expressions, string similarity and operations that I wasn’t at all familiar with.\nThere are a few obvious ways that this algorithm can be extended:\n\nIntead of using pairs of consecutive tokens as phrases, use pairs of next-to-nearest neighbour phrases.\nTo better handle certain spelling errors, particularly those that occur in the text that is needed for the matching, construct phrases based on trigrams.\nChain together a sequence of geocoding algorithms, so that with higher data quality addresses can be geocoded by the faster phrase-based geocoder and the lower quality ones then get filtered out and geocoded by the slower but more accurate trigram based geocoder (or another variant).\n\nSome of these variations I have coded up and will upload them at a later date.\n\nReferences\n\n\nExploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes\nGithub repo for PhraseGeocoder"
   },
   {
-    "objectID": "posts/llm_experiments/index.html",
-    "href": "posts/llm_experiments/index.html",
-    "title": "Experiments with Large Language Models",
-    "section": "",
-    "text": "Like most people in the world, for the past twelive months or so I have been doing some experimenting with Large Language Models (LLMs). For the past month I have been doing this in a more focused way, to understand what their capabilities are and how suitable they might be for my day-to-day work and for research.\nI have been using ChapGPT as a code assistant for quite a while (in lieu of StackOverflow, whose data OpenAI stole anyway). However, I hadn’t built anything using LLMs and, despite the huge number of papers that are published about them every week, I had yet to do any serious experimenting with them in a research sense.\nHere are a collection of some recent experiments."
-  },
-  {
-    "objectID": "posts/llm_experiments/index.html#getting-started-with-local-models",
-    "href": "posts/llm_experiments/index.html#getting-started-with-local-models",
-    "title": "Experiments with Large Language Models",
-    "section": "Getting started with local models",
-    "text": "Getting started with local models\nProbably the best starting point is Ollama, a tool that you can use to download and run open models (e.g., Mistral, Llama3, Phi-2) from the command line. For example, to run Mistral all you need is the run the following command.\nollama run mistral:latest\nOllama also allows you to interact with models from Python. ### Ollama for running local models This is a great tool for running models on my Mac. Once installed you can interact with an LLM from the command line. Furthermore, you can make requests to these models using the requests library and so interact with them via a Jupyter notebook."
-  },
-  {
-    "objectID": "posts/llm_experiments/index.html#prompting",
-    "href": "posts/llm_experiments/index.html#prompting",
-    "title": "Experiments with Large Language Models",
-    "section": "Prompting",
-    "text": "Prompting\nLLMs take as an input a prompt, i.e., a string, and then produce some outputs based on this. There is some experimentation used to steer the model into providing the output that you would like, through communicating with the model in particular ways. Some people have given this the pretentious name of prompt engineering.\nOne way to get a model to produce an output that is more inline with what you intend is to provide some examples to guide it.\nNow for a few different examples."
-  },
-  {
-    "objectID": "posts/llm_experiments/index.html#example-text-anonymization",
-    "href": "posts/llm_experiments/index.html#example-text-anonymization",
-    "title": "Experiments with Large Language Models",
-    "section": "Example: Text anonymization",
-    "text": "Example: Text anonymization\nEarlier in the year a pre-print came out Large Language Models are advanced anonymizers. The idea is to use LLMs to take some text that contains identifying information (e.g., location, age, gender) and use an LLM to rewrite is so that not only is this information replaced, but indirectly identifying information is also removed. Traditional Named Entity Recognition models are able to extract direct identifers but it turns out LLMs can do much more.\nThe idea is to have one LLM to extract identifying information from the text and another to de-identify the text. Once the extractor LLM can no longer pull out any more identifiying information, then the text is said to be anonymized.\nHere are the prompts\n\\\\ system prompt\nYou are an expert...\n\n\\\\ user prompt\n{query}\n\\\\ system prompt\nYou are an expert anonymizer\nLet’s see an example. In Melbourne there is a famous bar called Young and Jackson’s. Inside there is a 19th century nude portrait called Chloe. This second piece of information is therefore enough to indirectly identify the location of the bar and therefore the city.\nOver the weekend I went to that place near the station with the painting of chloe. There we had a few drinks and watched the game.\nThe LLM does an excellent job of extracting the information and then rewriting so that it is less specific."
-  },
-  {
-    "objectID": "posts/llm_experiments/index.html#example-data-cleaning",
-    "href": "posts/llm_experiments/index.html#example-data-cleaning",
-    "title": "Experiments with Large Language Models",
-    "section": "Example: Data Cleaning",
-    "text": "Example: Data Cleaning\nOne of my key motivations for using LLMs is to automate some of the drudgery of data work, namely data cleaning. Clinical data can be extremely messy with many variations for a given piece of information."
-  },
-  {
-    "objectID": "posts/llm_experiments/index.html#example-inforamtion-extraction-from-tabular-data",
-    "href": "posts/llm_experiments/index.html#example-inforamtion-extraction-from-tabular-data",
-    "title": "Experiments with Large Language Models",
-    "section": "Example: Inforamtion extraction from tabular data",
-    "text": "Example: Inforamtion extraction from tabular data\nWith very little effort, LLMs can also be used to extract information from tabular data, through converting the data to JSON or some other serialized format."
-  },
-  {
-    "objectID": "posts/llm_experiments/index.html#lessons",
-    "href": "posts/llm_experiments/index.html#lessons",
-    "title": "Experiments with Large Language Models",
-    "section": "Lessons",
-    "text": "Lessons\n\nLLMs can solve a broad range of tasks, through the use of a carefully crafted prompt.\nThey exceed the capabilities of many traditional ML models at tasks such as anonymization through the ability to use indirect pieces of information in the text and effectively reason with this.\nThey can be incorporated into data analysis workflows in a fairly straightforward way so tasks such as data cleaning be streamlined, though there are some limitations and caveats.\nTabular data information is also feasible.\nThere are still some significant limitations to them namely their apparent dependence on particular phrasing of the prompt and the fact that the same prompt can give multiple conflicting responses."
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Articles",
-    "section": "",
-    "text": "Date\n\n\nTitle\n\n\nCategories\n\n\n\n\n\n\nJun 11, 2025\n\n\nAn overview of record linkage and geocoding\n\n\npython, record linkage\n\n\n\n\nMay 18, 2025\n\n\nCreating and publishing your first Python package\n\n\npython development, natural language processing\n\n\n\n\nMar 22, 2025\n\n\nTokenisation\n\n\nnatural language processing\n\n\n\n\nJun 7, 2024\n\n\nExperiments with Large Language Models\n\n\nLLM\n\n\n\n\nMar 31, 2024\n\n\nLarger than memory datasets in Python using Polars\n\n\npython, polars, large data\n\n\n\n\nJul 9, 2022\n\n\nVirtual environments with Jupyter Notebooks\n\n\npython, jupyter\n\n\n\n\nMay 14, 2022\n\n\nGeospatial analysis in a secure environment\n\n\npython, geospatial\n\n\n\n\nApr 2, 2021\n\n\nSetting up a scratch space using Poetry, Docker and Jupyter\n\n\npython, docker, jupyter\n\n\n\n\nMar 14, 2021\n\n\nA simple geocoder using Postgres and Python\n\n\npython, postgres, geospatial\n\n\n\n\nJan 1, 2021\n\n\nIntro to webscraping\n\n\npython, webscraping, requests, open data\n\n\n\n\nDec 31, 2020\n\n\nRegular lattice shapefiles with geopandas\n\n\npython, geopandas, geospatial visualisation\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "posts/bpe/index.html",
-    "href": "posts/bpe/index.html",
-    "title": "Tokenisation",
-    "section": "",
-    "text": "Data is naturally represented as numerical variables but useful information is often stored in text. A key step in natural language processing is to convert the raw information that is initially represented as strings into a numerical representation that is suitable for downstream tasks such as text classification, named entity recognition or machine translation."
-  },
-  {
-    "objectID": "posts/bpe/index.html#tokenisation-for-large-language-models",
-    "href": "posts/bpe/index.html#tokenisation-for-large-language-models",
-    "title": "Tokenisation",
-    "section": "Tokenisation for large language models",
-    "text": "Tokenisation for large language models"
-  },
-  {
     "objectID": "posts/setting-up-a-github-project/index.html",
     "href": "posts/setting-up-a-github-project/index.html",
     "title": "Creating and publishing your first Python package",
     "section": "",
-    "text": "This post describes a step-by-step template for how to go about setting up a Python project using uv and github and publishing the end result as a package on PyPi. The result is a simple Python package (&lt; 200 lines of code) for finding and removing Personally Identifiable Information (PII) from text. I have published the result as blankit but you can call your version whatever you like.\nMore specifically this post describes:"
+    "text": "This post describes a step-by-step template for how to go about creating a Python project using uv and Github and publishing the end result as a package on PyPi.\nAs a example we create a simple Python package (&lt; 200 lines of code) for finding and removing Personally Identifiable Information (PII) from text. I have published the result as blankit. Call your version whatever you like.\nI will go through the following steps:"
   },
   {
     "objectID": "posts/setting-up-a-github-project/index.html#project-structure",
     "href": "posts/setting-up-a-github-project/index.html#project-structure",
     "title": "Creating and publishing your first Python package",
     "section": "1. Project structure",
-    "text": "1. Project structure\nI have recently switched to uv as an alternative to poetry as my preferred package manager. In other instances I have used conda but uv addresses all my issues with both of these. It is extremely fast at resolving package dependencies and convenient for managing projects. One caveat is that it is VC backed so, while it is currently free and open source, that may change at some point.\nFirstly, install uv by following the instructions on the uv website.\nNow you can set up a project in the command line via\nuv init --package project_name\nThis will create a uv project with the following structure\nproject_name\n|--- .python-version\n|--- README.md\n|--- pyproject.toml\n|___ src \n     |___ project_name \n          |___ __init__.py\nWe get a README.md (for giving users a basic overview of our project), a pyproject.toml (for listing all the dependencies of your project), .python-version that contains the python version and a src folder for storing all the project code.\n\n1.1. What is a pyproject.toml file?\nThis file is the modern approach for listing dependencies in a python package. Along with these dependencies it is also used to describe important metadata for your project, including the author name and contact details, project name, description and version. More details can be found in the Python packaging user guide.\nLet’s modify this file with some useful information.\n[project]\nname = \"project-name\"\nversion = \"0.1.0\"\ndescription = \"My PII detection project\"\nreadme = \"README.md\"\nauthors = [\n    { name = \"Alex Lee\", email = \"ajlee3141@gmail.com\" }\n]\nrequires-python = \"&gt;=3.10\"\ndependencies = []\n\n[project.scripts]\nproject-name = \"project_name:main\"\n\n[build-system]\nrequires = [\"hatchling\"]\nbuild-backend = \"hatchling.build\"\nNow let’s add a package that will be key to solving our PII detection task.\n\n\n1.2. Named Entity Recognition for PII detection\nWe will user the GLiNER package that does zero-shot named entity recognition. Since PII consists of explicit references to names, locations and other identifiers, this is a good option.\nLet’s add this package to our project\nuv add gliner\nThe pyproject.toml file has now been updated with this additional dependencies\ndependencies = [\n    \"gliner&gt;=0.2.19\",\n]\nAnd we will also add a couple of other packages that will be useful later on:\nuv add pandas blank ruff pytest\nYou will notice that uv has created a new file uv.lock which all the resolved dependencies for these packages required by our project, and also a folder .venv for our virtual environment.\nOnce a project is cloned from our repo if we run uv run python this will install all the required dependences, in other words, there is no requirements.txt file as is the case for pip.\n\n\n1.3. Write some code that solves our task\nThe final package contains two files: a utils.py file and a scanner.py file. The first contains functions for things like parsing text, replacing the identified PII with generic text and redacting the text. The second file describes a Scanner class that provides an API for users to identify and redact a given string or list of strings."
+    "text": "1. Project structure\nI have recently switched to uv as an alternative to poetry as my preferred package manager. In other instances I have used conda but uv addresses all my issues with both of these. It is extremely fast at resolving package dependencies and convenient for managing projects. One caveat is that it is VC backed so, while it is currently free and open source, that may well change.\nFirstly, install uv by following the instructions on the uv website.\nNow you can easily set up a project in the command line via\nuv init --package project_name\nThis will create a uv project with the following basic structure\nproject_name\n|--- .python-version\n|--- README.md\n|--- pyproject.toml\n|___ src \n     |___ project_name \n          |___ __init__.py\nWe get a README.md (for giving users a basic overview of our project), a pyproject.toml (for listing all the dependencies of your project), .python-version that contains the python version and a src folder for storing all the project code.\n\n1.1. What is a pyproject.toml file?\nFrom what I understand this is the modern approach for listing dependencies in a python package. Along with these dependencies the pyprofile.toml file is also used to describe important metadata for your project, including the author name and contact details, project name, description and version. More details can be found in the Python packaging user guide.\nLet’s modify this file to include some more information about our project.\n[project]\nname = \"project-name\"\nversion = \"0.1.0\"\ndescription = \"My PII detection project\"\nreadme = \"README.md\"\nauthors = [\n    { name = \"Alex Lee\", email = \"ajlee3141@gmail.com\" }\n]\nrequires-python = \"&gt;=3.10\"\ndependencies = []\n\n[project.scripts]\nproject-name = \"project_name:main\"\n\n[build-system]\nrequires = [\"hatchling\"]\nbuild-backend = \"hatchling.build\"\nNow we can start adding dependencies.\n\n\n1.2. Named Entity Recognition for PII detection\nGLiNER is a widely used package for zero-shot named entity recognition. This just means that we can give a description of the categories that we are interested in detecting and, without any training, the model will do a pretty good job of detecting them. This makes it an effective out-of-the-box solution for PII detection since PII consists of explicit references to names, locations and other identifiers.\nLet’s add this package to our project\nuv add gliner\nThe pyproject.toml file has now been updated with this additional dependencies\ndependencies = [\n    \"gliner&gt;=0.2.19\",\n]\nAnd we will also add a couple of other packages that will be useful later on:\nuv add pandas black ruff pytest\nYou will notice that uv has created a new file - uv.lock - with all the resolved dependencies for these packages required by our project, and also a folder .venv for our virtual environment.\nIf someone clones our project from a repo (see the next step), they can run uv run python to install all the required dependences. In other words, there is no requirements.txt file needed as for pip.\n\n\n1.3. Write some code that solves our task\nThe final package contains two files: a utils.py file and a scanner.py file. The first contains functions for basic tasks like parsing and replacing the identified PII with generic PII labels. The second file implements a Scanner class that provides an API for users to identify and redact a given string or list of strings. You can create these files in the src folder and copy the code across from the blankit repo."
   },
   {
-    "objectID": "posts/setting-up-a-github-project/index.html#environment",
-    "href": "posts/setting-up-a-github-project/index.html#environment",
-    "title": "Setting up a github project",
-    "section": "Environment",
-    "text": "Environment"
-  },
-  {
-    "objectID": "posts/setting-up-a-github-project/index.html#using-uv",
-    "href": "posts/setting-up-a-github-project/index.html#using-uv",
+    "objectID": "posts/setting-up-a-github-project/index.html#create-a-github-repository-for-our-project",
+    "href": "posts/setting-up-a-github-project/index.html#create-a-github-repository-for-our-project",
     "title": "Creating and publishing your first Python package",
-    "section": "",
-    "text": "pyproject.toml file to store the dependencies, including python version\nuv.lock file that contains detailed information on the resolved dependencies\n\nOnce project is cloned uv run python will install all the required dependencies the first time. E.g., there is no need to do uv pip install -r requirements.txt if there were a requirements.txt file"
+    "section": "2. Create a Github repository for our project",
+    "text": "2. Create a Github repository for our project\nWe now have the key ingredients for our project. Let’s create a respository for our project on Github.\n\n2.1. Initialise the github repo locally\nFirstly we intialise git (assuming you already have it installed). This is done in the base folder of the project:\ngit init\nThis will create: a file called .gitignore that tells the repo which files should not be tracked by git when we make a push request; and a folder named .git for tracking changes.\nIf you’re not comfortable with git there are plenty of tutorials online\nNow we can add our changes and make our initial commit.\ngit add .\ngit commit -m \"Initial commit\"\n\n\n2.2. Create a github respository in your Github account and push your code\nNow log in to your Github account and create a repository. Once that is created, you can push all the current project code to this repo.\ngit remote add origin https://github.com/yourusername/your-repo-name.git\ngit branch -M main\ngit push -u origin main"
   },
   {
-    "objectID": "posts/setting-up-a-github-project/index.html#unit-tests-and-integration-tests",
-    "href": "posts/setting-up-a-github-project/index.html#unit-tests-and-integration-tests",
+    "objectID": "posts/setting-up-a-github-project/index.html#add-some-unit-tests",
+    "href": "posts/setting-up-a-github-project/index.html#add-some-unit-tests",
     "title": "Creating and publishing your first Python package",
-    "section": "",
-    "text": "We are still missing a couple of things, one of which is some unit tests. This helps us to check that when we make changes to our code, we don’t break other things. We will add a couple of these, to check the functionality of our utility functions.\nCreate a folder tests under the project parent directory and a file test_function.py in this folder\ndef test_basic():\n    assert len(\"mango\") == 5\nWe will use pytest to run tests and so we add a few lines to our pyproject.toml file\n[tool.pytest.ini_options]\ntestpaths = [\"tests\"]\npython_files = [\"test_*.py\"]\npython_functions = \"test_*\"\nAnd we can run pytest as follows\nuv run pytest\nYou should see that 2 of out 2 tests have passed (assuming nothing broke in the code). You can also commit these and push to your git repo\ngit add tests\ngit add pyproject.toml\ngit commit -m 'Update with tests'\ngit push"
+    "section": "3. Add some unit tests",
+    "text": "3. Add some unit tests\nWe are still missing a couple of things, one of which is some unit tests. This helps us to check that when we make changes to our code, we don’t break other things. We will add a couple of these, to check the functionality of our utility functions.\nCreate a folder tests under the project parent directory and a file test_function.py in this folder\ndef test_basic():\n    assert len(\"mango\") == 5\nWe will use pytest to run tests and so we add a few lines to our pyproject.toml file to specify where to find the test functions\n[tool.pytest.ini_options]\ntestpaths = [\"tests\"]\npython_files = [\"test_*.py\"]\npython_functions = \"test_*\"\nNow we can run pytest as follows\nuv run pytest\nYou should see that 2 of out 2 tests have passed (assuming nothing broke in the code). You can also commit these and push to your git repo\ngit add tests\ngit add pyproject.toml\ngit commit -m 'Update with tests'\ngit push"
   },
   {
-    "objectID": "posts/setting-up-a-github-project/index.html#using-github-actions",
-    "href": "posts/setting-up-a-github-project/index.html#using-github-actions",
+    "objectID": "posts/setting-up-a-github-project/index.html#automation-with-github-actions",
+    "href": "posts/setting-up-a-github-project/index.html#automation-with-github-actions",
     "title": "Creating and publishing your first Python package",
-    "section": "",
-    "text": "Adding in github action for installing uv (https://docs.astral.sh/uv/guides/integration/github/#installation)\nWhat they are: https://docs.github.com/en/actions/about-github-actions/understanding-github-actions"
-  },
-  {
-    "objectID": "posts/setting-up-a-github-project/index.html#make-a-package-and-push-it-to-pypi",
-    "href": "posts/setting-up-a-github-project/index.html#make-a-package-and-push-it-to-pypi",
-    "title": "Creating and publishing your first Python package",
-    "section": "",
-    "text": "We first need to build the package. This will create a .whl file and .tar.gz file under /dist with the packages that are ready for distribution:\nuv build\nNow we can publish the file to (PyPI)[https://www.pypi.org]\nuv publish\nThe file can then be installed using a package manager such as uv, conda, poetry or pip as you usually do, and it can be incorporated into other developer’s projects."
+    "section": "4. Automation with Github Actions",
+    "text": "4. Automation with Github Actions\nWe are almost there. One useful addition to our project is to run a series our tests each time we commit to Github, so that anything that breaks can be detected before the code is pushed. In other words, it helps to avoid pushing broken code.\nAlso, since most users will not be working within our exact set up (operating system and python version), ensuring unit tests performed by Github in different environments (Windows, Mac, Linux) will reduce the chance that the users of the package will encounter bugs that you didn’t anticipate.\nThis can all be done via a Github Action.\nWe will add an action for carrying out tests. Create a file test.yml under a new folder .github/workflows/ and include the following in the file\nname: project_name\n\non: [push, pull_request]\n\njobs:\n  test:\n    runs-on: ${{ matrix.os }}\n    strategy:\n      matrix:\n        os: [ubuntu-latest, macos-latest]\n        python-version: ['3.10', '3.11', '3.12']\n\n    steps:\n    - uses: actions/checkout@v4\n\n    - name: Install uv\n      uses: astral-sh/setup-uv@v5\n\n    - name: \"Set up Python\"\n      uses: actions/setup-python@v5\n      with:\n        python-version: ${{ matrix.python-version }}\n\n    - name: Install the project\n      run: uv sync --locked --all-extras --dev\n\n    - name: Run tests (Linux/macOS)\n      if: runner.os != 'Windows'\n      run: uv run pytest tests\nEach time we push code to the repo this action will run, which installs uv and the project files and runs the tests in the tests folder. It will carry out these actions in a Mac OS and Ubuntu environment for three different Python versions.\nThere are a whole range of github actions. For this one I copied the code from the following:\n\nAdding in github action for installing uv\nUnderstanding Github Actions"
   },
   {
     "objectID": "posts/setting-up-a-github-project/index.html#documentation",
     "href": "posts/setting-up-a-github-project/index.html#documentation",
     "title": "Creating and publishing your first Python package",
     "section": "5. Documentation",
-    "text": "5. Documentation\nIt is handy to have some automation to write documentation for your project. This avoids the need to manually edit and update documentation each time you make a change. Rather, you can use a tool such as Sphinx and readthedocs to build the documentation from your code base. The documentation will be rebuilt with each push.\nFirstly create a new folder under docs/source called conf.py:\n# Configuration file for the Sphinx documentation builder.\nimport os\nimport sys\n\nsys.path.insert(0, os.path.abspath('../..'))\n\n# -- Project information\n\nproject = 'project_name'\ncopyright = '2025, Alex Lee'\nauthor = 'Alex Lee'\n\nrelease = '0.1.0'\nversion = \"0.1.0\"\n\n# -- General configuration\n\nextensions = [\n    'sphinx.ext.duration',\n    'sphinx.ext.doctest',\n    'sphinx.ext.autodoc',\n    'sphinx.ext.autosummary',\n    'sphinx.ext.intersphinx',\n    'sphinx.ext.napoleon',\n]\n\nintersphinx_mapping = {\n    'python': ('https://docs.python.org/3/', None),\n    'sphinx': ('https://www.sphinx-doc.org/en/master/', None),\n}\nintersphinx_disabled_domains = ['std']\n\n# -- Options for HTML output\nhtml_theme = 'alabaster'\n\n# -- Options for EPUB output\nepub_show_urls = 'footnote'\nAlso add a .readthedocs.yaml file to the root directory of your repo:\nversion: \"2\"\n\nsphinx:\n  configuration: docs/source/conf.py\n\nbuild:\n  os: \"ubuntu-22.04\"\n  tools:\n    python: \"3.10\"\n\npython:\n  install:\n    - method: pip\n      path: .\nRead the Docs doesn’t yet support pyproject.toml files so we have to create a requirements.txt file:\nuv pip compile pyproject.toml &gt; docs/requirements.txt\nNext log into Read The Docs and import your Github repo. Finally, when you push your latest commit the documentation will be built and available at https://project_name.readthedocs.io/en/latest/"
+    "text": "5. Documentation\nIn addition to automated testing, it is handy to use automation to create documentation. This avoids the need to manually edit and update documentation each time you make a change. Instead, you can use a tool such as Sphinx and readthedocs to build the documentation from your code base. The documentation will be rebuilt whenever code is pushed to the repo.\nFirstly, create a new folder under docs/source called conf.py:\n# Configuration file for the Sphinx documentation builder.\nimport os\nimport sys\n\nsys.path.insert(0, os.path.abspath('../..'))\n\n# -- Project information\n\nproject = 'project_name'\ncopyright = '2025, Alex Lee'\nauthor = 'Alex Lee'\n\nrelease = '0.1.0'\nversion = \"0.1.0\"\n\n# -- General configuration\n\nextensions = [\n    'sphinx.ext.duration',\n    'sphinx.ext.doctest',\n    'sphinx.ext.autodoc',\n    'sphinx.ext.autosummary',\n    'sphinx.ext.intersphinx',\n    'sphinx.ext.napoleon',\n]\n\nintersphinx_mapping = {\n    'python': ('https://docs.python.org/3/', None),\n    'sphinx': ('https://www.sphinx-doc.org/en/master/', None),\n}\nintersphinx_disabled_domains = ['std']\n\n# -- Options for HTML output\nhtml_theme = 'alabaster'\n\n# -- Options for EPUB output\nepub_show_urls = 'footnote'\nAlso add a .readthedocs.yaml file to the root directory of your repo:\nversion: \"2\"\n\nsphinx:\n  configuration: docs/source/conf.py\n\nbuild:\n  os: \"ubuntu-22.04\"\n  tools:\n    python: \"3.10\"\n\npython:\n  install:\n    - method: pip\n      path: .\nRead the Docs doesn’t yet support pyproject.toml files so we have to now create a requirements.txt file. This is straightforward in uv:\nuv pip compile pyproject.toml &gt; docs/requirements.txt\nNext log into Read The Docs and import your Github repo (you will need to first create an account on RTD if you haven’t).\nNow, each time we push code to our repo, the documentation will be automatically built and available at https://project_name.readthedocs.io/en/latest/"
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#build-and-distribute-the-package",
+    "href": "posts/setting-up-a-github-project/index.html#build-and-distribute-the-package",
+    "title": "Creating and publishing your first Python package",
+    "section": "6. Build and distribute the package",
+    "text": "6. Build and distribute the package\nNow we are ready to build the package and publish it to make it available to the world. Firstly, create a distribution of the package:\nuv build\nThis will create a .tar.gz and .whl file under the new dist folder.\nLet’s publish it to PyPI (note that you will need to setup a PyPI account with authentication to do this).\nuv publish\nThe package is now listed on the python package index and can be installed via uv, conda, poetry or pip"
+  },
+  {
+    "objectID": "posts/setting-up-a-github-project/index.html#summary",
+    "href": "posts/setting-up-a-github-project/index.html#summary",
+    "title": "Creating and publishing your first Python package",
+    "section": "Summary",
+    "text": "Summary\nAnd that’s it! You can now create a project in uv, make it available on github, incorporate some automated testing and documentation creation and make your project available to the rest of the Python community. As a bonus we have an easy-to-use Python package for redacting PII from text, a pretty common task when working with sensitive data."
   },
   {
     "objectID": "posts/setting-up-a-github-project/index.html#references",
@@ -327,152 +264,5 @@
     "title": "Creating and publishing your first Python package",
     "section": "References",
     "text": "References\n\nA Beginner’s Guide to Creating an Open Source Python Package\nFrom a Python Project to an Open Source Package: An A to Z Guide\nWriting pyproject.toml\nSetting Up Testing with Pytest and UV"
-  },
-  {
-    "objectID": "posts/setting-up-a-github-project/index.html#outline",
-    "href": "posts/setting-up-a-github-project/index.html#outline",
-    "title": "Creating and publishing your first Python package",
-    "section": "",
-    "text": "More specifically I will describe:\n\nUsing the uv Python package manager to initialise a project with a basic folder structure\nCreating a Github repository for the project\nIncorporating unit tests\nAutomating tests in different deployment environments using Github Actions\nUsing sphinx to produced automated documentation from the codebase\nBuilding and publishing the package to PyPi."
-  },
-  {
-    "objectID": "posts/setting-up-a-github-project/index.html#write-some-code-that-solves-our-task",
-    "href": "posts/setting-up-a-github-project/index.html#write-some-code-that-solves-our-task",
-    "title": "Creating and publishing your first Python package",
-    "section": "",
-    "text": "The final package contains two files: a utils.py file and a scanner.py file. The first contains functions for things like parsing text, replacing the identified PII with generic text and redacting the text. The second file describes a Scanner class that provides an API for users to identifying and redacting PII."
-  },
-  {
-    "objectID": "posts/setting-up-a-github-project/index.html#create-a-github-repository-for-our-project",
-    "href": "posts/setting-up-a-github-project/index.html#create-a-github-repository-for-our-project",
-    "title": "Creating and publishing your first Python package",
-    "section": "2. Create a Github repository for our project",
-    "text": "2. Create a Github repository for our project\nWe now have enough ingredients for our project to create a project respository on Github.\n\n2.1. Initialise the github repo locally\nFirstly we will intialise git:\ngit init\nThis will create two new files .gitignore that tells the repo which files should not be tracked and pushed to the repo, and a folder .git for tracking changes.\nNow we can carry out our initial commit.\ngit add .\ngit commit -m \"Initial commit\"\n\n\n2.2. Create a github respository in your Github account and push your code\nNow log in to your Github account and create a repostiory. Once that is created, you can push all the current project code to this repo.\ngit remote add origin https://github.com/yourusername/your-repo-name.git\ngit branch -M main\ngit push -u origin main"
-  },
-  {
-    "objectID": "posts/setting-up-a-github-project/index.html#automation-with-github-actions",
-    "href": "posts/setting-up-a-github-project/index.html#automation-with-github-actions",
-    "title": "Creating and publishing your first Python package",
-    "section": "4. Automation with Github Actions",
-    "text": "4. Automation with Github Actions\nWe are almost there. One useful addition to our project is to run a series of tests each time we commit to Github. Most users will not be working within our exact set up (operating system or python version) and so having tests performed by Github It will reduce the likelihood that the users of your package will encounter bugs that you didn’t anticipate.\nThis is done via a so-called Github Action.\nWe will add an action for carrying out tests. Create a file test.yml under a new folder .github/workflows/ and include the following in the file\nname: project_name\n\non: [push, pull_request]\n\njobs:\n  test:\n    runs-on: ${{ matrix.os }}\n    strategy:\n      matrix:\n        os: [ubuntu-latest, macos-latest]\n        python-version: ['3.10', '3.11', '3.12']\n\n    steps:\n    - uses: actions/checkout@v4\n\n    - name: Install uv\n      uses: astral-sh/setup-uv@v5\n\n    - name: \"Set up Python\"\n      uses: actions/setup-python@v5\n      with:\n        python-version: ${{ matrix.python-version }}\n\n    - name: Install the project\n      run: uv sync --locked --all-extras --dev\n\n    - name: Run tests (Linux/macOS)\n      if: runner.os != 'Windows'\n      run: uv run pytest tests\nWhen a change is committed to the repo, this will run an action that installs uv and the project files and runs the tests in the tests folder. Furthermore it will carry out these actions in a Mac OS and Ubuntu environment and three different Python versions, making the tests more robust.\nThere are many different actions that can be carried out upon a commit. For this one I copied the code from the following:\n\nAdding in github action for installing uv\nUnderstanding Github Actions"
-  },
-  {
-    "objectID": "posts/setting-up-a-github-project/index.html#build-and-distribute-the-package",
-    "href": "posts/setting-up-a-github-project/index.html#build-and-distribute-the-package",
-    "title": "Creating and publishing your first Python package",
-    "section": "6. Build and distribute the package",
-    "text": "6. Build and distribute the package\nFinally now that our package has been tested and documented, we can build and publish it. With uv this is very straightforward. Firstly, create a distribution of the package:\nuv build\nThis will create a .tar.gz and .whl file under the new dist folder. Let’s publish it to PyPI.\nuv publish\nThe package is now available for the entire world to use via uv, conda, poetry or pip"
-  },
-  {
-    "objectID": "posts/setting-up-a-github-project/index.html#add-some-unit-tests",
-    "href": "posts/setting-up-a-github-project/index.html#add-some-unit-tests",
-    "title": "Creating and publishing your first Python package",
-    "section": "3. Add some unit tests",
-    "text": "3. Add some unit tests\nWe are still missing a couple of things, one of which is some unit tests. This helps us to check that when we make changes to our code, we don’t break other things. We will add a couple of these, to check the functionality of our utility functions.\nCreate a folder tests under the project parent directory and a file test_function.py in this folder\ndef test_basic():\n    assert len(\"mango\") == 5\nWe will use pytest to run tests and so we add a few lines to our pyproject.toml file\n[tool.pytest.ini_options]\ntestpaths = [\"tests\"]\npython_files = [\"test_*.py\"]\npython_functions = \"test_*\"\nAnd we can run pytest as follows\nuv run pytest\nYou should see that 2 of out 2 tests have passed (assuming nothing broke in the code). You can also commit these and push to your git repo\ngit add tests\ngit add pyproject.toml\ngit commit -m 'Update with tests'\ngit push"
-  },
-  {
-    "objectID": "posts/setting-up-a-github-project/index.html#summary",
-    "href": "posts/setting-up-a-github-project/index.html#summary",
-    "title": "Creating and publishing your first Python package",
-    "section": "Summary",
-    "text": "Summary\nAnd that’s it! You can now create a project in uv, make it available on github, incorporate some automated testing and creation of documentation and make your project available to the rest of the Python community via Pypi. As a bonus we have an easy-to-use Python package for redacting PII from text, a pretty common task when working with sensitive data."
-  },
-  {
-    "objectID": "posts/record_linkage_and_geocoding/index.html",
-    "href": "posts/record_linkage_and_geocoding/index.html",
-    "title": "An overview of record linkage and geocoding",
-    "section": "",
-    "text": "Record linkage is a key step in enabling analysis of population-level trends and patterns, which is relevant to a broad range of questions in the public sector and healthcare. Examples include:\nIt is generally the case that relevant information is stored in disparate data sources, which need to be linked together to develop a harmonised pictuure of populations.\nA key challenge is that information about a given person can be recorded in many different ways: for example a person’s name may contain be recorded using initials in one dataset, a nickname in another and a complete name in a third. Similarly, street addresses often contain spelling errors, missing postcode or suburb names, or unusual formatting.\nRecord linkage, also called data linkage or entity resolution is a key step to harmonise these sources to obtain a more complete picture of the population’s use of different services. In addition to being robust to variations in how items are recorded, record linkage algorithms also need to scale, often to tens of millions of records. Brute force string similarity approaches are therefore out of the question.\nIn this article we will give a brief overview of what record linkage is and some record linkage techniques as applied to both person-level and address-level dataset. These two types of record linkage problems are related, but require slightly different approaches.\nFinally we will present two open source Python packages - Splink and whereabouts - that solve each of these problems."
-  },
-  {
-    "objectID": "posts/record_linkage_and_geocoding/index.html#an-example-synthetic-dataset",
-    "href": "posts/record_linkage_and_geocoding/index.html#an-example-synthetic-dataset",
-    "title": "An overview of record linkage and geocoding",
-    "section": "1. An example synthetic dataset",
-    "text": "1. An example synthetic dataset\nLet’s begin by considering the following dataset consisting of names and addresses.\n\n\n\nName\nAddress\n\n\n\n\nJonh Smth\n123 Aplee St, New Yrok, NY 10001\n\n\nMaria Gonsalez\n56b, Elm Street, los angeles CA\n\n\nA. K. Patel\nApt#4 78-King’s Rd London\n\n\nlucy o’conner\n8890 wElmwood av., dallas TX\n\n\nChen, Wei\nNo. 77, HuaiHai Rd, shanghi"
-  },
-  {
-    "objectID": "posts/record_linkage_and_geocoding/index.html#formulation-of-the-record-linkage-problem",
-    "href": "posts/record_linkage_and_geocoding/index.html#formulation-of-the-record-linkage-problem",
-    "title": "An overview of record linkage and geocoding",
-    "section": "2. Formulation of the record linkage problem",
-    "text": "2. Formulation of the record linkage problem\nConsider just the two sets of addresses in the above examples. They are two different sets of strings and we need to find a mapping from one set to the other, in such a way that equivalent addresses are deemed to be true matches while those that do not match are correctly identified as such.\n(Diagram showing two sets and maps between them)\nThis mapping is called a score function and assigns a number between each pair of records in the two datasets. Roughly this can be thought of as a probability of a match between them, although since the function is not necessarily calibrated we prefer the term score.\n\n2.1. Blocking\n\nProblem: large search space\nSolution: reduce the search space by only searching over candidate matches\nHow do we reduce the search space?\n\n\n\n2.2. Scoring\nOnce we have a set of candidate records to compare against, we need to be able to assign a ranking to each candidate based on high likely it is to be a correct match. This is known as scoring.\n\n\n2.3. Tokenisation\n\n\n2.4. Privacy"
-  },
-  {
-    "objectID": "posts/record_linkage_and_geocoding/index.html#section",
-    "href": "posts/record_linkage_and_geocoding/index.html#section",
-    "title": "An overview of record linkage and geocoding",
-    "section": "",
-    "text": "References\n\n\nExploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes\nGithub repo for PhraseGeocoder"
-  },
-  {
-    "objectID": "posts/record_linkage_and_geocoding/index.html#common-errors",
-    "href": "posts/record_linkage_and_geocoding/index.html#common-errors",
-    "title": "An overview of record linkage and geocoding",
-    "section": "Common errors",
-    "text": "Common errors"
-  },
-  {
-    "objectID": "posts/record_linkage_and_geocoding/index.html#scaling",
-    "href": "posts/record_linkage_and_geocoding/index.html#scaling",
-    "title": "An overview of record linkage and geocoding",
-    "section": "Scaling",
-    "text": "Scaling"
-  },
-  {
-    "objectID": "posts/record_linkage_and_geocoding/index.html#approach",
-    "href": "posts/record_linkage_and_geocoding/index.html#approach",
-    "title": "An overview of record linkage and geocoding",
-    "section": "Approach",
-    "text": "Approach\n\nReferences\n\n\nExploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes\nSplink\nwhereabouts\nData Matching: Concepts and Techniques for Record Linkage, Entity Resolution, and Duplicate Detection, Peter Christen"
-  },
-  {
-    "objectID": "posts/record_linkage_and_geocoding/index.html#challenges",
-    "href": "posts/record_linkage_and_geocoding/index.html#challenges",
-    "title": "An overview of record linkage and geocoding",
-    "section": "Challenges",
-    "text": "Challenges"
-  },
-  {
-    "objectID": "posts/record_linkage_and_geocoding/index.html#evaluation",
-    "href": "posts/record_linkage_and_geocoding/index.html#evaluation",
-    "title": "An overview of record linkage and geocoding",
-    "section": "4. Evaluation",
-    "text": "4. Evaluation\nHow do we test the performance? This is actually a non-trivial problem. Unlike for many machine learning tasks, there are few publicly available datasets that are representative of the kinds of records that are encountered ‘in the wild.’\n\nThe lack of available benchmarking datasets\nVariations in types of errors"
-  },
-  {
-    "objectID": "posts/record_linkage_and_geocoding/index.html#data-quality",
-    "href": "posts/record_linkage_and_geocoding/index.html#data-quality",
-    "title": "An overview of record linkage and geocoding",
-    "section": "Data quality",
-    "text": "Data quality"
-  },
-  {
-    "objectID": "posts/record_linkage_and_geocoding/index.html#implementation",
-    "href": "posts/record_linkage_and_geocoding/index.html#implementation",
-    "title": "An overview of record linkage and geocoding",
-    "section": "Implementation",
-    "text": "Implementation\nNow that we understand some of the theory and algorithms, let’s implement them. Some desirable characteristics of a good implementation include:\n\nEase of installation: most data scientists are lazy when it comes to deciding which software to use, so the fewer steps it takes to install a package, the better\nClear documentation: simple code examples to demonstrate the software makes a package much more appealing.\nUsing well-tested tools ensure that algorithm implementations will be more performant and have fewer errors\n\nFor these reasons an obvious choice is DuckDB. It’s an open source tool based on SQL with a Python API. Unlike other SQL implementations such as Postgres is has the advantage of not requiring a user to create a SQL server instance, in order word, all the data is stored directly on a file.\n\nPrivacy considerations"
-  },
-  {
-    "objectID": "posts/record_linkage_and_geocoding/index.html#reference-datasets",
-    "href": "posts/record_linkage_and_geocoding/index.html#reference-datasets",
-    "title": "An overview of record linkage and geocoding",
-    "section": "5. Reference datasets",
-    "text": "5. Reference datasets\n\n5.1. Address databases\nBuilding a geocoder depends on having a good quality reference dataset, i.e., a complete set of clean, standardised street addresses, with corresponding latitude and longitude values.\nThe availability of such datasets varies widely between countries. In Australia, the Geocoded National Address File is a quarterly-updated, free and publicly available reference dataset covering the entire country. In the UK, in comparison, such data sources are ownly available commerically."
-  },
-  {
-    "objectID": "posts/record_linkage_and_geocoding/index.html#specific-algorithms",
-    "href": "posts/record_linkage_and_geocoding/index.html#specific-algorithms",
-    "title": "An overview of record linkage and geocoding",
-    "section": "3. Specific algorithms",
-    "text": "3. Specific algorithms\nLet’s look at some specific approaches\n\n3.1. Felligi-Sunter\n\n\n3.2. Signature-based approaches\n\nProblem: How to define blocks\nSolution: Use terms that serve as approximate signatures of the record, i.e., substrings within the original string that almost uniquely identify it. Intuitively: Peter MacCallum Cancer Centre -&gt; Peter Mac\nPaper by Tania Churchill, Kee Siong Ng, etc:\n\n\n\n3.3. Implementation\nNow that we understand some of the theory and algorithms, let’s implement them. Some desirable characteristics of a good implementation include:\n\nEase of installation: most data scientists are lazy when it comes to deciding which software to use, so the fewer steps it takes to install a package, the better\nClear documentation: simple code examples to demonstrate the software makes a package much more appealing.\nUsing well-tested tools ensure that algorithm implementations will be more performant and have fewer errors\n\nFor these reasons an obvious choice is DuckDB. It’s an open source tool based on SQL with a Python API. Unlike other SQL implementations such as Postgres is has the advantage of not requiring a user to create a SQL server instance, in order word, all the data is stored directly on a file."
-  },
-  {
-    "objectID": "posts/record_linkage_and_geocoding/index.html#other-challenges",
-    "href": "posts/record_linkage_and_geocoding/index.html#other-challenges",
-    "title": "An overview of record linkage and geocoding",
-    "section": "6. Other challenges",
-    "text": "6. Other challenges\n\nReferences\n\n\nExploiting Redundancy, Recurrence and Parallelism: How to Link Millions of Addresses with Ten Lines of Code in Ten Minutes\nSplink\nwhereabouts\nData Matching: Concepts and Techniques for Record Linkage, Entity Resolution, and Duplicate Detection, Peter Christen"
   }
 ]

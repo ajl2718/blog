@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Alex Lee">
+<meta name="dcterms.date" content="2026-01-25">
 
-<title>Articles</title>
+<title>Using LLMs to validate geocoder outputs</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +25,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,77 +68,20 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
 
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<meta property="og:title" content="Articles">
+<meta property="og:title" content="Using LLMs to validate geocoder outputs">
+<meta property="og:description" content="">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Data meanderings</span>
     </a>
   </div>
@@ -149,7 +92,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -170,23 +113,39 @@ window.Quarto = {
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     
 <!-- main -->
-<main class="content column-page" id="quarto-document-content">
+<main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Articles</h1>
-</div>
+<h1 class="title">Using LLMs to validate geocoder outputs</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">LLMs</div>
+    <div class="quarto-category">address data</div>
+  </div>
+  </div>
 
 
 
-<div class="quarto-title-meta column-page">
+<div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Alex Lee </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 25, 2026</p>
+    </div>
+  </div>
   
     
   </div>
@@ -196,131 +155,47 @@ window.Quarto = {
 </header>
 
 
+<p>Machine learning algorithms are typically evaluated and compared against one another by using some sort of independent validation dataset. For geocoding algorithms such datasets don’t appear to be readily available. Furthermore, to evaluate the performance of an algorithm against an address dataset how do we define the <em>correctness</em> of a prediction? One way is to use the latitude, longitude values along with the <a href="https://en.wikipedia.org/wiki/Haversine_formula">Haversine Formula</a> to calculate the distance between each prediction and the ground truth. Alternatively we can evaluate each address that has been matched with a ground truth.</p>
+<p>This is a bit more involved since the results are text. One performance measure I find useful is to compare address pairs at four different levels:</p>
+<ul>
+<li>Apartment / Unit / Tenancy number</li>
+<li>Street number</li>
+<li>Street name</li>
+<li>Suburb name</li>
+</ul>
+<p>So, for example if the correct address is <code>4 / 23 Johnston Avenue Burwood East 3151</code> and our geocoder produces <code>23 Johnston Avenue Burwood East 3151</code> then this is accurate up to street number but not the apartment number.</p>
+<p>Depending on the application, a geocoder that is accurate to the street name (or even suburb name) may be sufficient, for example if we are only interested in created aggregated statistics across suburbs. For other applications (e.g., a food delivery service) the exact apartment number may be required.</p>
+<p>When evaluating the outputs of my own geocoding algorithms I would previously have to manually review each pair of addresses to score the predictions. For example see <a href="https://github.com/ajl2718/whereabouts_testing">this notebook</a> where I compare <a href="https://www.github.com/ajl2718/whereabouts">whereabouts</a> with other geocoders. LLMs provide a more streamlined way to automate this. I found that the following prompt with GPT4 gives a structured outputs and assesses the accuracy at the four levels of geographic granularity above.</p>
+<pre><code>You are scoring the quality of a list of Australian street addresses with their corresponding matches.
+
+You should identify all the components of the street address, including unit or apartment number, shop / tenancy number, street number,  street name, suburb and postcode and use these components in creating a score. 
+
+You consider four levels of granularity for each address in order to assign a score: unit, property number (e.g., house number), 
+street name, suburb / postcode. A numerical score should be assigned as follows:
+
+- 4: unit number, street number, street name and suburb / postcode all match (including where there is no unit number)
+- 3: property number, street name and suburb / postcode match
+- 2: only the streetname and suburb / postcode match
+- 1: only the suburb / postcode match
+- 0: none of the components match or if the state is different, for example 'NSW' instead of 'QLD'
+
+Additional instructions:
+- Shop and tenancy are equivalent, as are unit and apartment number. Level is not considered relevant. 
+- If the suburb name is different but the postcode and other components of the address match then we consider them the same suburb.
+- If there is no unit or shop number in the addresses then we consider that to be a match on the unit or shop number, since they are both empty
+
+Structure of the output:
+- The output should consist ONLY of a json list with keys for each entry: 
+  - input_address, matched_address, unit_match, street_number_match, street_name_match, suburb_match, postcode_match, overall_score
+- The columns with the '_match' suffix are binary. 
+- No other text should be shown in the output, ONLY THE JSON.
+
+The pairs of input and matched addresses are shown below:</code></pre>
+<p>Another example of LLMs saving time on menial tasks.</p>
 
 
 
-
-<div class="quarto-listing quarto-listing-container-table" id="listing-listing">
-<table class="quarto-listing-table table">
-<thead>
-<tr>
-<th>
-Date
-</th>
-<th>
-Title
-</th>
-<th>
-Categories
-</th>
-</tr>
-</thead>
-<tbody class="list">
-<tr data-index="0" data-categories="LLMs,address data" data-listing-date-sort="1769259600000" data-listing-file-modified-sort="1769297439046" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="566" data-listing-title-sort="Using LLMs to validate geocoder outputs" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Jan 25, 2026</span>
-</td>
-<td>
-<a href="./posts/address_validation/index.html" class="title listing-title">Using LLMs to validate geocoder outputs</a>
-</td>
-<td>
-<span class="listing-categories">LLMs, address data</span>
-</td>
-</tr>
-<tr data-index="1" data-categories="python development,natural language processing" data-listing-date-sort="1751464800000" data-listing-file-modified-sort="1766451956592" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1749" data-listing-title-sort="Creating and publishing your first Python package" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Jul 3, 2025</span>
-</td>
-<td>
-<a href="./posts/setting-up-a-github-project/index.html" class="title listing-title">Creating and publishing your first Python package</a>
-</td>
-<td>
-<span class="listing-categories">python development, natural language processing</span>
-</td>
-</tr>
-<tr data-index="2" data-categories="python,polars,large data" data-listing-date-sort="1711803600000" data-listing-file-modified-sort="1751515139463" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1579" data-listing-title-sort="Larger than memory datasets in Python using Polars" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Mar 31, 2024</span>
-</td>
-<td>
-<a href="./posts/large_datasets_in_python/index.html" class="title listing-title">Larger than memory datasets in Python using Polars</a>
-</td>
-<td>
-<span class="listing-categories">python, polars, large data</span>
-</td>
-</tr>
-<tr data-index="3" data-categories="python,jupyter" data-listing-date-sort="1657288800000" data-listing-file-modified-sort="1751515139469" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="346" data-listing-title-sort="Virtual environments with Jupyter Notebooks" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Jul 9, 2022</span>
-</td>
-<td>
-<a href="./posts/virtual-environments-with-jupyter/index.html" class="title listing-title">Virtual environments with Jupyter Notebooks</a>
-</td>
-<td>
-<span class="listing-categories">python, jupyter</span>
-</td>
-</tr>
-<tr data-index="4" data-categories="geospatial" data-listing-date-sort="1652450400000" data-listing-file-modified-sort="1752755271992" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="371" data-listing-title-sort="Geospatial analysis in a secure environment" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">May 14, 2022</span>
-</td>
-<td>
-<a href="./posts/local-geospatial-analysis/index.html" class="title listing-title">Geospatial analysis in a secure environment</a>
-</td>
-<td>
-<span class="listing-categories">geospatial</span>
-</td>
-</tr>
-<tr data-index="5" data-categories="python,docker,jupyter" data-listing-date-sort="1617282000000" data-listing-file-modified-sort="1751515139468" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="337" data-listing-title-sort="Setting up a scratch space using Poetry, Docker and Jupyter" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Apr 2, 2021</span>
-</td>
-<td>
-<a href="./posts/using-docker/index.html" class="title listing-title">Setting up a scratch space using Poetry, Docker and Jupyter</a>
-</td>
-<td>
-<span class="listing-categories">python, docker, jupyter</span>
-</td>
-</tr>
-<tr data-index="6" data-categories="postgres,geospatial" data-listing-date-sort="1615640400000" data-listing-file-modified-sort="1752755252458" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="747" data-listing-title-sort="A simple geocoder using Postgres and Python" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Mar 14, 2021</span>
-</td>
-<td>
-<a href="./posts/geocoding/index.html" class="title listing-title">A simple geocoder using Postgres and Python</a>
-</td>
-<td>
-<span class="listing-categories">postgres, geospatial</span>
-</td>
-</tr>
-<tr data-index="7" data-categories="webscraping,requests,open data" data-listing-date-sort="1609419600000" data-listing-file-modified-sort="1752755259645" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1649" data-listing-title-sort="Intro to webscraping" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Jan 1, 2021</span>
-</td>
-<td>
-<a href="./posts/intro-to-webscraping/index.html" class="title listing-title">Intro to webscraping</a>
-</td>
-<td>
-<span class="listing-categories">webscraping, requests, open data</span>
-</td>
-</tr>
-<tr data-index="8" data-categories="python,geopandas,geospatial visualisation" data-listing-date-sort="1609333200000" data-listing-file-modified-sort="1751515139468" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="170" data-listing-title-sort="Regular lattice shapefiles with geopandas" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Dec 31, 2020</span>
-</td>
-<td>
-<a href="./posts/regular-lattice-shapefiles/index.html" class="title listing-title">Regular lattice shapefiles with geopandas</a>
-</td>
-<td>
-<span class="listing-categories">python, geopandas, geospatial visualisation</span>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
