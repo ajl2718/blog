@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Alex Lee">
+<meta name="dcterms.date" content="2026-06-05">
 
-<title>About</title>
+<title>Token usage for LLMs</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -26,22 +28,23 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-8ce484d92116c4accc59257505a5c3a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-8ce484d92116c4accc59257505a5c3a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -71,8 +74,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="About">
-<meta property="og:description" content="">
+<meta property="og:title" content="Token usage for LLMs">
 </head>
 
 <body class="nav-fixed fullcontent quarto-light">
@@ -82,7 +84,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Data meanderings</span>
     </a>
   </div>
@@ -93,7 +95,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./about.html" aria-current="page"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -119,45 +121,102 @@ ul.task-list li input[type="checkbox"] {
 <!-- margin-sidebar -->
     
 <!-- main -->
-<div class="quarto-about-trestles">
-  <div class="about-entity">
-    <img src="chile_lago_grey.jpg" class="about-image
-  rounded " style="width: 20em;">
+<main class="content" id="quarto-document-content">
+
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">About</h1>
-</div>
+<h1 class="title">Token usage for LLMs</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">LLMs</div>
+    <div class="quarto-category">telemetry</div>
+  </div>
+  </div>
+
+
+
 <div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Alex Lee </p>
+          </div>
   </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 5, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
 </header>
-    <div class="about-links">
-  <a href="https://twitter.com/saunteringcat" class="about-link" rel="" target="">
-    <i class="bi bi-twitter"></i>
-     <span class="about-link-text">Twitter</span>
-  </a>
-  <a href="https://github.com/ajl2718" class="about-link" rel="" target="">
-    <i class="bi bi-github"></i>
-     <span class="about-link-text">Github</span>
-  </a>
-</div>
-  </div>
-  <div class="about-contents"><main class="content" id="quarto-document-content">
-<p>In my day job I am a data scientist who works with linked healthcare data for cancer research, applying machine learning and statistical methods to improve cancer outcomes.</p>
-<p>This blog relates more to general tech, programming and data topics, rather than academia; the purpose is to record some interesting things I learn, which are hopefully useful to others too.</p>
-<p>My background is in maths and physics and since around 2015 I have been in the data world, working on projects involving signal processing, geospatial analysis and over the past few years, clinical data science. My main interests are in data science, particularly the methodological aspects of statistics and machine learning, and also tools that can help to faciliate the grunt work that is common in data science (especially in the healthcare area).</p>
-<hr>
-<p>Here is a github project I’ve been working on for open-source geocoding, since I couldn’t find any good open-source geocoding libraries and prefer not to pay:</p>
+
+
+<section id="understanding-token-usage-in-llms-and-agents" class="level1">
+<h1>Understanding token usage in LLMs and agents</h1>
 <ul>
-<li><a href="https://github.com/ajl2718/whereabouts">whereabouts</a>: a fast open-source geocoding package built using Python and DuckDB that can be run in your own environment.</li>
+<li>Why this is interesting?</li>
+<li>What this explains</li>
+<li>Some particular scenarios where this is useful to understand</li>
 </ul>
-<p>Some other things I like: mountains; cycling; middle-eastern cooking experiments; reading; and music.</p>
+<section id="open-telemetry" class="level2">
+<h2 class="anchored" data-anchor-id="open-telemetry">Open telemetry</h2>
+<ul>
+<li>What is it?</li>
+<li>Why use it?</li>
+</ul>
+</section>
+<section id="via-github-cli" class="level2">
+<h2 class="anchored" data-anchor-id="via-github-cli">Via Github CLI</h2>
+</section>
+<section id="in-vs-code" class="level2">
+<h2 class="anchored" data-anchor-id="in-vs-code">In VS Code</h2>
+</section>
+<section id="traces-and-routing-for-agents-and-skills" class="level2">
+<h2 class="anchored" data-anchor-id="traces-and-routing-for-agents-and-skills">Traces and routing for agents and skills</h2>
+</section>
+<section id="what-this-looks-like-for-some-different-tasks" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-looks-like-for-some-different-tasks">What this looks like for some different tasks</h2>
+<ul>
+<li>Common workflows and tasks in data science and software engineering</li>
+<li>What the traces look like</li>
+<li>What the token counts look like</li>
+<li>Some pretty visualisations</li>
+</ul>
+</section>
+<section id="comparisons-of-different-llms" class="level2">
+<h2 class="anchored" data-anchor-id="comparisons-of-different-llms">Comparisons of different LLMs</h2>
+<ul>
+<li>How do token counts and prices compare for different LLMs</li>
+</ul>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<ul>
+<li>What we learnt</li>
+<li>Agent AI can be costly, this helps to monitor usage</li>
+</ul>
 
 
-</main></div>
-</div>
- <!-- /main -->
+</section>
+</section>
+
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
     const isCodeAnnotation = (el) => {
       for (const clz of el.classList) {
         if (clz.startsWith('code-annotation-')) {                     

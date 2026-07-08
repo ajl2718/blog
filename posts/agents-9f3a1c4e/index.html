@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Alex Lee">
-<meta name="dcterms.date" content="2022-07-09">
+<meta name="dcterms.date" content="2026-06-29">
 
-<title>Virtual environments with Jupyter Notebooks</title>
+<title>Tools, Agents and Harnesses: How to domesticate an LLM</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -107,13 +107,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
-<meta property="og:title" content="Virtual environments with Jupyter Notebooks">
+<meta property="og:title" content="Tools, Agents and Harnesses: How to domesticate an LLM">
 <meta property="og:description" content="">
-<meta property="og:image" content="https://ajl2718.github.io/blog/posts/virtual-environments-with-jupyter/conda_env_jupyter_dropdown.png">
-<meta property="og:image:height" content="340">
-<meta property="og:image:width" content="334">
+<meta property="og:image" content="https://ajl2718.github.io/blog/posts/agents-9f3a1c4e/bull_throws_man.png">
+<meta property="og:image:height" content="800">
+<meta property="og:image:width" content="1301">
 </head>
 
 <body class="nav-fixed fullcontent quarto-light">
@@ -164,10 +167,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Virtual environments with Jupyter Notebooks</h1>
+<h1 class="title">Tools, Agents and Harnesses: How to domesticate an LLM</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">python</div>
-    <div class="quarto-category">jupyter</div>
+    <div class="quarto-category">LLMs</div>
+    <div class="quarto-category">AI</div>
   </div>
   </div>
 
@@ -185,7 +188,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">July 9, 2022</p>
+      <p class="date">June 29, 2026</p>
     </div>
   </div>
   
@@ -197,57 +200,189 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Virtual environments are a way of collecting all the packages you need for a given software project into one place, in such a way that it can be isolated from other software projects. For example, recently I have been experimenting with several different libraries for natural language processing and machine learning: <a href="https://docs.fast.ai">Fast AI</a>, <a href="https://pytorch.org">PyTorch</a>, <a href="https://spacy.io">spaCy</a>. Installing all of them turns out to cause conflicts: one project may require one set of versions for the libraries and another requires a different set of versions.</p>
-<p>Furthermore, I mostly rely on Jupyter Notebooks, as they allow you to quickly experiment, which is a requirement for data science work. Since I keep forgetting how to set up a virtual environment that is accessible from Jupyter Notebook, I thought it would be a good idea to record this here to quickly remind myself.</p>
-<section id="create-the-environment-and-install-the-required-packages" class="level2">
-<h2 class="anchored" data-anchor-id="create-the-environment-and-install-the-required-packages">Create the environment and install the required packages</h2>
-<ol type="1">
-<li>Firstly make sure that conda is installed. The instructions are available here: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html</li>
-<li>Next, create a virtual environment form conda. Here we will just call is ds_project1 and use Python 3.8:</li>
-</ol>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>conda create -n ds_project1 python=3.8</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<ol start="3" type="1">
-<li>Now we can activate this environment to install are required packages. Here we’re installing FastAI:</li>
-</ol>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>conda activate ds_project1</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>conda install -c fastchan fastai</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The string after <code>-c</code> indicates the repository where the package is located. This can be easily found through a Google search.</p>
-</section>
-<section id="allow-jupyter-notebook-to-use-the-environment" class="level2">
-<h2 class="anchored" data-anchor-id="allow-jupyter-notebook-to-use-the-environment">Allow Jupyter Notebook to use the environment</h2>
-<p>After all the required packages are added to the conda environment, we need to allow Jupyter to use it. Still in the virtual environment type:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>conda install -c anaconda ipykernel </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>python -m ipykernel install --user --n=ds_project1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Now each time you want to use this environment in Jupyter notebook, simply activate the environment and start jupyter notebook as you usually would:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>conda activate ds_project1</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>jupyter notebook</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Now when you want to create a new notebook the environment should be available from the dropdown list:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="conda_env_jupyter_dropdown.png" class="img-fluid figure-img"></p>
-<figcaption>Dropdown list with the new conda environment</figcaption>
+<p><img src="bull_throws_man.png" class="img-fluid figure-img"></p>
+<figcaption>Large Language Models don’t always behave the way you expect them to</figcaption>
 </figure>
 </div>
+<p>I have been using generative AI in my day-to-day work for at least two years now. For data science and software development, tools like Claude Code and Github Copilot now take on much of my coding work. Meanwhile my own time is spent developing a deeper understanding of the data and domain or thinking about more subtle aspects of problems such as the suitable choices of evaluation metrics for a model.</p>
+<p>This certainly wasn’t the case two years ago (or even early last year). When ChatGPT was first released it had <em>some</em> capabilities in writing code but the results were often unpredictable and prone to errors. These models, self-contained but lacking context, also needed constant guidance and corrections to obtain a useful result; it was hard to trust them.</p>
+<p>So what has now made them so much more useful?</p>
+<p>Two key and related developments are <strong>agents</strong> and <strong>harnesses</strong>. These enable an LLM to carry out long-running tasks, autonomously, producing code that is tested and aligns well with the user’s intentions.</p>
+<p>I have been confused about these concepts for a while (and sometimes still am depending on who I talk to). It’s an ongoing struggle for me to navigate all the content being produced about AI, and the overloaded terminology doesn’t help. So this post is an attempt to help me clarify these ideas for myself, which will hopefully be useful to others who are similarly overwhelmed.</p>
+<p>Before getting into the thick of agents and harnesses though, let’s just take a small step up in complexity from a vanilla LLM using the concept of a <strong>workflow</strong>.</p>
+<section id="workflows" class="level2">
+<h2 class="anchored" data-anchor-id="workflows">Workflows</h2>
+<p>In <a href="https://www.anthropic.com/engineering/building-effective-agents">Anthropic’s engineering blog</a> they draw a distinction between what they refer to as <strong>workflows</strong> and <strong>agents</strong>.</p>
+<p>To understand what they mean by a workflow consider the example of using an LLM to edit a blog post.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> We can separate this larger task into two subtasks: a <strong>reviewer</strong> and a <strong>corrector</strong>:</p>
+<ol type="1">
+<li>The <strong>reviewer</strong> is provided with the post along with a pre-defined prompt that specifies what we want to look out for, e.g., grammatical and spelling errors, issues with the writing style and overall structure, relevance of content and the desired output structure. The final output might be a list of bullet points that summarises the main issues with the post.</li>
+<li>The <strong>corrector</strong> makes corrections to the post based on the results from the reviewer. It is a separate LLM call provided with both the original post as well as the list of bullet points from the reviewer.</li>
+</ol>
+<p>The figure below illustrates the overall process in the workflow.</p>
+<div id="fig-workflow-wrap" class="quarto-float quarto-figure quarto-figure-center anchored" style="margin: 3rem 0; text-align: left;">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-workflow-wrap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div id="fig-workflow" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-workflow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<pre class="mermaid mermaid-js" data-label="fig-workflow">flowchart LR
+    A[Original post] --&gt; B[Reviewer LLM]
+    R[Review prompt] --&gt; B
+    B --&gt; C[List of issues]
+    A --&gt; D[Corrector LLM]
+    C --&gt; D
+    D --&gt; E[Edited post]
+</pre>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-workflow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) A two-step workflow for editing a blog post: a reviewer LLM evaluates the original post against a review prompt to produce a list of issues, which a corrector LLM then uses alongside the original post to generate the edited version.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-workflow-wrap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1
+</figcaption>
+</figure>
+</div>
+<p>These two tasks are ones that anyone writing a post would carry out. But we can enhance this further by allowing the LLM to retrieve information from the web. For example, we may want to include the ability to add references. These may be buried somewhere in the LLM’s training data, but a more reliable approach is to connect the LLM to a <em>tool</em> that can search the web, retrieve additional information on references, and incorporate these into the output.</p>
 </section>
-<section id="removing-the-environment" class="level2">
-<h2 class="anchored" data-anchor-id="removing-the-environment">Removing the environment</h2>
-<p>To remove the environment simply type:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>conda remove env --name ds_project1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>And then to remove the option from Jupyter notebook:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>jupyter kernelspec uninstall ds_project1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<h1>
-References
-</h1>
+<section id="tools" class="level2">
+<h2 class="anchored" data-anchor-id="tools">Tools</h2>
+<p>Every LLM has a so-called <em>knowledge cut-off</em> which defines the most recent date of the data that was used to train the model. This cut-off limits a model’s abilities to produce accurate results they draw on more current information.</p>
+<p>A <strong>tool</strong> is a function that an LLM can call to provide it with additional context, for example data on recent events. An example of code for a tool is shown below (this assumes a <code>search_journal</code> function for searching a particular academic journal).</p>
+<div id="392ead45" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> search_web_for_references(paragraph: <span class="bu">str</span>, journals: <span class="bu">list</span>[<span class="bu">str</span>]) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">str</span>]:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">    A tool for extracting references from journals based on a paragraph of text</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    refs <span class="op">=</span> []</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> journal <span class="kw">in</span> journals:</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        relevant_journal_refs <span class="op">=</span> search_journal(paragraph, journal)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        refs <span class="op">+=</span> relevant_journal_refs</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> refs    </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>We might reference this tool by creating a system prompt for the LLM as follows:</p>
+<div id="72738ee8" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>system_prompt <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="st">You are a useful research assistant that provides reliable information on academic literature relevant to a particular body of text.</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="st">You have access to a web search tool - `search_web_for_references` that takes a paragraph of text and returns a list of references that</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="st">are directly relevant to the information stated in the text. Only include references that are required to support claims in the text,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="st">or provide useful background context. Provide a response as a list of references, formatted in the APA format.</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The user may make a request to the <strong>reference finder</strong> LLM as follows:</p>
+<div id="9da461f7" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> call_llm(user_message: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    message <span class="op">=</span> {</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"system_prompt"</span>: system_prompt,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"user_message"</span>: user_message</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> requests.post(llm_endpoint, json<span class="op">=</span>message)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> response[<span class="st">'content'</span>][<span class="dv">0</span>][<span class="st">'messages'</span>][<span class="dv">0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>So we now have three steps in the workflow: (1) <strong>reviewer</strong>; (2) <strong>corrector</strong> and (3) <strong>reference_finder</strong>.</p>
+<div id="fig-workflow-refs-wrap" class="quarto-float quarto-figure quarto-figure-center anchored" style="margin: 3rem 0; text-align: left;">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-workflow-refs-wrap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div id="fig-workflow-refs" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-workflow-refs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<pre class="mermaid mermaid-js" data-label="fig-workflow-refs">flowchart LR
+    A[Original post] --&gt; B[Reviewer LLM]
+    R[Review prompt] --&gt; B
+    B --&gt; C[List of issues]
+    A --&gt; D[Corrector LLM]
+    C --&gt; D
+    D --&gt; E[Edited post]
+    E --&gt; F[Reference finder LLM]
+    F --&gt; T[search_web_for_references tool]
+    T --&gt; F
+    F --&gt; G[Post with references]
+</pre>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-workflow-refs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) A three-step workflow that extends the reviewer and corrector with a reference finder LLM. The reference finder calls the search_web_for_references tool to retrieve relevant references, which are appended to the edited post.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-workflow-refs-wrap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2
+</figcaption>
+</figure>
+</div>
+<p>The use of the reference finder allows the system to search for relevant references rather than make them up, providing a new capability. Importantly the reference finder reduces the risk that the model will invent non-existent references or include ones that are not highly relevant.</p>
+<p>A limitation of the workflow approach, even with tools, is that the sequence of steps have been defined from the outset. For this particular task, this is still a reasonable approach, but there are many other problems we the sequence of tasks must be created dynamically. Ultimately we would like to allow the system to decide for itself which particular decisions it makes and to do this we introduce an <strong>agent.</strong></p>
+</section>
+<section id="agents" class="level2">
+<h2 class="anchored" data-anchor-id="agents">Agents</h2>
+<p>An agent extends the notion of workflows to enable the system to dynamically select different paths and decisions, without these being specified by the user at the outset. Let’s consider a different problem: reading Python code and ensuring that it runs and conforms to the PEP-8 conventions. To do this we introduce three tools: a <strong>file reader</strong>; a <strong>linter</strong> such as <a href="https://flake8.pycqa.org/en/latest/">flake8</a>; and a <strong>executor</strong> (a function that runs the code).</p>
+<p>Suppose a user writes the query</p>
+<pre><code>Check that the code in `main.py` is running</code></pre>
+<p>then we want the system to to read the file called <code>main.py</code> and run it to check for errors, i.e., the system should use the <strong>file reader</strong> and the <strong>executor</strong>. How do we do this? One way would be to translate the query into a sequence of unix commands with arguments defined by inputs in the query (such as the file <code>main.py</code>).</p>
+<p>If instead the user asks</p>
+<pre><code>Can you check that `functions.py` conforms to PEP-8</code></pre>
+<p>Then we want to use the <strong>file reader</strong> and the <strong>linter</strong>.</p>
+<p>We see that we cannot know ahead of time the sequence of tool calls a user wishes to execute; instead this is done dynamically. The agent should translate a query into executable code that reads a file and tests it or performs another operation such as executes the linter. This is an <em>agentic</em> approach.</p>
+<p>Note that this approach isn’t specific to LLMs or AI. We could have created a set of pre-defined rules based on common patterns expected in the text, and a program selects the appropriate tool based on these patterns. But LLMs, being a very sophisticated type of machine learning, are excellent at uncovering the broad range of pattern in text, so the LLM is used to do this routing instead.</p>
+<p>We can think of an agent as <em>LLM + tools + additional context</em>.</p>
+</section>
+<section id="harnesses-domesticating-an-llm" class="level2">
+<h2 class="anchored" data-anchor-id="harnesses-domesticating-an-llm">Harnesses: domesticating an LLM</h2>
+<p>Finally we can introduce the notion of a <strong>harness</strong>. This concept puzzled me until I realised I had been using them all along.</p>
+<p>The agent just defined as built by creating some additional structure around the LLM: We gave it some tools so that its responses would be accurate and grounded in reliable external information; and we provided some additional context in its prompts so that it would be <em>steered</em> towards our intended outputs and handle the kinds of scenarios that we expect to appear when a user is interacting with the system.</p>
+<p>In fact, these elements form what everyone is now referring to as a <strong>harness</strong> (well I actually see different definitions of harnesses but this one seems to most natural and well-motivated).</p>
+<p>If we take a step back and think about what we are trying to achieve, we want to develop a system that complete tasks without heavy guidance from the user. But how do we do this? LLMs are stochastic so their behaviour is to some extent always unpredictable; this is both a feature of LLMs (they are great at parsing the wildly unstructured data of human language) and a source of frustration for anyone who wants consistent, well-defined results.</p>
+<p>It is non-trivial to build an LLM-based system that aligns with what we want, our <em>intent</em>. An analogy is that an LLM is an animal that has been captured in the wild while an agent is that same animal with some house-training so that it follow instructions and behave in a way that we intend it to.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> This domesication, taking the wild LLM to one that is suitable for our work (whether it is coding or something else) is achieved via the <strong>harness</strong>.</p>
+<p>In other words, <em>The harness is the necessary structure around an LLM that turns it into an agent, capable of solving tasks independently with all the checks in place so we can trust the outputs</em>. This definition is often not fully achievable in practice because it is impossible to check every possible scenario and output, along with all the ways that a user can interact with the system. But the motivation is clear.</p>
+</section>
+<section id="some-exercises" class="level2">
+<h2 class="anchored" data-anchor-id="some-exercises">Some exercises</h2>
+<p>I found it easier to get my head around these ideas by tinkering with LLMs and seeing how they fail. Once you start introducing some structure in place to <em>guide</em> the LLM, the notion of a harness emerges much more naturally. Here are some things I have tried:</p>
+<ol type="1">
+<li>Start with an LLM and ask it questions that relate to recent events. What do you notice?</li>
+<li>Create a tool for the current time and incorporate it into the prompt.</li>
+<li>Now, think of a type of problem which might involve multiple tools and implement an agent for using these tools.</li>
+</ol>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
 <ul>
-<li><a href="https://interactivechaos.com/sites/default/files/data/conda_cheatsheet.pdf">Conda Cheat Sheet</a></li>
-<li><a href="https://docs.fast.ai">Fast AI</a></li>
-<li><a href="https://medium.com/@nrk25693/how-to-add-your-conda-environment-to-your-jupyter-notebook-in-just-4-steps-abeab8b8d084">How to add your conda environment to your jupyter notebook in just 4 steps</a></li>
+<li><a href="https://www.anthropic.com/engineering/building-effective-agents">Building effective agents</a>: a good general overview of agents, harnesses and workflows</li>
+<li><a href="https://tidydesign.substack.com/p/what-is-an-agent">What is an agent?</a>: to-the-point explainer of agents with code samples in R.</li>
 </ul>
 
 
 </section>
 
-</main> <!-- /main -->
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>I have a gut-reaction against AI-generated text so everything I write is still me, not an AI. Especially if the goal is improving my own understanding, the process of writing is key.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>This isn’t the most animal friendly analogy.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
