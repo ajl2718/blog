@@ -1,0 +1,210 @@
+---
+title: "Tools, Agents and Harnesses: How to domesticate an LLM"
+author: "Alex Lee"
+date: "2026-06-29"
+categories: [LLMs, AI]
+search: false
+---
+
+![Large Language Models don't always behave the way you expect them to](bull_throws_man.png)
+
+I have been using generative AI in my day-to-day work for at least two years now.  For data science and software development, tools 
+like Claude Code and Github Copilot now take on much of my coding work. Meanwhile my own time is spent developing a deeper understanding of 
+the data and domain or thinking about more subtle aspects of problems such as the suitable choices of evaluation metrics for a model. 
+
+This certainly wasn't the case two years ago (or even early last year). When ChatGPT was first released it had *some* capabilities in 
+writing code but the results were often unpredictable and prone to errors. These models, self-contained but lacking context, also 
+needed constant guidance and corrections to obtain a useful result; it was hard to trust them. 
+
+So what has now made them so much more useful? 
+
+Two key and related developments are **agents** and **harnesses**. These enable an LLM to carry out 
+long-running tasks, autonomously, producing code that is tested and aligns well with the user's intentions.
+
+I have been confused about these concepts for a while (and sometimes still am depending on who I talk to). It's an ongoing struggle 
+for me to navigate all the content being produced about AI, and the overloaded terminology doesn't help. So this post is an attempt
+to help me clarify these ideas for myself, which will hopefully be useful to others who are similarly overwhelmed.
+
+Before getting into the thick of agents and harnesses though, let's just take a small step up in complexity from a 
+vanilla LLM using the concept of a **workflow**.  
+
+## Workflows
+In [Anthropic's engineering blog](https://www.anthropic.com/engineering/building-effective-agents) they draw a distinction between what 
+they refer to as **workflows** and **agents**. 
+
+To understand what they mean by a workflow consider the example of using an LLM to edit a blog post.[^1]
+We can separate this larger task into two subtasks: a **reviewer** and a **corrector**:
+
+1) The **reviewer** is provided with the post along with a pre-defined prompt that specifies what we want to look out for, e.g., 
+grammatical and spelling errors, issues with the writing style and overall structure, relevance of content and the desired output 
+structure. The final output might be a list of bullet points that summarises the main issues with the post.
+2) The **corrector** makes corrections to the post based on the results from the reviewer. It is a separate LLM call 
+provided with both the original post as well as the list of bullet points from the reviewer.
+
+The figure below illustrates the overall process in the workflow.
+
+::: {#fig-workflow-wrap style="margin: 3rem 0; text-align: left;"}
+```{mermaid}
+%%| label: fig-workflow
+%%| fig-cap: "A two-step workflow for editing a blog post: a reviewer LLM evaluates the original post against a review prompt to produce a list of issues, which a corrector LLM then uses alongside the original post to generate the edited version."
+flowchart LR
+    A[Original post] --> B[Reviewer LLM]
+    R[Review prompt] --> B
+    B --> C[List of issues]
+    A --> D[Corrector LLM]
+    C --> D
+    D --> E[Edited post]
+```
+:::
+
+
+These two tasks are ones that anyone writing a post would carry out. But we can enhance this further by allowing the LLM to retrieve information
+from the web. For example, we may want to include the ability to add references. These may be buried somewhere in the LLM's training data,
+but a more reliable approach is to connect the LLM to a *tool* that can search the web, retrieve additional information on references,
+and incorporate these into the output.
+
+## Tools
+
+Every LLM has a so-called *knowledge cut-off* which defines the most recent date of the data that was used to train the model. This cut-off limits a 
+model's abilities to produce accurate results they draw on more current information. 
+
+A **tool** is a function that an LLM can call to provide it with additional context, for example data on recent events. An example of code for a tool is shown below (this assumes a `search_journal` function for searching a particular academic journal).
+
+```{python}
+def search_web_for_references(paragraph: str, journals: list[str]) -> list[str]:
+    """
+    A tool for extracting references from journals based on a paragraph of text
+    """
+    refs = []
+
+    for journal in journals:
+        relevant_journal_refs = search_journal(paragraph, journal)
+        refs += relevant_journal_refs
+
+    return refs    
+```
+
+We might reference this tool by creating a system prompt for the LLM as follows:
+
+```{python}
+system_prompt = """
+You are a useful research assistant that provides reliable information on academic literature relevant to a particular body of text.
+You have access to a web search tool - `search_web_for_references` that takes a paragraph of text and returns a list of references that
+are directly relevant to the information stated in the text. Only include references that are required to support claims in the text,
+or provide useful background context. Provide a response as a list of references, formatted in the APA format.
+"""
+```
+
+The user may make a request to the **reference finder** LLM as follows:
+
+```{python}
+import requests 
+
+def call_llm(user_message: str) -> str:
+    message = {
+        "system_prompt": system_prompt,
+        "user_message": user_message
+    }
+
+    response = requests.post(llm_endpoint, json=message)
+    return response['content'][0]['messages'][0]
+```
+
+So we now have three steps in the workflow: (1) **reviewer**; (2) **corrector** and (3) **reference_finder**.
+
+::: {#fig-workflow-refs-wrap style="margin: 3rem 0; text-align: left;"}
+```{mermaid}
+%%| label: fig-workflow-refs
+%%| fig-cap: "A three-step workflow that extends the reviewer and corrector with a reference finder LLM. The reference finder calls the search_web_for_references tool to retrieve relevant references, which are appended to the edited post."
+flowchart LR
+    A[Original post] --> B[Reviewer LLM]
+    R[Review prompt] --> B
+    B --> C[List of issues]
+    A --> D[Corrector LLM]
+    C --> D
+    D --> E[Edited post]
+    E --> F[Reference finder LLM]
+    F --> T[search_web_for_references tool]
+    T --> F
+    F --> G[Post with references]
+```
+:::
+
+The use of the reference finder allows the system to search for relevant references rather than make them up, providing a new capability. Importantly
+the reference finder reduces the risk that the model will invent non-existent references or include ones that are not highly relevant.
+
+A limitation of the workflow approach, even with tools, is that the sequence of steps have been defined from the outset. For this particular task, this
+is still a reasonable approach, but there are many other problems we the sequence of tasks must be created dynamically. Ultimately we would 
+like to allow the system to decide for itself which particular decisions it makes and to do this we introduce an **agent.**
+
+## Agents
+An agent extends the notion of workflows to enable the system to dynamically select different paths and decisions, without these being 
+specified by the user at the outset. Let's consider a different problem: reading Python code and ensuring that it runs and conforms to the PEP-8 conventions.
+To do this we introduce three tools: a **file reader**; a **linter** such as [flake8](https://flake8.pycqa.org/en/latest/); and a **executor** (a function that runs the code). 
+
+Suppose a user writes the query
+```
+Check that the code in `main.py` is running
+```
+then we want the system to to read the file called `main.py` and run it to check for errors, i.e., the system should use the **file reader** and the **executor**. How do we do this?
+One way would be to translate the query into a sequence of unix commands with arguments defined by inputs in the query (such as the file `main.py`).
+
+If instead the user asks
+```
+Can you check that `functions.py` conforms to PEP-8
+```
+
+Then we want to use the **file reader** and the **linter**. 
+
+We see that we cannot know ahead of time the sequence of tool calls a user wishes to execute; instead this is done dynamically. The agent should translate a query
+into executable code that reads a file and tests it or performs another operation such as executes the linter. This is an *agentic* approach.
+
+Note that this approach isn't specific to LLMs or AI. We could have created a set of pre-defined rules based on common patterns expected in the 
+text, and a program selects the appropriate tool based on these patterns. But LLMs, being a very sophisticated type of machine learning, are excellent at uncovering 
+the broad range of pattern in text, so the LLM is used to do this routing instead.
+
+We can think of an agent as *LLM + tools + additional context*.
+
+## Harnesses: domesticating an LLM
+
+Finally we can introduce the notion of a **harness**. This concept puzzled me until I realised I had been using them all along. 
+
+The agent just defined as built by creating some additional structure around the LLM: We gave it some tools so that its responses would 
+be accurate and grounded in reliable external information; and we provided some additional context in its prompts so that it would be 
+*steered* towards our intended outputs and handle the kinds of scenarios that we expect to appear when a user is interacting
+with the system.
+
+In fact, these elements form what everyone is now referring to as a **harness** (well I actually see different definitions of harnesses
+but this one seems to most natural and well-motivated).
+
+If we take a step back and think about what we are trying to achieve, we want to develop a system that complete tasks without 
+heavy guidance from the user. But how do we do this? LLMs are stochastic so their behaviour is to some extent always unpredictable; 
+this is both a feature of LLMs (they are great at parsing the wildly unstructured data of human language) and a source of 
+frustration for anyone who wants consistent, well-defined results. 
+
+It is non-trivial to build an LLM-based system that aligns with what we want, our *intent*. An analogy is that an LLM is an animal 
+that has been captured in the wild while an agent is that same animal with some house-training so that it follow instructions and 
+behave in a way that we intend it to.[^2] This domesication, taking the wild LLM to one 
+that is suitable for our work (whether it is coding or something else) is achieved via the **harness**. 
+
+In other words, *The harness is the necessary structure around an LLM that turns it into an agent, capable of solving tasks independently 
+with all the checks in place so we can trust the outputs*. This definition is often not fully achievable in practice because it is 
+impossible to check every possible scenario and output, along with all the ways that a user can interact with the system. But 
+the motivation is clear.
+
+## Some exercises
+
+I found it easier to get my head around these ideas by tinkering with LLMs and seeing how they fail. Once you start introducing some structure in place to *guide* the LLM, the notion of a harness
+emerges much more naturally. Here are some things I have tried:
+
+1. Start with an LLM and ask it questions that relate to recent events. What do you notice?
+2. Create a tool for the current time and incorporate it into the prompt.
+3. Now, think of a type of problem which might involve multiple tools and implement an agent for using these tools.
+
+## References
+
+- [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents): a good general overview of agents, harnesses and workflows
+- [What is an agent?](https://tidydesign.substack.com/p/what-is-an-agent): to-the-point explainer of agents with code samples in R.
+
+[^1]: I have a gut-reaction against AI-generated text so everything I write is still me, not an AI. Especially if the goal is improving my own understanding, the process of writing is key.
+[^2]: This isn't the most animal friendly analogy.

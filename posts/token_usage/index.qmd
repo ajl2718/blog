@@ -1,0 +1,38 @@
+---
+title: "Token usage for LLMs"
+author: "Alex Lee"
+date: "2026-06-05"
+categories: [LLMs, telemetry]
+---
+
+# Understanding token usage in LLMs and agents
+
+- Why this is interesting?
+- What this explains
+- Some particular scenarios where this is useful to understand
+
+## Open telemetry
+- What is it?
+- Why use it?
+
+## Via Github CLI
+
+## In VS Code
+
+## Traces and routing for agents and skills
+
+## What this looks like for some different tasks
+
+- Common workflows and tasks in data science and software engineering
+- What the traces look like
+- What the token counts look like
+- Some pretty visualisations
+
+## Comparisons of different LLMs
+
+- How do token counts and prices compare for different LLMs
+
+## Conclusion
+- What we learnt
+- Agent AI can be costly, this helps to monitor usage
+

@@ -264,5 +264,47 @@
     "title": "Creating and publishing your first Python package",
     "section": "References",
     "text": "References\n\nA Beginner’s Guide to Creating an Open Source Python Package\nFrom a Python Project to an Open Source Package: An A to Z Guide\nWriting pyproject.toml\nSetting Up Testing with Pytest and UV"
+  },
+  {
+    "objectID": "posts/token_usage/index.html",
+    "href": "posts/token_usage/index.html",
+    "title": "Token usage for LLMs",
+    "section": "",
+    "text": "Why this is interesting?\nWhat this explains\nSome particular scenarios where this is useful to understand\n\n\n\n\nWhat is it?\nWhy use it?\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCommon workflows and tasks in data science and software engineering\nWhat the traces look like\nWhat the token counts look like\nSome pretty visualisations\n\n\n\n\n\nHow do token counts and prices compare for different LLMs\n\n\n\n\n\nWhat we learnt\nAgent AI can be costly, this helps to monitor usage"
+  },
+  {
+    "objectID": "posts/token_usage/index.html#open-telemetry",
+    "href": "posts/token_usage/index.html#open-telemetry",
+    "title": "Token usage for LLMs",
+    "section": "",
+    "text": "What is it?\nWhy use it?"
+  },
+  {
+    "objectID": "posts/token_usage/index.html#what-this-looks-like-for-some-different-tasks",
+    "href": "posts/token_usage/index.html#what-this-looks-like-for-some-different-tasks",
+    "title": "Token usage for LLMs",
+    "section": "",
+    "text": "Common workflows and tasks in data science and software engineering\nWhat the traces look like\nWhat the token counts look like\nSome pretty visualisations"
+  },
+  {
+    "objectID": "posts/token_usage/index.html#comparisons-of-different-llms",
+    "href": "posts/token_usage/index.html#comparisons-of-different-llms",
+    "title": "Token usage for LLMs",
+    "section": "",
+    "text": "How do token counts and prices compare for different LLMs"
+  },
+  {
+    "objectID": "posts/token_usage/index.html#conclusion",
+    "href": "posts/token_usage/index.html#conclusion",
+    "title": "Token usage for LLMs",
+    "section": "",
+    "text": "What we learnt\nAgent AI can be costly, this helps to monitor usage"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Articles",
+    "section": "",
+    "text": "Date\n\n\n\nTitle\n\n\n\nCategories\n\n\n\n\n\n\n\n\nJun 5, 2026\n\n\nToken usage for LLMs\n\n\nLLMs, telemetry\n\n\n\n\n\n\nJul 3, 2025\n\n\nCreating and publishing your first Python package\n\n\npython development, natural language processing\n\n\n\n\n\n\nJan 25, 2025\n\n\nUsing LLMs to validate geocoder outputs\n\n\nLLMs, address data\n\n\n\n\n\n\nMar 31, 2024\n\n\nLarger than memory datasets in Python using Polars\n\n\npython, polars, large data\n\n\n\n\n\n\nJul 9, 2022\n\n\nVirtual environments with Jupyter Notebooks\n\n\npython, jupyter\n\n\n\n\n\n\nMay 14, 2022\n\n\nGeospatial analysis in a secure environment\n\n\npython, geospatial\n\n\n\n\n\n\nApr 2, 2021\n\n\nSetting up a scratch space using Poetry, Docker and Jupyter\n\n\npython, docker, jupyter\n\n\n\n\n\n\nMar 14, 2021\n\n\nA simple geocoder using Postgres and Python\n\n\npython, postgres, geospatial\n\n\n\n\n\n\nJan 1, 2021\n\n\nIntro to webscraping\n\n\npython, webscraping, requests, open data\n\n\n\n\n\n\nDec 31, 2020\n\n\nRegular lattice shapefiles with geopandas\n\n\npython, geopandas, geospatial visualisation\n\n\n\n\n\n\nNo matching items"
   }
 ]
