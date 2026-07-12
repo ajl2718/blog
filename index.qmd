@@ -3,7 +3,7 @@ title: "Articles"
 listing:
   contents:
     - "posts/*/index.qmd"
-    - "!posts/agents-9f3a1c4e/index.qmd"
+    - "!posts/token_usage/index.qmd"
   sort: "date desc"
   type: table
   fields: [date, title, categories]
